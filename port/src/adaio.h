@@ -31,20 +31,20 @@ Initial revision (Arcturus release 1.3E)
  */
 
 #include "color.h" /* since this file needs color.h always */
-#define std_adain  0
-#define std_adaout 1
-#define std_adamsg 2
-#define adaeof 0
-#define adaeos 1
+#define std_adain  0L
+#define std_adaout 1L
+#define std_adamsg 2L
+#define adaeof 0L
+#define adaeos 1L
 
 typedef	enum {in_file, out_file, inout_file} file_mode;
 
-typedef struct {
-	int ibufp;
-	int ibuflast;
+typedef struct adafile {	/* port: tag added */
+	long ibufp;
+	long ibuflast;
 	char *ibuf;
-	int what;  /* like file or window */
-	int which; /* A UNIX file or "tty" window */
+	long what;  /* like file or window */
+	long which; /* A UNIX file or "tty" window */
 } infile_des, outfile_des, *FILE_TYPE;
 
 FILE_TYPE adaout;

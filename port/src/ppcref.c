@@ -54,12 +54,12 @@ extern  nodep intstk[],
 
 enum { fcur, ffile, fpipe } ftype;
 
-bktr (levels)			/* backtrace of all forms on interpreter
+long bktr (levels)			/* backtrace of all forms on interpreter
 				   stack */
-int     levels;
+long     levels;
 {
     nodep * sp = intsp - 1;	/* skip bktr(n); procedure call */
-    int     depth = intsp - intstk;
+    long     depth = intsp - intstk;
 
     while (levels-- > 0 && sp >= intstk) {
 	putf ("%4d.  ", depth--);
@@ -97,7 +97,7 @@ static FILE *open_file(fname, nroff)
     return f;
 }
 
-static close_file(f)
+static long close_file(f)
     FILE *f;
 {
     switch (ftype) {
@@ -112,13 +112,13 @@ static close_file(f)
     }
 }
 
-sympp(fix, ada_fname, nroff, vert_bars, comments, attachments,
+long sympp(fix, ada_fname, nroff, vert_bars, comments, attachments,
     width, attach_column, color, identifiers, reserved, number,
     indent, expt)   /* pretty printer */
     register fixp fix;
     arrayp ada_fname;
     boolean nroff, vert_bars, comments, attachments, number, expt;
-    int width, attach_column, indent;
+    long width, attach_column, indent;
     enum pp_color_use color;
     enum pp_capitalize identifiers, reserved;
 {
@@ -185,13 +185,13 @@ sympp(fix, ada_fname, nroff, vert_bars, comments, attachments,
     close_file(f);
 }
 
-symifp (fix, ada_fname, nroff, vert_bars, comments,
+long symifp (fix, ada_fname, nroff, vert_bars, comments,
 	attachments, width, attach_column)	/* internal form printer */
     fixp fix;
     arrayp ada_fname;
     boolean vert_bars, comments, attachments;
-    int width, attach_column;
-{
+    long width, attach_column;
+long nroff; {
     char    fname[256];
     FILE    *f;
 
@@ -241,7 +241,7 @@ symifp (fix, ada_fname, nroff, vert_bars, comments,
     }
 }
 
-symcref (fix, ada_fname, nroff)		/* cross reference */
+long symcref (fix, ada_fname, nroff)		/* cross reference */
     fixp fix;
     arrayp ada_fname;
     boolean nroff;
@@ -284,13 +284,13 @@ symcref (fix, ada_fname, nroff)		/* cross reference */
     }
 }
 
-ada_pp(p, ada_fname, nroff, vert_bars, comments, attachments,
+long ada_pp(p, ada_fname, nroff, vert_bars, comments, attachments,
     width, attach_column, color, identifiers, reserved,
     number, indent, expt)   /* pretty printer */
     register nodep p;
     arrayp ada_fname;
     boolean nroff, vert_bars, comments, attachments, number, expt;
-    int     width, attach_column, indent;
+    long     width, attach_column, indent;
     enum pp_color_use color;
     enum pp_capitalize identifiers, reserved;
 {
@@ -308,13 +308,13 @@ ada_pp(p, ada_fname, nroff, vert_bars, comments, attachments,
     close_file(f);
 }
 
-ada_ifp(p, ada_fname, nroff, vert_bars, comments,
+long ada_ifp(p, ada_fname, nroff, vert_bars, comments,
 	attachments, width, attach_column)	/* internal form printer */
     nodep p;
     arrayp ada_fname;
     boolean vert_bars, comments, attachments;
-    int width, attach_column;
-{
+    long width, attach_column;
+long nroff; {
     char    fname[256];
     FILE    *f;
 
@@ -325,7 +325,7 @@ ada_ifp(p, ada_fname, nroff, vert_bars, comments,
 	comments, attachments, width, attach_column);
 }
 
-symdir(s, ada_fname, color)
+long symdir(s, ada_fname, color)
     register symp s;
     arrayp ada_fname;
     enum pp_color_use color;

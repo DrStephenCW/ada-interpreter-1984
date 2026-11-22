@@ -27,12 +27,12 @@ static char rcsid[] =
 
 #include <setjmp.h>
 
-catch(lab, fn, arg1, arg2, arg3, arg4, arg5)
-int **lab;      /* global pointer, initialized by this routine */
-int (*fn)();    /* function to call */
-{
-        int flag;       /* tells if normal return from setjmp */
-        int res;        /* result value for catch */
+long catch(lab, fn, arg1, arg2, arg3, arg4, arg5)
+long **lab;      /* global pointer, initialized by this routine */
+long (*fn)();    /* function to call */
+long arg1, arg2, arg3, arg4, arg5; {
+        long flag;       /* tells if normal return from setjmp */
+        long res;        /* result value for catch */
         jmp_buf env;    /* place where setjmp stores environment */
 
         flag = 1;       /* initialize flag to 1 */

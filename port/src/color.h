@@ -71,8 +71,8 @@ typedef struct {
 #define assign_bcolor_of(x,y) ((x).bcolor = (char)(y))
 #define assign_protected_of(x,y) ((x).protected = (y))
 
-#define color_to_bg(c) ((int)(c) + 20)
-#define color_to_fg(c) ((int)(c) + 10)
+#define color_to_bg(c) ((long)(c) + 20)
+#define color_to_fg(c) ((long)(c) + 10)
 
 
 #define set_fg(f) set_both(f,cur_color.bg)

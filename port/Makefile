@@ -1,20 +1,19 @@
-# Build Arcturus 1.6-A on 32-bit-capable Linux.  Needs gcc with -m32
-# (Debian/Ubuntu: apt install gcc-multilib).
+# Build Arcturus 1.6-A with gcc on 64-bit (or 32-bit) Linux, x86 or ARM.
+# Debian/Ubuntu: apt install gcc make.  Amazon Linux/Fedora: dnf install gcc make.
 CC      = gcc
 LIBDIR ?= $(CURDIR)/lib/
-CFLAGS  = -m32 -std=gnu89 -g -O0 -fno-strict-aliasing -fcommon -w -Icompat -Isrc \
-          -DARCTURUS_LIB='"$(LIBDIR)"'
-TAPE   ?= ../ada
-REBUILT?= ..
+# the 1984 code assumes chars are signed, as on the VAX (ARM's are not)
+CFLAGS  = -std=gnu89 -g -O0 -fno-strict-aliasing -fcommon -fsigned-char -w \
+          -Icompat -Isrc -include src/decls64.h -DARCTURUS_LIB='"$(LIBDIR)"'
 
 SRCS = $(wildcard src/*.c) $(wildcard compat/*.c)
 OBJS = $(patsubst %.c,build/%.o,$(notdir $(SRCS)))
 vpath %.c src compat
 
 ada: $(OBJS)
-	$(CC) -m32 $(LDFLAGS) -o $@ $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS)
 
-build/%.o: %.c | build
+build/%.o: %.c src/decls64.h | build
 	$(CC) $(CFLAGS) -c $< -o $@
 
 build:

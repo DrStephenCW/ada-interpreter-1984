@@ -80,7 +80,7 @@ extern nodep intstk[], *intsp, *intstk_end;
 
 extern nodep handler;		/* exception handler -- set by raise */
 
-int stack_level = 0;
+long stack_level = 0;
 
   /* 	doscope does the evaluation of a scope.  It is also used around
 	for if, loop, while, and case statements.  Although these are not
@@ -88,7 +88,7 @@ int stack_level = 0;
 	goto statements and therefore need the same kind of catch/throw
 	protection as scopes do.  */
 	
-doscope(rets, int_form, context, decls, body, result)
+long doscope(rets, int_form, context, decls, body, result)
     retsp rets;
     nodep int_form;		/* pointer to internal form of subprogram,
 				   package, loop, etc. */
@@ -97,7 +97,7 @@ doscope(rets, int_form, context, decls, body, result)
     nodep body;			/* pointer to internal form for body */
     typedval *result;
 {
-    int exception;		/* return value from unwind_retstk */
+    long exception;		/* return value from unwind_retstk */
 
     /* evaluate the context specificaton */
 
@@ -189,10 +189,10 @@ doscope(rets, int_form, context, decls, body, result)
     stack_level--;
 }
 
-do_comp_statement(rets, int_form, fn)
+long do_comp_statement(rets, int_form, fn)
     retsp rets;		/* return stack entry */
     nodep int_form;	/* internal form of compound statement */
-    int (*fn)();	/* function to interpret compound statement */
+    long (*fn)();	/* function to interpret compound statement */
 {
   /* link new entry into stack */
 
@@ -217,7 +217,7 @@ do_comp_statement(rets, int_form, fn)
     --stack_level;
 }
 
-popretstk(where)
+long popretstk(where)
     retsp where;
 {
     register retsp rets;
@@ -240,9 +240,9 @@ popretstk(where)
 	*/
 
 
-unwind_retstk(where, type)
+long unwind_retstk(where, type)
     retsp where;
-    int type;
+    long type;
 {
     popretstk(where);
     throw(retstk->retenv, type);	

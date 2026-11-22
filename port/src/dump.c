@@ -59,7 +59,7 @@ static char rcsid[] =
 #include "color.h"
 #include "oblist.h"
 
-#define willson_version 1
+#define willson_version 1L
 
 /* 	This file contains routines to dump the execution environment
 	to a file.
@@ -73,9 +73,9 @@ static FILE *dumpfile;
 static nodep type_list_head;
 static nodep type_list_tail;
 static boolean comma;
-static boolean newline;
+static boolean dump_newline;	/* port: was newline */
 
-putsym(thing)
+long putsym(thing)
 fixp thing;
 {
     register    typep typ = thing -> fxf.dyna -> sy.var.type;
@@ -106,14 +106,14 @@ fixp thing;
 	    }
 
     comma = false; /* Don't print commas or newline the first time through */
-    newline = false;
+    dump_newline = false;
     if (hasval)
 	putname (current_output(), mkidnode (thing -> fxf.name), typ);
 				/* should free this */
 }
 
 
-putname(f, p, typ)
+long putname(f, p, typ)
    FILE *f;
    nodep p;
    typep typ;
@@ -153,13 +153,13 @@ putname(f, p, typ)
 }
 
 
-putarray(f, p, typ)
+long putarray(f, p, typ)
 FILE *f;
 nodep p;
 typep typ;
 {
         /* assumes one-dimensional array for now */
-        int i,l,u;
+        long i,l,u;
         nodep cnst, arg, call;
         nodep attr, arg2, call2;
         typedval e;
@@ -227,7 +227,7 @@ typep typ;
         /* should free attr, arg2, and call2 */
 }
 
-enter_save_list(p)
+long enter_save_list(p)
     nodep p;
 {
         if(type_list_head == null)
@@ -237,7 +237,7 @@ enter_save_list(p)
         type_list_tail = p;
 }
 
-dump_type() 
+long dump_type() 
 {
     register    nodep p;
     for (p = type_list_head; p != null; p = p -> ndf.next)
@@ -246,14 +246,14 @@ dump_type()
 
  /* calls the function f on each fixform in the table tab.  A pointer to
     the fixform is the first argument to f.  The arg1 and arg2 arguments
-    to maptab are passed on to f as optional additional arguments. */
+    to dump_maptab are passed on to f as optional additional arguments. */
 
-static maptab(tab, f, arg1, arg2)
+long dump_maptab(tab, f, arg1, arg2)
     symtabp tab;
-    int (*f)();
-{
+    long (*f)();
+long arg1, arg2; {
     register fixp p;
-    register int i,n;
+    register long i,n;
 
     n = tab -> symtab_size;
     for (i = 0; i < n; i++)
@@ -263,7 +263,7 @@ static maptab(tab, f, arg1, arg2)
          
 char *enumimage(typ, val) 
     typep typ;
-    int val;
+    long val;
 {
     if (val < typ -> ty.srange.lbound || val > typ -> ty.srange.ubound)
 	error ("enum value out of bounds");
@@ -272,9 +272,9 @@ char *enumimage(typ, val)
 }
 
 
-printimage(res, val, typ) /* put print image in res based on typ */
+long printimage(res, val, typ) /* put print image in res based on typ */
     char *res;
-    int val;                /* only works for scalars */
+    long val;                /* only works for scalars */
     typep typ;
 {
     typ = base (typ);
@@ -302,9 +302,9 @@ printimage(res, val, typ) /* put print image in res based on typ */
     }
 }
 
-typedprint(f, val, typ)
+long typedprint(f, val, typ)
     FILE *f;
-    int val;
+    long val;
     typep typ;
 {
     char    buf[128];
@@ -312,7 +312,7 @@ typedprint(f, val, typ)
     fputf (f, buf);
 }
 
-dumpobj(f, fix)
+long dumpobj(f, fix)
     FILE *f;
     fixp fix;
 {
@@ -351,7 +351,7 @@ dumpobj(f, fix)
 				/* should free this */
 }
 
-dumpname(f, p, typ)
+long dumpname(f, p, typ)
    FILE *f;
    nodep p;
    typep typ;
@@ -391,13 +391,13 @@ dumpname(f, p, typ)
         }
 }
 
-dumparray(f, p, typ)
+long dumparray(f, p, typ)
 FILE *f;
 nodep p;
 typep typ;
 {
         /* assumes one-dimensional array for now */
-        int i,l,u;
+        long i,l,u;
         nodep cnst, arg, call;
         nodep attr, arg2, call2;
         typep ele_type, index_type;
@@ -435,7 +435,7 @@ typep typ;
         /* should free attr, arg2, and call2 */
 }
 
-dumpfield(fix, f, p)  /* called indirectly by maptab */
+long dumpfield(fix, f, p)  /* called indirectly by dump_maptab */
     fixp fix;
     FILE *f;
     nodep p;
@@ -444,7 +444,7 @@ dumpfield(fix, f, p)  /* called indirectly by maptab */
     dumpname(f, p, fix -> fxf.dyna -> sy.var.type);
 }
 
-putfield(fix, f, p)  /* called indirectly by maptab */
+long putfield(fix, f, p)  /* called indirectly by dump_maptab */
     fixp fix;
     FILE *f;
     nodep p;
@@ -457,7 +457,7 @@ putfield(fix, f, p)  /* called indirectly by maptab */
     putname(f, p, fix -> fxf.dyna -> sy.var.type);
 }
 
-putrecord(f, p, typ)
+long putrecord(f, p, typ)
     FILE *f;
     nodep p;
     typep typ;
@@ -468,12 +468,12 @@ putrecord(f, p, typ)
     select -> nd.selectx.var = p;
     putf("(");
     comma = false;
-    maptab (typ -> ty.record.fieldtab, putfield, f, select);
+    dump_maptab (typ -> ty.record.fieldtab, putfield, f, select);
     putf(")");
     free (select);
 }
 
-dumprecord(f, p, typ)
+long dumprecord(f, p, typ)
     FILE *f;
     nodep p;
     typep typ;
@@ -482,11 +482,11 @@ dumprecord(f, p, typ)
 
     select = newnode (select_node, nop_dot);
     select -> nd.selectx.var = p;
-    maptab (typ -> ty.record.fieldtab, dumpfield, f, select);
+    dump_maptab (typ -> ty.record.fieldtab, dumpfield, f, select);
     free (select);
 }
 
-dumptype(fix)
+long dumptype(fix)
     fixp fix;
 {
     FILE * d;
@@ -515,7 +515,7 @@ dumptype(fix)
     }
 }
 
-dumpsym(fix)
+long dumpsym(fix)
     fixp fix;
 {
     switch (fix -> fxf.class) {
@@ -548,7 +548,7 @@ char *savename(name, fix)
 
 #ifdef willson_version
 
-dump_uses_list()
+long dump_uses_list()
 {	usep	use_list _ currtab -> use_list;
 	fputf(dumpfile,"-- Uses list (Dangerous to re-arrange manually)\n");
 	while (use_list) {
@@ -564,7 +564,7 @@ dump_uses_list()
 	fputf(dumpfile,"-- End of uses list\n");
 }
 
-dump_subps_and_packs_only(fix)
+long dump_subps_and_packs_only(fix)
     fixp fix;
 {
     switch (fix -> fxf.class) {
@@ -583,7 +583,7 @@ dump_subps_and_packs_only(fix)
 
 #endif willson_version
 
-dumpusr() {
+long dumpusr() {
         dumpfile = fopen(SWAPNAME, "w");
         if(dumpfile == null) {
                 sysputf("can't save functions");
@@ -592,11 +592,11 @@ dumpusr() {
 #ifdef willson_version
 	fputf(dumpfile,"-- Edit this file at your own risk!\n");
 	fputf(dumpfile,"-- This file was created automatically by Arcturus\n");
-	maptab(usrtab, dump_subps_and_packs_only);
+	dump_maptab(usrtab, dump_subps_and_packs_only);
 	dump_uses_list();
 #else
         dump_type();
-        maptab(usrtab, dumpsym);
+        dump_maptab(usrtab, dumpsym);
 #endif willson_version
         fclose(dumpfile);
 }
@@ -624,7 +624,7 @@ FILE *savefile(fix)
     return f;
 }
 
-subp_writeout(fix) 
+long subp_writeout(fix) 
     fixp fix;
 {
     register  FILE* savef;
@@ -637,7 +637,7 @@ subp_writeout(fix)
     fclose (savef);
 }
 
-pack_writeout(fix)
+long pack_writeout(fix)
     fixp fix;
 {
     register    FILE * savef;

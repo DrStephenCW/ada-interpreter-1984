@@ -301,7 +301,7 @@ char *gentab[] = {
 
 };
 
-int sizetab[] = {
+long sizetab[] = {
 
 	sizeof(struct F)+sizeof(struct 	comment_node),
 	sizeof(struct F)+sizeof(struct 	counter_node),

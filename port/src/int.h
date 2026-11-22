@@ -59,7 +59,7 @@ typedef struct node *nodep;
 
 typedef struct symtabform *symtabp;
 
-int	curr_generation;	/* for symbol pointer binding trick */
+long	curr_generation;	/* for symbol pointer binding trick */
 
 struct node {
 struct F {
@@ -75,7 +75,7 @@ struct comment_node {
 } comment;
 
 struct counter_node {
-	int count;
+	long count;
 } counter;
 
 struct abort_node {
@@ -128,7 +128,7 @@ struct call_node {
 
 struct call_form_node {
 	nodep list;
-	int items;
+	long items;
 	nodep refined_to;	 /* warning:  This pointer is a pointer back
 				   to the internal form.  It should not
 				   be traversed by an enumerating function
@@ -221,7 +221,7 @@ struct goto_node {
 		/* the following are for the interpreter */
 	nodep dest;
 	nodep throw_dest;
-	int gen_number;
+	long gen_number;
 } gotox;
 
 struct id_decl_node {
@@ -230,8 +230,8 @@ struct id_decl_node {
 
 struct ident_node {
         char *id;
-	int *curr_binding;	/* hack to get around symp */
-	int gen_number;
+	long *curr_binding;	/* hack to get around symp */
+	long gen_number;
 } ident;
  
 struct if_node {
@@ -258,7 +258,7 @@ struct instant_node {
 } instant;
 
 struct integer_node {
-        int val;
+        long val;
         char *prval;
 } integer;
                  
@@ -333,9 +333,9 @@ struct pdl_node {
     char *pdl;		/* temp until things get changed */
     nodep cform;
     nodep decls;  	/* maybe list for these later */
-    int num_decls;
+    long num_decls;
     nodep stmts;
-    int num_stmts;
+    long num_stmts;
 } pdl;
 
 struct pragma_node {

@@ -36,7 +36,7 @@ static char rcsid[] =
 #include "nodes.h"
 #include "int.h"
 
-static (*pre_func)(), (*post_func)(),
+static long (*pre_func)(), (*post_func)(),
                 (*pre_list_func)(), (*post_list_func)(),
                 (*Map)();
 
@@ -85,15 +85,15 @@ of the tree.  maptreelist() and smaptreelist() are the same as maptree()
 and smaptree() respectively except that they do traverse the ndf.next field.
  ****************************************************************/
 
-map();  /* forward declaration */
+long map();  /* forward declaration */
 
 nodep smaptree(ptr, Map_fn, pre_fn, post_fn, pre_list_fn, post_list_fn)
     nodep ptr;	
-    int (*Map_fn)();
-    int (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
+    long (*Map_fn)();
+    long (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
 {
-    int (*Map_fn_sav)();
-    int (*pre_fn_sav)(), (*post_fn_sav)(), 
+    long (*Map_fn_sav)();
+    long (*pre_fn_sav)(), (*post_fn_sav)(), 
 	(*pre_list_fn_sav)(), (*post_list_fn_sav)();
 
     Map_fn_sav = Map;
@@ -121,15 +121,15 @@ nodep smaptree(ptr, Map_fn, pre_fn, post_fn, pre_list_fn, post_list_fn)
 
 nodep maptree(ptr, pre_fn, post_fn, pre_list_fn, post_list_fn)
     register nodep ptr;
-    int (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
+    long (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
 {
     return smaptree(ptr, map, pre_fn, post_fn, pre_list_fn, post_list_fn);
 }
 
 nodep smaptreelist(ptr, Map_fn, pre_fn, post_fn, pre_list_fn, post_list_fn)
     register nodep ptr;
-    int (*Map_fn)();
-    int (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
+    long (*Map_fn)();
+    long (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
 {
     nodep *q;
 
@@ -147,14 +147,14 @@ nodep smaptreelist(ptr, Map_fn, pre_fn, post_fn, pre_list_fn, post_list_fn)
 
 nodep maptreelist(ptr, pre_fn, post_fn, pre_list_fn, post_list_fn)
     register nodep ptr;
-    int (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
+    long (*pre_fn)(), (*post_fn)(), (*pre_list_fn)(), (*post_list_fn)();
 {
     return smaptreelist(ptr, map, pre_fn, post_fn, pre_list_fn, post_list_fn);
 }
 
-nill() {}               /* use this for unneeded functional arguments */
+long nill() {}               /* use this for unneeded functional arguments */
 
-maplist(ptr)
+long maplist(ptr)
     nodep *ptr;
 {
     register nodep *p = ptr;
@@ -169,7 +169,7 @@ maplist(ptr)
     (*post_list_func)(*ptr,ptr);
 }
 
-map(ptr)
+long map(ptr)
     register nodep *ptr;
 {
     if (*ptr == null) return;

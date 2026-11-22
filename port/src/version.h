@@ -29,5 +29,5 @@ Initial revision (Arcturus release 1.3E)
     fixversion is incremented for new versions with bug fixes *only*. */
 
 extern char systemname[], sysdate[], systemtype[];
-extern int majorversion, minorversion;
+extern long majorversion, minorversion;
 extern char fixversion;

@@ -46,14 +46,14 @@ static char rcsid[] =
 typedef struct stack_element elem;
 
 struct stack_element {
-        int (*func)();
+        long (*func)();
         elem *link;
 };
 
 elem *stack;		/* list of exception handlers to invoke on */
 			/* control-c interrupt */
-pushfunc(f)
-int (*f)();
+long pushfunc(f)
+long (*f)();
 {
         register elem *p;
         p = (elem *)zalloc(sizeof(elem), false);
@@ -62,14 +62,14 @@ int (*f)();
         stack = p;
 }
 
-popfunc() {
+long popfunc() {
         register elem *p;
         p = stack;
         stack = stack->link;
         free(p);
 }
 
-clean_up_using_control_c_stack() {
+long clean_up_using_control_c_stack() {
 	control_c_was_typed _ false;
         while(stack) {
                 (*stack->func)();

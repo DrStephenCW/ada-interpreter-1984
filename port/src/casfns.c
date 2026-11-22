@@ -47,7 +47,7 @@ static char rcsid[] =
 #include "oblist.h"
 #include "castor.h"
 /* port: block-scope externs, repeated at file scope */
-extern nill();
+extern long nill();
 extern nodep maptreelist();
 extern nodep maptree();
 
@@ -63,7 +63,7 @@ extern typep type_intnode,
 	type of the calling form is determined by the parser by its
 	syntatic location.  */
 	
-check_macro_return_type(call_form, typ)
+long check_macro_return_type(call_form, typ)
     nodep call_form;		/* the calling form for the macro (internal
 				   form) */
     typep typ;			/* the return type of the macro */
@@ -294,7 +294,7 @@ static boolean is_ident(tree)
     else return true;
 }
 
-macro_splice(p,v)
+long macro_splice(p,v)
     nodep *p;
     register nodep v;
 {
@@ -324,7 +324,7 @@ static nodep macro_variable_value(n)
     return (nodep) *(f -> fxf.dyna -> sy.var.value);
 }
 
-static pre_macro_subst(n,p)
+static long pre_macro_subst(n,p)
     nodep n, *p;
 {
     nodep v;
@@ -382,20 +382,20 @@ static pre_macro_subst(n,p)
     }
 }
 
-macro_substitute(p)
+long macro_substitute(p)
     nodep *p;
 {
-    extern nill();
+    extern long nill();
     extern nodep maptreelist();
 
     *p = maptreelist(*p, pre_macro_subst, nill, nill, nill);
 }
 
-static expand_pre(n,p)
+static long expand_pre(n,p)
     nodep n, *p;
 {
     typedval result;
-    int len;
+    long len;
     register nodep ex, q, tail;
     boolean defined;			/* true if macro is defined */        
     switch (n->ndf.op) {
@@ -424,16 +424,16 @@ static expand_pre(n,p)
     }
 }
 
-static do_macro_expansion(p)
+static long do_macro_expansion(p)
     nodep *p;
 {
     extern nodep maptree();
-    extern nill();
+    extern long nill();
     if (*p == null) system_error("No internal form");
     *p = maptree(*p, expand_pre, nill, nill, nill);
 }
 
-expand(f)
+long expand(f)
     register fixp f;
 {
     switch (f -> fxf.class) {
@@ -473,10 +473,10 @@ expand(f)
      ultimately reduces to a single node, little is lost in efficiency
      but the algorithm is more complex.  */
 
-       unexpand_pre(n,p)
+       long unexpand_pre(n,p)
     nodep n, *p;
 {
-    register int i;
+    register long i;
     register nodep c, *q;
 
     while (true) {
@@ -499,17 +499,17 @@ expand(f)
     }
 }
 
-static do_macro_unexpand(p)
+static long do_macro_unexpand(p)
     nodep *p;
 {
     extern nodep maptree();
-    extern nill();
+    extern long nill();
 
     if (*p == null) system_error("No internal form");
     *p = maptree(*p, unexpand_pre, nill, nill, nill);
 }
 
-unexpand(f)
+long unexpand(f)
     register fixp f;
 {
     switch (f -> fxf.class) {

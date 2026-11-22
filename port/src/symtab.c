@@ -72,7 +72,7 @@ static char rcsid[] =
 	The contents of this file used to be in tab.c and a part of sym.c.
 */
 
-extern int stack_level;		/* level of interpreter return stack */
+extern long stack_level;		/* level of interpreter return stack */
 
 /*	sympstack is a stack of symbolforms.  See below. */
 
@@ -91,7 +91,7 @@ fixp	fixpstack _ null;
 */
 
 fixp newfix1(size, class)
-    register int size;
+    register long size;
     enum symbolclasses class;
 {
     register fixp fix;
@@ -112,7 +112,7 @@ fixp newfix1(size, class)
 }
 
 symp newsym1(size, class)
-    register int size;
+    register long size;
     enum symbolclasses class;
 {
     register symp sym;
@@ -122,7 +122,7 @@ symp newsym1(size, class)
 */
     if (sympstack) {
 	register char  *p;
-	register int size _ sizeof (struct symbolform);
+	register long size _ sizeof (struct symbolform);
 
 	sym _ sympstack;
 	sympstack _ sympstack -> syf.link;
@@ -140,7 +140,7 @@ symp newsym1(size, class)
 /*   	Print all the symbolforms for a symbol.  This is called by
 	printfix after all of the fixed part is printed. */
 
-printsym(s,class)
+long printsym(s,class)
     symp s;
     enum symbolclasses class;
 {
@@ -174,7 +174,7 @@ printsym(s,class)
 
 /*	Print the contents of a symbol; this is a formatted debugging aid. */
 
-printfix(f)
+long printfix(f)
     register fixp f;
 {
     register symp s;
@@ -255,11 +255,11 @@ printfix(f)
 
 /*	print all the symbols in a table (formatted debugging aid) */
 
-printtab(tab)
+long printtab(tab)
    symtabp tab;
 {
     register fixp p;
-    register int  i, n;
+    register long  i, n;
     register usep up;
 
  /* list some of the fixed fields of the table */
@@ -302,7 +302,7 @@ printtab(tab)
 	table being printed.
 */
 
-printall() 
+long printall() 
 {
     register retsp ret;
     register symtabp tab;
@@ -321,7 +321,7 @@ printall()
      lot of printing.	*/
 
 
-printstatic(tab)
+long printstatic(tab)
     symtabp tab;
 {
     while (tab != null) {
@@ -333,7 +333,7 @@ printstatic(tab)
 
  /* print the symbol table corresponding to the given symbol (fixp) */
 
-symbol_table(fix)
+long symbol_table(fix)
     fixp fix;
 {
     switch (fix->fxf.class) {
@@ -361,7 +361,7 @@ symbol_table(fix)
  /* print the symbol table corresponding to the given symbol and
     the tables of all enclosing scopes by following the static link */
 
-static_link(fix)
+long static_link(fix)
     fixp fix;
 {
     switch (fix->fxf.class) {
@@ -385,11 +385,11 @@ static_link(fix)
 
 /*	Create a new symbol table out of the void.  */
 
-int	symtabform_count;
-int	hash_table_count;
+long	symtabform_count;
+long	hash_table_count;
 
 symtabp newtab(n, owner)  
-    int n;               /* n should be power of 2     */
+    long n;               /* n should be power of 2     */
     fixp owner;          /* and should not exceed 256  */
 {
     register    symtabp p;	/* and should not exceed 256 */
@@ -397,7 +397,7 @@ symtabp newtab(n, owner)
     symtabform_count += sizeof (struct symtabform);
     hash_table_count += n;
     p = (symtabp) zalloc (sizeof (struct symtabform), true);
-    p -> symtab_tab = (fixp *) zalloc (n * sizeof (int), true);
+    p -> symtab_tab = (fixp *) zalloc (n * sizeof (long), true);
     p -> symtab_size = n;
     p -> symtab_owner = owner;
     return (p);
@@ -409,10 +409,10 @@ symtabp newtab(n, owner)
 	the guy who frees internal forms, since symbol tables are now
 	effectively a part of the internal form for a subp or package. */
 
-freetab(tab) 
+long freetab(tab) 
 symtabp tab;
 {
-        int     i,size;
+        long     i,size;
 
         size = tab->symtab_size;
         for(i = 0; i<size; i++)  
@@ -421,14 +421,14 @@ symtabp tab;
         free(tab);             
 }
 
-freefixp(p)
+long freefixp(p)
 fixp p;
 {
     p -> fxf.next _ fixpstack;	/* put fixp into recovery stack */
     fixpstack _ p;
 }
 
-freelist(p)		/* free list pointed at by fixp p and then free p */
+long freelist(p)		/* free list pointed at by fixp p and then free p */
 fixp p;
 {	if (p) {
 		freelist2(p->fxf.dyna);
@@ -436,7 +436,7 @@ fixp p;
 	}
 }
 
-       freelist2(p)
+       long freelist2(p)
 symp p;
 {
         if(p) {
@@ -448,7 +448,7 @@ symp p;
 /*	freesym doesn't do a "free"; instead, it pushes the symbol on
 	the free list of symbolforms for later reuse.  */
 
-freesym(sym) 
+long freesym(sym) 
 symp sym;
 {                  /* later: free space allocated for       */
 				/*   array or record objects             */
@@ -468,12 +468,12 @@ symp sym;
  	table before execution begins.
  */
 
-enter(tab, fix, sym)
+long enter(tab, fix, sym)
     symtabp tab;
     fixp fix;
     symp sym;
 {
-    register int h;
+    register long h;
     register fixp p;
 
     p _ lookuptab (tab, fix -> fxf.name, null);
@@ -514,10 +514,10 @@ enter(tab, fix, sym)
 fixp lookuptab(tab, id, fun, a)
     symtabp tab;
     char *id;
-    boolean (*fun)();
-    int a;
+    long boolean (*fun)();
+    long a;
 {
-    register int h = hashval (id);
+    register long h = hashval (id);
     register    fixp f;
 
     f = tab -> symtab_tab[h & (tab -> symtab_size - 1)];
@@ -540,10 +540,10 @@ fixp lookuptab(tab, id, fun, a)
 fixp lookup(tab, id, f, a)
     symtabp tab;
     char *id;       /* symbol identifier */
-    boolean (*f)();
-    int a;
+    long boolean (*f)();
+    long a;
 {
-    register int h = hashval (id);
+    register long h = hashval (id);
     register fixp fix;
     register usep up;
 
@@ -564,7 +564,7 @@ fixp lookup(tab, id, f, a)
  /* this procedure places the table for the symbol f on the use list
     of table tab  */
 
-use_sym(f, tab)
+long use_sym(f, tab)
     fixp f;
     symtabp tab;
 {
@@ -593,7 +593,7 @@ use_sym(f, tab)
 	Used only to explicitly delete symbols via del(x'sym); from Ada. 
 */
 
-deltab(fix)
+long deltab(fix)
 fixp fix;
 {
 	/* short term hack: set to undef_id */
@@ -620,13 +620,13 @@ fixp fix;
 	See the comment for newsym1 about the optimization done here in
 	cooperation with newsym1.  */
 
-poplevel(tab, level)
+long poplevel(tab, level)
     symtabp tab;
-    int level;
+    long level;
 {
-    register int size = tab -> symtab_size;
+    register long size = tab -> symtab_size;
     register fixp p;
-    register int i;
+    register long i;
 
     for (i _ 0; i < size; i++)
 	for (p _ tab -> symtab_tab[i]; p; p _ p -> fxf.next) {

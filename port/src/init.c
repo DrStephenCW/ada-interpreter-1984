@@ -103,52 +103,52 @@ extern  boolean argmatch ();
 extern char *get_editor_name();
 extern nodep ada_parse_file();
 extern nodep ada_parse();
-extern ada_include(), ada_include_commands(), ada_load();
+extern long ada_include(), ada_include_commands(), ada_load();
 extern nodep int_form(), body_int_form();
 extern char *macro_pname();		/* Castor */
-extern reorder_and_dump();	/* export laundry, sort of */
-extern dump_history();		/* dump record of user input */
+extern long reorder_and_dump();	/* export laundry, sort of */
+extern long dump_history();		/* dump record of user input */
 
 nodep root;		/* root of predefined environment package */
-int *croak_okp;		/* points to value slot of "croak_ok" symbol. */
-int *write_core_file_p;	/* points to "write_core_file" symbol. */
+long *croak_okp;		/* points to value slot of "croak_ok" symbol. */
+long *write_core_file_p;	/* points to "write_core_file" symbol. */
 symtabp standard_tab;	/* used by UUI to detect recursive def of standard */
 static nodep userp;	/* root of user package internal form */
 
-int symbol_table();	/* symbolic symbol table listing */
-int static_link();	/* symbolically list all tables on the static link */
+long symbol_table();	/* symbolic symbol table listing */
+long static_link();	/* symbolically list all tables on the static link */
 
 /* stuff for package internal */
 
 /* nodep */ 
-int ada_eval();		/* the interpreter */
-int ada_pp();		/* the prettyprinter */
-int ada_ifp();		/* the internal form prettyprinter */
+long ada_eval();		/* the interpreter */
+long ada_pp();		/* the prettyprinter */
+long ada_ifp();		/* the internal form prettyprinter */
 nodep ada_copytree();	/* copy an internal form tree */
-int macro_substitute();	/* macro substitution [$thing]	  (Castor) */
+long macro_substitute();	/* macro substitution [$thing]	  (Castor) */
 
-getchr();		/* I/O functions */
-fgetchr();
-putchr();
-fputchr();
+long getchr();		/* I/O functions */
+long fgetchr();
+long putchr();
+long fputchr();
 
 	/* prettyprinter, backtrace,  directory, and 
 	   cross reference procedures */
 
-extern symifp(), sympp(), bktr(), symcref(), symdir();
-extern expand(), unexpand();
-extern putsym();
+extern long symifp(), sympp(), bktr(), symcref(), symdir();
+extern long expand(), unexpand();
+extern long putsym();
 
-extern standard_input(), standard_output(), standard_msg();
+extern FILE_TYPE standard_input(), standard_output(), standard_msg();	/* port */
 extern char *getenv();
 
 FILE_TYPE current_input() { return adain; }
 FILE_TYPE current_output() { return adaout; }
 FILE_TYPE current_msg() { return adamsg; }
 
-set_input(f) FILE_TYPE f; { adain = f; }
-set_output(f) FILE_TYPE f; { adaout = f; }
-set_msg(f) FILE_TYPE f; { adamsg = f; }
+long set_input(f) FILE_TYPE f; { adain = f; }
+long set_output(f) FILE_TYPE f; { adaout = f; }
+long set_msg(f) FILE_TYPE f; { adamsg = f; }
 
 static FILE_TYPE fd_out(astr)
 arrayp astr;
@@ -171,11 +171,11 @@ arrayp astr;
 	return (FILE_TYPE)f;
 }
 
-str_ada_to_c(cstr, astr)
+long str_ada_to_c(cstr, astr)
 char *cstr;
 arrayp astr;
 {
-        register int len, i;
+        register long len, i;
 
         len = arr_size(astr);
         for(i = 0 ; i < len; i++) {
@@ -184,13 +184,13 @@ arrayp astr;
         cstr[len] = 0;
 }
 
-str_c_to_ada(astr,cstr)         /* copy c string into ada string array */
+long str_c_to_ada(astr,cstr)         /* copy c string into ada string array */
 arrayp astr;			/* null terminate if possible */
 char *cstr;
 {
-        register int i;
-        register int len _ strlen(cstr);        /* length of C string */
-        register int size _ arr_size(astr);     /* size of ada array */
+        register long i;
+        register long len _ strlen(cstr);        /* length of C string */
+        register long size _ arr_size(astr);     /* size of ada array */
 
         if (len > size)  error("String overflow (copying c str to ada)");
 
@@ -204,12 +204,12 @@ char *cstr;
 extern	char *write_core_flag;
 extern	char *read_core_flag;
 
-check_top_level() {
+long check_top_level() {
 	if (currtab != usrtab)
 	  error("This procedure must be executed at the top-level");
 }
 
-static	symwrite_core(a)
+static	long symwrite_core(a)
 arrayp a;
 {	static	char s[256];
 	check_top_level();
@@ -217,7 +217,7 @@ arrayp a;
 	write_core_flag = s;
 }
 
-static	symread_core(a)
+static	long symread_core(a)
 arrayp a;
 {	static	char s[256];
 	check_top_level();
@@ -225,23 +225,23 @@ arrayp a;
 	read_core_flag _ s;
 }
 
-int	memreport();	/* report on memory usage */
-int	quick_memreport();	/* only print total usage */
+long	memreport();	/* report on memory usage */
+long	quick_memreport();	/* only print total usage */
 
-int	total_size_of_tree;
-int	number_of_nodes;
-extern	nill();
-extern	int sizetab[];
+long	total_size_of_tree;
+long	number_of_nodes;
+extern	long nill();
+extern	long sizetab[];
 
-static treecounter(p)
+static long treecounter(p)
 nodep p;
 {	if (p) {
-		total_size_of_tree += sizetab[(int)(p->ndf.op)];
+		total_size_of_tree += sizetab[(long)(p->ndf.op)];
 		number_of_nodes++;
 	}
 }
 
-static treesize(f)
+static long treesize(f)
     fixp f;
 {
 	nodep p;
@@ -257,22 +257,22 @@ static treesize(f)
 	putf("%d nodes, %d bytes\n", number_of_nodes,total_size_of_tree);
 }
 
-extern etext();		/* definitions for profiling */
-#define BUFSIZE 10000
+extern long etext();		/* definitions for profiling */
+#define BUFSIZE 10000L
 static short BUF[BUFSIZE];
 
-profile_on() {
-	monitor((int) 2, etext, BUF, BUFSIZE, 200);
+long profile_on() {
+	monitor((long) 2, etext, BUF, BUFSIZE, 200L);
 }
 
-profile_off() {
-	monitor(0);
+long profile_off() {
+	monitor(0L);
 }
 
 /*      set to leave Ada environment and dump "core" if bus error or */
 /*	segmentation fault or illegal instruction */
 
-dumpcore() {
+long dumpcore() {
         signal(SIGBUS, SIG_DFL);
         signal(SIGSEGV, SIG_DFL);
         signal(SIGILL, SIG_DFL);
@@ -280,18 +280,18 @@ dumpcore() {
 
 /*	leave ada environment */
 
-die() {
+long die() {
 	if (*croak_okp == 0)
 	  error("Can't die unless croak_ok is true.");
 	quick_memreport();
 	uui_term();	
-	exit(1);	/* doesn't dump usr table, so good way to get out
+	exit(1L);	/* doesn't dump usr table, so good way to get out
 			   when you don't want to save anything from your
 			   current session.  */
 }
 
-quit(write_core) 
-int write_core;
+long quit(write_core) 
+long write_core;
 { 
 	if (write_core) {
 	   check_top_level();
@@ -300,22 +300,22 @@ int write_core;
 	quick_memreport();	/* report memory used */
         uui_term();	/* finish up any interface processing */
         dumpusr();	/* dump "usr" symbol table */
-        exit(0); 	/* leave and close files */
+        exit(0L); 	/* leave and close files */
 }
 
 /* explicit call to break package */
 
-static symbreak() {
+static long symbreak() {
         ada_break(true);        /* recoverable */
 }
 
-int dir();			/* directory of package */
-int symdel();			/* delete a symbol */
-int clear_counters();		/* clear execution frequency counters */
-int question();			/* ask a question via mail */
-int bug();			/* make a bug report via mail */
+long dir();			/* directory of package */
+long symdel();			/* delete a symbol */
+long clear_counters();		/* clear execution frequency counters */
+long question();			/* ask a question via mail */
+long bug();			/* make a bug report via mail */
 
-static symcat(t)		/* print a file on the terminal */
+static long symcat(t)		/* print a file on the terminal */
 arrayp t;
 {
         char command[256];
@@ -335,13 +335,13 @@ arrayp t;
 
 extern	char *Fix_File;
 
-       fix_last_command()
+       long fix_last_command()
 {
 	textedit(Fix_File);
 	command_include(Fix_File, true);
 }
 
-static symedit(f)       /* edit the value of a symbol */
+static long symedit(f)       /* edit the value of a symbol */
     fixp f;                /* (functions only for now) */
 {
 	char name[256];
@@ -364,7 +364,7 @@ static symedit(f)       /* edit the value of a symbol */
         }
 }
 
-       textedit(t)	/* edit a text object in the environment */
+       long textedit(t)	/* edit a text object in the environment */
 char *t;
 {
         char command[256];
@@ -375,13 +375,13 @@ char *t;
         system(command);
 }
 
-static symtextedit(a) arrayp a;
+static long symtextedit(a) arrayp a;
 {	char name[256];
 	str_ada_to_c(name,a);
 	textedit(name);
 }
 
-       symdel(f)        /* remove a symbol entry */
+       long symdel(f)        /* remove a symbol entry */
     fixp f;
 {
     check_top_level();
@@ -389,7 +389,7 @@ static symtextedit(a) arrayp a;
 }
 
 
-       callcsh(ada_s,term_flag)	/* call a csh to hack around in or */
+       long callcsh(ada_s,term_flag)	/* call a csh to hack around in or */
 arrayp ada_s;			/* execute the given command and return */
 boolean term_flag;
 /*	much of the code in here was swiped from "system.c", the c library
@@ -404,16 +404,16 @@ boolean term_flag;
 {
     char    s[256];
     char    command[256];
-    int    (*istat)(), (*qstat)(), status;
+    long    (*istat)(), (*qstat)(), status;
 
     str_ada_to_c (s, ada_s);
     fflush(stdout);
     if (term_flag) set_users_terminal();
     if (*s) {			/* command given as arg to "csh" */
-	int     pid, w;
+	long     pid, w;
 	if ((pid = vfork ()) == 0) {
-	    execl ("/bin/csh", "csh", "-c", s, 0);
-	    _exit (127);
+	    execl ("/bin/csh", "csh", "-c", s, 0L);
+	    _exit (127L);
 	}
 	istat _ signal (SIGINT, SIG_IGN);
 	qstat _ signal (SIGQUIT, SIG_IGN);
@@ -429,7 +429,7 @@ boolean term_flag;
     return status;
 }
 
-static sympsyms()       /* ugly dump of the symbol table */
+static long sympsyms()       /* ugly dump of the symbol table */
 {       
     printall();
 }
@@ -442,7 +442,7 @@ static fixp	status_error, mode_error, name_error, use_error, device_error,
 
 #ifdef whitehill
 
-symcreate(fp, mode, t, form)	/* create a text object */
+long symcreate(fp, mode, t, form)	/* create a text object */
     FILE **fp;
     file_mode mode;	/* must be out */
     char *t;
@@ -459,7 +459,7 @@ symcreate(fp, mode, t, form)	/* create a text object */
     *fp = f;
 }
 
-symopen(fp, mode, t, form)	/* open a text object for reading */
+long symopen(fp, mode, t, form)	/* open a text object for reading */
     FILE **fp;
     file_mode mode;	/* must be in_file */
     char *t;
@@ -476,7 +476,7 @@ symopen(fp, mode, t, form)	/* open a text object for reading */
     *fp = f;
 }
 
-symclose(fp)		/* close a text object */
+long symclose(fp)		/* close a text object */
     FILE **fp;
 {
     if (*fp == null)
@@ -489,7 +489,7 @@ symclose(fp)		/* close a text object */
 
 /*	versions more like manual definition */
 
-symcreate(fp, mode, t, form)	/* create a text object */
+long symcreate(fp, mode, t, form)	/* create a text object */
     FILE **fp;
     file_mode mode;	/* must be out_file */
     arrayp t;
@@ -508,7 +508,7 @@ symcreate(fp, mode, t, form)	/* create a text object */
     *fp = f;
 }
 
-symopen(fp, mode, t, form)	/* open a text object for reading */
+long symopen(fp, mode, t, form)	/* open a text object for reading */
     FILE **fp;
     file_mode mode;	/* must be in_file */
     arrayp t;
@@ -527,7 +527,7 @@ symopen(fp, mode, t, form)	/* open a text object for reading */
     *fp = f;
 }
 
-symclose(fp)		/* close a text object */
+long symclose(fp)		/* close a text object */
     FILE **fp;
 {
     if (*fp == null)
@@ -540,21 +540,21 @@ symclose(fp)		/* close a text object */
 
 /* i/o on files: */
 
-fgetint(f, ip)
+long fgetint(f, ip)
 FILE *f;
-int *ip;
+long *ip;
 {
     fgetf(f, "%d", ip);
 }
 
-static getint(p)                  /* get an integer */
-int *p;
+static long getint(p)                  /* get an integer */
+long *p;
 {                        
         fgetint(adain, p);
 }
           
-static check_limit(actual, upper)
-int actual, upper;
+static long check_limit(actual, upper)
+long actual, upper;
 {
     if (actual >= upper)
 	sysraise(data_error,
@@ -562,33 +562,33 @@ int actual, upper;
 	 actual, upper);
 }
 
-static symfgetstr(f,a)
+static long symfgetstr(f,a)
 FILE *f;
 arrayp a;
-{	int len _ arr_size(a);
-	int count;
+{	long len _ arr_size(a);
+	long count;
 	char data[256];
-	check_limit(len,256);
+	check_limit(len,256L);
 	for (count _ 0; count < len; count++)
 		fgetchr(f, &data[count]);
 	data[count] _ '\000';
 	str_c_to_ada(a, data);
 }
 
-static symgetstr(a)
+static long symgetstr(a)
 arrayp a;
 {	symfgetstr(adain, a);
 }
 
-static symfget_line(f,s,n)
+static long symfget_line(f,s,n)
 FILE *f;
 arrayp s;
-int *n;
+long *n;
 {
-	int len	_ arr_size(s);
-	int amt;
+	long len	_ arr_size(s);
+	long amt;
 	char data[256];
-	check_limit(len,256);
+	check_limit(len,256L);
 	fgets(data, len + 1, f);
 	amt _ strlen(data);
 	if (data[amt - 1] eq '\n') {
@@ -599,81 +599,81 @@ int *n;
 	*n _ amt;
 }
 
-static symget_line(s,n)
+static long symget_line(s,n)
 arrayp s;
-int *n;
+long *n;
 {	symfget_line(adain, s, n);
 }
 
-fgetreal(f, rp)
+long fgetreal(f, rp)
 FILE *f;
 float *rp;
 {
    fgetf(f, "%f", rp);
 }
 
-static getreal(p)        /* get a floating value */
+static long getreal(p)        /* get a floating value */
 float *p;                     
 {
    fgetreal(adain, p);
 }
 
-static fputadastr(f, s)
+static long fputadastr(f, s)
 FILE *f;
 arrayp s;
 {
         char buffer[256];
-	int len _ arr_size(s);
-	check_limit(len, 256);
+	long len _ arr_size(s);
+	check_limit(len, 256L);
         str_ada_to_c(buffer, s);
         fputf(f, buffer);
 }
 
-static putadastr(s)     /* put an Ada string to standard output */
+static long putadastr(s)     /* put an Ada string to standard output */
 arrayp s;
 {
         fputadastr(adaout, s);
 }
 
-static symput_line(s)
+static long symput_line(s)
 arrayp s;
 {	putadastr(s);
-	newline(1);
+	newline(1L);
 }
 
-static symfput_line(f, s)
+static long symfput_line(f, s)
 FILE *f;
 arrayp s;
 {	fputadastr(f, s);
-	fnewline(f,1);
+	fnewline(f,1L);
 }
 
 boolean symfeof(f)		/* return true if at end of file */
 FILE *f;
-{	int ch;
+{	long ch;
 	ch _ getc(f);
 	ungetc(ch,f);
 	if (feof(f)) return true;
 	else return false;
 }
 
-fputint(f, x, width)
+long fputint(f, x, width)
 FILE *f;
-int x;
-int width;
+long x;
+long width;
 {
         fputf(f, "%*d", width, x);
 }
 
-putint(x, w) {              /* put an integer on the terminal */
+long putint(x, w) long x, w; {              /* put an integer on the terminal */
         fputint(adaout, x, w);
 }
 
-static fputreal(f, xbits, width, prec)
+static long fputreal(f, xbits, width, prec)
 FILE *f;
-int xbits;	/* port: float bits, from call() */
-int width;
-int prec;
+long xbits;	/* port: float bits, from call() */
+long width;
+long prec;
 {
         char buf[128]; float x = *(float *)&xbits;	/* port */
         if(width == 0 && prec == 0) 
@@ -682,29 +682,29 @@ int prec;
         fputf(f, buf);
 }                              
 
-static putreal(x, width, prec)        /* put a real on the terminal */
-int x;	/* port: float bits, passed on as they are */
-int width;
-int prec;
+static long putreal(x, width, prec)        /* put a real on the terminal */
+long x;	/* port: float bits, passed on as they are */
+long width;
+long prec;
 {
         fputreal(adaout, x, width, prec);
 }                              
 
-       fnewline(f, n)
+       long fnewline(f, n)
 FILE *f;
-int n;
+long n;
 {
 	while(n--)
          fputf(f, "\n");
 }
                             
-       newline(n) {     /* print n newlines; n defaults to 1 */
+       long newline(n) long n; {     /* print n newlines; n defaults to 1 */
         fnewline(adaout, n);
 }
                             
 /*	print a string describing a path from "standard" to current scope */
 
-static string_where1(s,tab)
+static long string_where1(s,tab)
     char *s;
     symtabp tab;
 {
@@ -737,7 +737,7 @@ static string_where1(s,tab)
 	strcat (s, "Block-or-Loop");
 }
 
-string_where(s,currtab)
+long string_where(s,currtab)
 char *s;
 symtabp currtab;
 {
@@ -745,14 +745,14 @@ symtabp currtab;
 	string_where1(s,currtab);
 }
 
-where()         /* static backtrace */
+long where()         /* static backtrace */
 {   
 	char buff[256];
 	string_where(buff,currtab);
         putf("%s\n",buff);  
 }
 
-static print_owner(t)
+static long print_owner(t)
     symtabp t;
 {
     if (t->symtab_owner)
@@ -761,7 +761,7 @@ static print_owner(t)
     putf("(%x)", t);
 }
 
-stack_trace()
+long stack_trace()
 {
     register    retsp r;
     register    symtabp sym;
@@ -787,7 +787,7 @@ stack_trace()
 
 extern nodep intstk[], *intsp;
 
-how()                  /* dynamic backtrace */
+long how()                  /* dynamic backtrace */
 {   
         register nodep *sp;
         register nodep p;
@@ -811,19 +811,19 @@ static fixp findfix(name)
 }
                                   
 
-funcinit(name, funct)
+long funcinit(name, funct)
     char *name;
-    int (*funct)();
+    long (*funct)();
 {
     findfix(name)->fx.func.code = funct;
 }
 
 
 
-ovlinit(name, params, func)	/* initialize a symbol which has */
+long ovlinit(name, params, func)	/* initialize a symbol which has */
      char *name;			/* overloaded meanings */
     char *params;
-    int (*func)();
+    long (*func)();
 {
     register fixp fix, paramfix;
     extern  boolean argmatch ();
@@ -849,7 +849,7 @@ nodep mkidnode(name)	/* make an internal form identifier node */
     return (p);
 }
 
-int *objinit(name)	/* used to lookup type identifiers for initializing */
+long *objinit(name)	/* used to lookup type identifiers for initializing */
 char    *name;		/* predefined object types */
 {
     register fixp fix;
@@ -862,13 +862,13 @@ char    *name;		/* predefined object types */
                                   
 /*	main workhorse: */
 
-syminit () {			/* initialize standard.usr symbol table
+long syminit () {			/* initialize standard.usr symbol table
 				   and predefined types */
     register    fixp fix;
     register    symp sym;
     register    symtabp stand_vis_tab, stand_body_tab;
 
-    int     dummy = 0;
+    long     dummy = 0;
 
     intdebugp = &dummy; countingp = &dummy;	/* port: was a read of address 0 */		/* until intdebugp points to ada symbol;
 				/* necessary, because we go through the
@@ -889,7 +889,7 @@ syminit () {			/* initialize standard.usr symbol table
 	visible as the outter-most scope.  
 */
 
-    stand_vis_tab _ newtab (16, fix);	/* contains a few typedefs only */
+    stand_vis_tab _ newtab (16L, fix);	/* contains a few typedefs only */
 
     root _ ada_parse_file ("standard");
     root -> nd.packagex.table _ stand_vis_tab;
@@ -941,7 +941,7 @@ syminit () {			/* initialize standard.usr symbol table
     symboltype = findfix ("symbol") -> fxf.dyna -> sy.var.type;
     symboltype -> tyf.class = accessform;
     symboltype -> tyf.int_form = mkidnode ("symbol");
-    symboltype -> tyf.size = sizeof (int *);
+    symboltype -> tyf.size = sizeof (long *);
     symboltype -> ty.access.targettype = newtype (undefform);
 
     texttype = findfix ("text") -> fxf.dyna -> sy.var.type;
@@ -952,14 +952,14 @@ syminit () {			/* initialize standard.usr symbol table
     chartype = findfix ("character") -> fxf.dyna -> sy.var.type;
     chartype -> tyf.class = enumform;
     chartype -> tyf.int_form = mkidnode ("character");
-    chartype -> tyf.size = sizeof (int);
+    chartype -> tyf.size = sizeof (long);
     chartype -> ty.srange.lbound = 0;/* characters */
     chartype -> ty.srange.ubound = 127;
 
     inttype = findfix ("integer") -> fxf.dyna -> sy.var.type;
     inttype -> tyf.class = intform;
     inttype -> tyf.int_form = mkidnode ("integer");
-    inttype -> tyf.size = sizeof (int);
+    inttype -> tyf.size = sizeof (long);
     inttype -> ty.srange.lbound = -256 * 256 * 256 * 128;
     inttype -> ty.srange.ubound = 256 * 256 * 256 * 128 - 1;
     inttype -> ty.srange.basetype = inttype;/* range of itself */
@@ -967,7 +967,7 @@ syminit () {			/* initialize standard.usr symbol table
     realtype = findfix ("float") -> fxf.dyna -> sy.var.type;
     realtype -> tyf.class = realform;
     realtype -> tyf.int_form = mkidnode ("float");
-    realtype -> tyf.size = sizeof (float);
+    realtype -> tyf.size = sizeof (long);	/* port: was sizeof (float) */
  /* float must take up one word */
 
     booltype = findfix ("boolean") -> fxf.dyna -> sy.var.type;
@@ -998,7 +998,7 @@ syminit () {			/* initialize standard.usr symbol table
 	empty), thus completing package standard. */
 
     fix _ findfix ("standard");
-    stand_body_tab _ newtab (4, fix);	/* contains only packages like usr,
+    stand_body_tab _ newtab (4L, fix);	/* contains only packages like usr,
 					   uci, etc. */
     stand_body_tab -> symtab_static_link = stand_vis_tab;
     stand_body_tab -> symtab_owner = fix;
@@ -1025,10 +1025,10 @@ syminit () {			/* initialize standard.usr symbol table
     funcinit ("stack_trace", stack_trace);
     funcinit ("csh", callcsh);
     funcinit ("edit", symedit);
-    { extern delete_sym(); funcinit ("rm", delete_sym); }	/* port: as in the 1984 binary */
+    { extern long delete_sym(); funcinit ("rm", delete_sym); }	/* port: as in the 1984 binary */
     funcinit ("where", where);
     funcinit ("how", how);
-    { extern printall(); funcinit ("printall", printall); }	/* port: as in the 1984 binary */
+    { extern long printall(); funcinit ("printall", printall); }	/* port: as in the 1984 binary */
     funcinit ("symbol_table", symbol_table);
     funcinit ("static_link", static_link);
     funcinit ("bktr", bktr);
@@ -1049,7 +1049,7 @@ syminit () {			/* initialize standard.usr symbol table
     funcinit ("include_commands", ada_include_commands);
     funcinit ("load", ada_load);
     funcinit ("putsym", putsym);
-    { extern touch(); funcinit ("touch", touch); }	/* port: as in the 1984 binary */
+    { extern long touch(); funcinit ("touch", touch); }	/* port: as in the 1984 binary */
 
     intdebugp = objinit ("intdebug");
     countingp = objinit ("counting");
@@ -1069,9 +1069,9 @@ syminit () {			/* initialize standard.usr symbol table
     funcinit ("standard_input", standard_input);
     funcinit ("standard_output", standard_output);
     funcinit ("standard_msg", standard_msg);
-    funcinit ("current_input", (int (*) ()) current_input);
-    funcinit ("current_output", (int (*) ()) current_output);
-    funcinit ("current_msg", (int (*) ()) current_msg);
+    funcinit ("current_input", (long (*) ()) current_input);
+    funcinit ("current_output", (long (*) ()) current_output);
+    funcinit ("current_msg", (long (*) ()) current_msg);
     funcinit ("set_input", set_input);
     funcinit ("set_output", set_output);
     funcinit ("set_msg", set_msg);
@@ -1098,7 +1098,7 @@ syminit () {			/* initialize standard.usr symbol table
     funcinit ("fput_line", symfput_line);
     funcinit ("get_line", symget_line);
     funcinit ("fget_line", symfget_line); 
-    funcinit ("end_of_file", (int (*) ()) symfeof);
+    funcinit ("end_of_file", (long (*) ()) symfeof);
 
  /* also read in io_exceptions; hook them up	*/
 
@@ -1149,16 +1149,16 @@ syminit () {			/* initialize standard.usr symbol table
 
  /* hooks for package internal_form and package castor */
 
-	funcinit ("t_parse", (int (*) ()) ada_parse);
+	funcinit ("t_parse", (long (*) ()) ada_parse);
 	funcinit ("t_eval", ada_eval);
 	funcinit ("t_pp", ada_pp);
 	funcinit ("t_ifp", ada_ifp);
-	funcinit ("t_copytree", (int (*) ()) ada_copytree);
+	funcinit ("t_copytree", (long (*) ()) ada_copytree);
 	funcinit ("t_macro_subst", macro_substitute);
 	funcinit ("t_expand", expand);
 	funcinit ("t_unexpand", unexpand);
-	funcinit ("t_int_form", (int (*) ()) int_form);
-    	funcinit ("t_body_int_form", (int (*) ()) body_int_form);
+	funcinit ("t_int_form", (long (*) ()) int_form);
+    	funcinit ("t_body_int_form", (long (*) ()) body_int_form);
 
     }
 

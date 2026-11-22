@@ -43,7 +43,7 @@ static char rcsid[] =
 extern  typep tyeval ();
 
 extern nodep intstk[], *intsp, *intstk_end;
-extern int stack_level;
+extern long stack_level;
 
    /* runloop, runwhile, and runfor execute the three types of loops.
       doloop, dowhile, and dofor push an entry on the interpreter return
@@ -56,14 +56,14 @@ extern int stack_level;
       higher levels.  It is needed in the case that exit is used to
       exit from one or more for loops or blocks */ 
 
-       runloop(p)
+       long runloop(p)
     nodep p;
 {
     while (true)
 	eval (p -> nd.whilex.bodyx, eval_mode, &dummy, null);
 }
 
-doloop(p)
+long doloop(p)
     nodep p;
 {
     struct retstkform   rets;
@@ -74,7 +74,7 @@ doloop(p)
         /* for loops have their own scope; we create a symbol table for
            the loop control variable.	*/
 
-       runwhile(p)
+       long runwhile(p)
     nodep p;
 {
     typedval r;
@@ -88,7 +88,7 @@ doloop(p)
     }
 }
 
-dowhile(p)
+long dowhile(p)
     nodep p;
 {
     struct retstkform   rets;
@@ -97,13 +97,13 @@ dowhile(p)
 }
 
 
-static int for_limit, *for_loopvarp;
+static long for_limit, *for_loopvarp;
 
-       runfor(p)
+       long runfor(p)
     nodep p;
 {
-    register int limit = for_limit;
-    register int *loopvarp = for_loopvarp;
+    register long limit = for_limit;
+    register long *loopvarp = for_loopvarp;
 
     if (*loopvarp <= limit)
 	do
@@ -114,11 +114,11 @@ static int for_limit, *for_loopvarp;
 	while (++(*loopvarp) <= limit);
 }
 
-static runforrev(p)
+static long runforrev(p)
     nodep p;
 {
-    register int    limit = for_limit;
-    register int   *loopvarp = for_loopvarp;
+    register long    limit = for_limit;
+    register long   *loopvarp = for_loopvarp;
 
     if (*loopvarp >= limit)
 	do
@@ -129,7 +129,7 @@ static runforrev(p)
 	while (--(*loopvarp) >= limit);
 }
 
-dofor(p)
+long dofor(p)
     nodep p;
 {
     struct retstkform rets;
@@ -140,7 +140,7 @@ dofor(p)
     symtabp save_currtab = currtab;
 
     if (p -> nd.forx.table eq null) {
-	tab = newtab (4, null);	/* no owner */
+	tab = newtab (4L, null);	/* no owner */
     /* make table small enough not to  waste space, but large enough  that
        lookups of variables other than the control var fail sooner */
 
@@ -180,7 +180,7 @@ dofor(p)
        an exit cannot exit from these constructs.  However, it is possible
        to exit from a block.  */
 
-doexit(p)
+long doexit(p)
     nodep p;
 {
     typedval r;
@@ -209,7 +209,7 @@ doexit(p)
 				 ret->p->nd.whilex.label);
 
 	    if (exitwhat == null || exitwhat == loopname)
-		unwind_retstk(ret,1);
+		unwind_retstk(ret,1L);
 	}
         
 	ret = ret->link;
@@ -221,7 +221,7 @@ doexit(p)
 }
 
 
-runif(p)
+long runif(p)
     nodep p;
 {
     typedval r;
@@ -234,7 +234,7 @@ runif(p)
 	eval (p -> nd.ifx.elsif_list, &dummy, null);
 }
 
-doif(p)
+long doif(p)
     nodep p;
 {
     struct retstkform   rets;

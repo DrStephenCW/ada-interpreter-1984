@@ -24,7 +24,7 @@ Revision 1.1  82/12/12  21:32:10  tadman
 Initial revision (Arcturus release 1.3E)
  */
 
-int     *countingp;
+long     *countingp;
 #define counting (*countingp)
 
-int max_node_counts;
+long max_node_counts;

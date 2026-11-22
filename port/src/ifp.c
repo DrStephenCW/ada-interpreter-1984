@@ -44,105 +44,105 @@ static char rcsid[] =
 # define f false
 
 extern FILE  *ppfile;
-extern pp_tok(), pp_cut();
+extern long pp_tok(), pp_cut();
 
-ifp_begin(), ifp_end(), ifp_lbegin(), ifp_lend(); /* forward declarations */
+long ifp_begin(), ifp_end(), ifp_lbegin(), ifp_lend(); /* forward declarations */
 
-ifp(p, file, nrf, vbf, cmf, atf, wid, atc, enf)
+long ifp(p, file, nrf, vbf, cmf, atf, wid, atc, enf)
     nodep p;
     FILE *file;
     boolean nrf, vbf, cmf, atf, enf;
-    int wid, atc;
+    long wid, atc;
 {
 	ppfile = file;
         if ((atf || cmf) && (wid < atc+10))
             error("no room for attachments (width < attach_column + 10)");
-        pp_init(wid, 0, false, false, vbf);
+        pp_init(wid, 0L, false, false, vbf);
   	ifp_list(p);
 	pp_cleanup(enf);
 }
 
-ifp_list(p)
+long ifp_list(p)
     nodep p;
 {
     if (p == null) fputf("pointer is null\n");
     else {
-        pp_begin(null,-4,0,f,f,f);		/* kludge */
+        pp_begin(null,-4L,0L,f,f,f);		/* kludge */
         while (true) {
 	    maptree(p, ifp_begin, ifp_end, ifp_lbegin, ifp_lend);
 	    p = p->ndf.next;
 	    if (p == null) break;
-	    pp_cut(2);
+	    pp_cut(2L);
 	}
         pp_end();
     }
 }
 
-ifp_lbegin(p)
+long ifp_lbegin(p)
     nodep p;
 {
-    pp_begin(null,4,0,f,f,f);
+    pp_begin(null,4L,0L,f,f,f);
     pp_tok("{");
-    pp_cut(1);
+    pp_cut(1L);
 }
 
-ifp_lend(p)
+long ifp_lend(p)
     nodep p;
 {
-    pp_cut(1);
+    pp_cut(1L);
     pp_tok("}");
     pp_end();
 }
 
-static int Int_fld(i,fl)
-    int i;
+static long Int_fld(i,fl)
+    long i;
     char *fl;
 {
     char s[30];
 
-    pp_cut(1);
+    pp_cut(1L);
     sprintf(s, "%s:%d", fl, i);
     pp_tok(s);
 }
 
-static Real_fld(r,fl)
+static long Real_fld(r,fl)
     float r;
     char *fl;
 {
     char s[30];
 
-    pp_cut(1);
+    pp_cut(1L);
     sprintf(s, "%s:%g", fl, r);
     pp_tok(s);
 }
 
-static Str_fld(s, fl)
+static long Str_fld(s, fl)
     char *s, *fl;
 {
     char v[200];
 
-    pp_cut(1);
+    pp_cut(1L);
     sprintf(v, "%s:\"%s\"", fl, s);
     pp_tok(v);
 }
 
-static Char_fld(c, fl)
+static long Char_fld(c, fl)
     char c, *fl;
 {
     char s[30];
 
-    pp_cut(1);
+    pp_cut(1L);
     sprintf(s, "%s:'%c'", fl, c);
     pp_tok(s);
 }
 
-static Bool_fld(b, fl)
+static long Bool_fld(b, fl)
     boolean b;
     char *fl;
 {
     char s[30];
 
-    pp_cut(1);
+    pp_cut(1L);
     sprintf(s,"%s:%s", fl, (b ? "true" : "false"));
     pp_tok(s);
 }
@@ -153,24 +153,24 @@ static Bool_fld(b, fl)
 # define char_fld(nop,fl)   Char_fld(p->nd.nop.fl, "fl") 
 # define bool_fld(nop,fl)   Bool_fld(p->nd.nop.fl, "fl")
 
-ifp_begin(p)   nodep p;    { begin_node(p,"["); }
-ifp_end(p)     nodep p;    { end_node(p,"]"); }
+long ifp_begin(p)   nodep p;    { begin_node(p,"["); }
+long ifp_end(p)     nodep p;    { end_node(p,"]"); }
 
-begin_node(p,sym)
+long begin_node(p,sym)
     nodep p;
     char *sym;
 {
     char addr[20];
 
     if (p == null) return;
-    pp_cut(1);
-    pp_begin(p,0,0,f,f,f);
+    pp_cut(1L);
+    pp_begin(p,0L,0L,f,f,f);
     pp_tok(sym);
     pp_tok(nodename(p));
     /* sprintf(addr, "(8#%o#)", (int)p); */
     /* pp_tok(addr);                     */
-    pp_cut(0);
-    pp_begin(p,4,0,f,f,t);
+    pp_cut(0L);
+    pp_begin(p,4L,0L,f,f,t);
     switch (p -> ndf.op) {
         case nop_count:                         /* counter_node */
                 int_fld(counter,count);
@@ -427,7 +427,7 @@ begin_node(p,sym)
     }
 }
 
-end_node(p,term)
+long end_node(p,term)
     nodep p;
     char *term;
 {
@@ -441,7 +441,7 @@ end_node(p,term)
 	}
     }
     pp_end();
-    pp_cut(1);
+    pp_cut(1L);
     pp_tok(term);
     pp_end();
 }

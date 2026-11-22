@@ -40,35 +40,36 @@ static char rcsid[] =
 
 
 char *malloc();
+extern long port_brk0;	/* port: in compat/port.c */
 
-static int memcount;
-static int memsize;
-static int newnode_count;
-extern int typecount;
-extern int symtabform_count;
-extern int hash_table_count;
+static long memcount;
+static long memsize;
+static long newnode_count;
+extern long typecount;
+extern long symtabform_count;
+extern long hash_table_count;
 extern fixp fixpstack;
 extern symp sympstack;
 extern struct choice_item *case_choice_stack;
-extern end();
+extern long end();
 
 /*	Print total memory expansion only.  */
 
-quick_memreport() {
+long quick_memreport() {
 	putf("[%dk bytes of memory allocated for this session]\n",
-		((sbrk(0) - (int)end) / 1024));
+		(((long)sbrk(0L) - port_brk0) / 1024));	/* port: was sbrk(0) - (int)end */
 }
 
 /*	Print memory statistics.  Easy way to make yourself be depressed. */
 
-memreport() {
-        int count;
+long memreport() {
+        long count;
         symp sym;
         struct choice_item  *case_choice_ptr;
 	fixp fix;
 
         putf("%d malloc's for %d bytes\n", memcount, memsize);
-        putf("Total expansion due to malloc's: %d\n", sbrk(0) - (int)end);
+        putf("Total expansion due to malloc's: %d\n", (long)sbrk(0L) - port_brk0);	/* port: was sbrk(0) - (int)end */
 
         for (count _ 0, sym _ sympstack;
                 sym;
@@ -100,7 +101,7 @@ memreport() {
 }
 
 
-getval(s)        /* lookup a value in the interpreter */
+long getval(s)        /* lookup a value in the interpreter */
 char *s;                /* environment; return zero if not defined */
 {
 	fixp fix;
@@ -120,12 +121,12 @@ char *s;                /* environment; return zero if not defined */
     the fixform is the first argument to f.  The arg1 and arg2 arguments
     to maptab are passed on to f as optional additional arguments. */
 
-maptab(tab, f, arg1, arg2)
+long maptab(tab, f, arg1, arg2)
     symtabp tab;
-    int (*f)();
-{
+    long (*f)();
+long arg1, arg2; {
     register fixp p;
-    register int i,n;
+    register long i,n;
 
     n = tab -> symtab_size;
     for (i = 0; i < n; i++)
@@ -133,7 +134,7 @@ maptab(tab, f, arg1, arg2)
 	    (*f) (p, arg1, arg2);
 }
          
-char *zalloc(size, zero) {
+char *zalloc(size, zero) long size, zero; {
 register char *p,*q;
         memcount++;
         memsize += size;
@@ -148,7 +149,7 @@ register char *p,*q;
 }
 
 nodep newnode1(size, op)
-int size;
+long size;
 enum tokentypes op;
 {
         register nodep p;
@@ -159,7 +160,7 @@ enum tokentypes op;
         return(p);
 }
 
-memq(tok, list)
+long memq(tok, list)
 enum tokentypes tok;
 tokenlist list;
 {

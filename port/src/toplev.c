@@ -44,13 +44,13 @@ static char rcsid[] =
 
 jmp_buf	topenv;			/* top level of the read-eval loop */
 
-extern	int stack_level;	/* depth of the interpreter return stack */
-extern	int *write_core_file_p;	/* points to "write_core_file" symbol */
+extern	long stack_level;	/* depth of the interpreter return stack */
+extern	long *write_core_file_p;	/* points to "write_core_file" symbol */
 
 extern	FILE *fdopen();
 extern	char *parsestring();
 extern	char *sbrk();
-extern	etext();
+extern	long etext();
 
 /*	Top level of Arcturus: the read-parse-interpret loop, the signal
 	handlers, and saving and restoring the whole environment as a
@@ -73,23 +73,23 @@ extern	etext();
 
 
 
-check_control_c() {
+long check_control_c() {
 	if (control_c_was_typed)
 		control_c_handler();
 }
 
-ignore_control_c() {
+long ignore_control_c() {
 	signal(SIGINT, ignore_control_c);
 	sysputf("Sorry, please wait for interrupt service.\n");
 }
 
-set_flag() {
+long set_flag() {
 	signal(SIGINT, ignore_control_c);
 	control_c_was_typed _ true;
 	/* the interpreter will notice the flag */
 }
 
-reinit() {
+long reinit() {
 	if (currtab != usrtab)
 		poplevel(currtab, null);
 	popretstk(null);
@@ -99,10 +99,10 @@ reinit() {
 	currtab _ usrtab;
 	uui_reset();
 	clearinterp();
-	longjmp(topenv, 0);
+	longjmp(topenv, 0L);
 }
 
-trap_handler(sig) {
+long trap_handler(sig) long sig; {
 	signal(SIGILL, SIG_IGN);
 	signal(SIGBUS, SIG_IGN);
 	signal(SIGSEGV, SIG_IGN);
@@ -114,12 +114,12 @@ trap_handler(sig) {
 	}
 }
 
-break_handler() {
+long break_handler() {
 	signal(SIGQUIT, break_handler);
 	ada_break(true);
 }
 
-control_c_handler() {
+long control_c_handler() {
 	clean_up_using_control_c_stack();
 	signal(SIGINT, set_flag);
 	reinit();
@@ -129,10 +129,10 @@ FILE	*stdbrk;		/* input stream while at a break */
 
 /*	Enter a break: a nested read-eval loop at the point of an error
 	or a quit signal.  End-of-file leaves the break.	*/
-ada_break(recoverable)
+long ada_break(recoverable)
 boolean recoverable;
 {
-	int	fildes;
+	long	fildes;
 	char	where_buf[1000];
 	nodep	p;
 
@@ -154,7 +154,7 @@ boolean recoverable;
 			if (recoverable) break;
 			else
 				sysputf("Can't continue from this type of error");
-			if (feof(stdin)) exit(1);	/* port: stop at end of piped input */
+			if (feof(stdin)) exit(1L);	/* port: stop at end of piped input */
 			continue;
 		}
 
@@ -168,7 +168,7 @@ boolean recoverable;
 }
 
 
-signalinit() {
+long signalinit() {
 	char *s;
 
 	signal(SIGXCPU, trap_handler);
@@ -185,7 +185,7 @@ signalinit() {
 
 
 
-adainit() {
+long adainit() {
 	clearinterp();
 	syminit();
 }
@@ -197,8 +197,8 @@ adainit() {
 
 char	*write_core_flag;	/* set by write_core: save at top level */
 char	*read_core_flag;	/* set by read_core: restore at top level */
-extern	int time_stamp;		/* changes every time "ada" is linked */
-extern	int pagesize;		/* data segment starts on a page boundary */
+extern	long time_stamp;		/* changes every time "ada" is linked */
+extern	long pagesize;		/* data segment starts on a page boundary */
 
 
 
@@ -210,26 +210,26 @@ extern	int pagesize;		/* data segment starts on a page boundary */
 
 
 
-read_core_file(s) char *s;
-{	int fd, data_addr, time_in_file, idata; char fname[256];
-	fd _ open(s, 0);
+long read_core_file(s) char *s;
+{	long fd, data_addr, time_in_file, idata; char fname[256];
+	fd _ open(s, 0L);
 	if (fd != -1) { close(fd); sysputf("[port: %s is a memory image; it can't be restored on this machine]\n", s); }
 	return false;	/* port */
 	/* start of the data segment: first page boundary after the text */
 
-	idata _ (int)etext % pagesize ? (int)etext + pagesize - (int)etext % pagesize : (int)etext;
+	idata _ (long)etext % pagesize ? (long)etext + pagesize - (long)etext % pagesize : (long)etext;
 	/* s may point into the data segment we are about to overwrite,
 	   so keep a copy of the name */
 
 	strcpy(fname, s);
 	if (fd == -1) return false;
-	read(fd, &time_in_file, sizeof(int));
+	read(fd, &time_in_file, sizeof(long));
 	if (time_in_file != time_stamp) {
 		sysputf("[Core file '%s' doesn't match this version of Arcturus]", s);
 		close(fd);
 		return false;
 	}
-	read(fd, &data_addr, sizeof(int));
+	read(fd, &data_addr, sizeof(long));
 	brk(data_addr);
 	read(fd, idata, data_addr - idata);
 	close(fd);
@@ -238,17 +238,17 @@ read_core_file(s) char *s;
 }
 
 
-write_core_file(s) char *s;
-{	int data_addr, idata, fd;
+long write_core_file(s) char *s;
+{	long data_addr, idata, fd;
 	sysputf("[port: saving a memory image is not supported on this machine]\n");
 	return false;	/* port */
-	data_addr _ (int)sbrk(0);
-	idata _ (int)etext % pagesize ? (int)etext + pagesize - (int)etext % pagesize : (int)etext;
+	data_addr _ (long)sbrk(0L);
+	idata _ (long)etext % pagesize ? (long)etext + pagesize - (long)etext % pagesize : (long)etext;
 
-	fd _ creat(s, 0644);
+	fd _ creat(s, 0644L);
 	if (fd == -1) return false;
-	write(fd, &time_stamp, sizeof(int));
-	write(fd, &data_addr, sizeof(int));
+	write(fd, &time_stamp, sizeof(long));
+	write(fd, &data_addr, sizeof(long));
 	write(fd, idata, data_addr - idata);
 	close(fd);
 	putf("[Core file '%s' written]\n", s);
@@ -260,13 +260,13 @@ write_core_file(s) char *s;
 
 
 
-main(argc, argv)
-int argc; char **argv;
+long main(argc, argv)
+long argc; char **argv;
 {
 	char	buf[1024];
 	char	*ret;
 	nodep	p;
-	int	fd;
+	long	fd;
 
 	vadvise(VA_ANOM);
 

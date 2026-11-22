@@ -1,83 +1,83 @@
-# define ABORT 257
-# define ACCEPT 258
-# define ACCESS 259
-# define ALL 260
-# define AND 261
-# define ARRAY 262
-# define ASSIGN_OP 263
-# define AT 264
-# define XBEGIN 265
-# define BODY 266
-# define BOX 267
-# define CASE 268
-# define CONSTANT 269
-# define DBL_DOLLAR 270
-# define DECLARE 271
-# define DELAY 272
-# define DELTA 273
-# define DIGITS 274
-# define DO 275
-# define ELSE 276
-# define ELSIF 277
-# define END 278
-# define ENTRY 279
-# define EXCEPTION 280
-# define EXIT 281
-# define EXPONENTIAL 282
-# define FOR 283
-# define FUNCTION 284
-# define GENERIC 285
-# define GEQ 286
-# define GOTO 287
-# define IF 288
-# define IN 289
-# define IS 290
-# define LEFT_LABEL_BRACKET 291
-# define LEQ 292
-# define LIMITED 293
-# define LOOP 294
-# define MACRO 295
-# define MOD 296
-# define NEQ 297
-# define NEW 298
-# define NOT 299
-# define XNULL 300
-# define OF 301
-# define OR 302
-# define OTHERS 303
-# define OUT 304
-# define PACKAGE 305
-# define PRAGMA 306
-# define PRIVATE 307
-# define PROCEDURE 308
-# define RAISE 309
-# define RANGE 310
-# define RECORD 311
-# define REM 312
-# define RENAMES 313
-# define RETURN 314
-# define REVERSE 315
-# define RIGHT_ARROW 316
-# define RIGHT_LABEL_BRACKET 317
-# define SELECT 318
-# define SEPARATE 319
-# define SUBRANGE_SYM 320
-# define SUBTYPE 321
-# define TASK 322
-# define TERMINATE 323
-# define THEN 324
-# define TYPE 325
-# define USE 326
-# define WHEN 327
-# define WHILE 328
-# define WITH 329
-# define XOR 330
-# define Character 331
-# define Identifier 332
-# define Integer 333
-# define Operator_String 334
-# define Real 335
-# define String 336
+# define ABORT 257L
+# define ACCEPT 258L
+# define ACCESS 259L
+# define ALL 260L
+# define AND 261L
+# define ARRAY 262L
+# define ASSIGN_OP 263L
+# define AT 264L
+# define XBEGIN 265L
+# define BODY 266L
+# define BOX 267L
+# define CASE 268L
+# define CONSTANT 269L
+# define DBL_DOLLAR 270L
+# define DECLARE 271L
+# define DELAY 272L
+# define DELTA 273L
+# define DIGITS 274L
+# define DO 275L
+# define ELSE 276L
+# define ELSIF 277L
+# define END 278L
+# define ENTRY 279L
+# define EXCEPTION 280L
+# define EXIT 281L
+# define EXPONENTIAL 282L
+# define FOR 283L
+# define FUNCTION 284L
+# define GENERIC 285L
+# define GEQ 286L
+# define GOTO 287L
+# define IF 288L
+# define IN 289L
+# define IS 290L
+# define LEFT_LABEL_BRACKET 291L
+# define LEQ 292L
+# define LIMITED 293L
+# define LOOP 294L
+# define MACRO 295L
+# define MOD 296L
+# define NEQ 297L
+# define NEW 298L
+# define NOT 299L
+# define XNULL 300L
+# define OF 301L
+# define OR 302L
+# define OTHERS 303L
+# define OUT 304L
+# define PACKAGE 305L
+# define PRAGMA 306L
+# define PRIVATE 307L
+# define PROCEDURE 308L
+# define RAISE 309L
+# define RANGE 310L
+# define RECORD 311L
+# define REM 312L
+# define RENAMES 313L
+# define RETURN 314L
+# define REVERSE 315L
+# define RIGHT_ARROW 316L
+# define RIGHT_LABEL_BRACKET 317L
+# define SELECT 318L
+# define SEPARATE 319L
+# define SUBRANGE_SYM 320L
+# define SUBTYPE 321L
+# define TASK 322L
+# define TERMINATE 323L
+# define THEN 324L
+# define TYPE 325L
+# define USE 326L
+# define WHEN 327L
+# define WHILE 328L
+# define WITH 329L
+# define XOR 330L
+# define Character 331L
+# define Identifier 332L
+# define Integer 333L
+# define Operator_String 334L
+# define Real 335L
+# define String 336L
 
 # line 390 "parser.y"
 # include <stdio.h>
@@ -89,20 +89,20 @@
 # include "parser.h"
 
     static nodep parsetree;
-    extern int yylineno;
+    extern long yylineno;
     extern boolean in_call_form;
 
 # define yyerror(msg) 	{ vlookahead(yystate);  ada_perror("%s",msg); }
 
 #define yyclearin yychar = -1
 #define yyerrok yyerrflag = 0
-extern int yychar;
+extern long yychar;
 extern short yyerrflag;
 #ifndef YYMAXDEPTH
-#define YYMAXDEPTH 150
+#define YYMAXDEPTH 150L
 #endif
 YYSTYPE yylval, yyval;
-# define YYERRCODE 256
+# define YYERRCODE 256L
 
 # line 2503 "parser.y"
 
@@ -119,28 +119,27 @@ static nodep append(list,item)
     return list;
 }	
 
-static idcheck(ib,ie,ty)
+static long idcheck(ib,ie,ty)
     char *ib, *ie, *ty;
 {
     if (strcmp(ib,ie) != 0)
 	ada_perror("identifier mismatch %s %s / END %s",ty,ib,ie);
 }
 
-# include <varargs.h>
+# include <stdarg.h>	/* port: was <varargs.h> */
 /* port: block-scope externs, repeated at file scope */
-extern int yylineno;
+extern long yylineno;
 extern boolean in_call_form;
 
-static cm(va_alist)
-    va_dcl
+static long cm(nodep m, ...)	/* port: was cm(va_alist) va_dcl */
 {
     va_list pvar;
-    nodep p, m;
+    nodep p;
 
-    va_start(pvar);
-    m = (nodep)va_arg(pvar,nodep);	/* first argument is syntax node */
+    va_start(pvar, m);
+    /* port: m is the first argument, the syntax node */	/* first argument is syntax node */
 		/******* check this cast to make sure it's right ******/
-    while ((int)(p = (nodep)va_arg(pvar,nodep)) != -1) { 
+    while ((long)(p = (nodep)va_arg(pvar,nodep)) != -1) { 
 	if (p) {
 	    /* printf("attaching \"-- %s\" to %s node\n",p->nd.comment.text,nodename(m)); */
 	    m->ndf.ag = append(m->ndf.ag,p);
@@ -165,13 +164,13 @@ static cm(va_alist)
 
     if (list == null) return item;
     for (n=list; n->ndf.next != null; n = n->ndf.next);
-    cm(n,att,-1);
+    cm(n,att,-1L);
     n->ndf.next = item;
     return list;
 }	
 
 # ifdef YYDEBUG
-    int yydebug;
+    long yydebug;
 # endif YYDEBUG
 
     /*	parser() is the top level call to the parser.  Yacc generates a parser
@@ -256,8 +255,8 @@ short yyexca[] ={
 	58, 508,
 	-2, 504,
 	};
-# define YYNPROD 510
-# define YYLAST 2838
+# define YYNPROD 510L
+# define YYLAST 2838L
 short yyact[]={
 
  171, 405, 453,  72, 148, 154, 357, 156, 326, 206,
@@ -968,7 +967,7 @@ short yydef[]={
  115, 342,   0, 339,   0, 477, 427, 431,   0, 266,
  105, 344, 340,   0, 432 };
 #
-# define YYFLAG -1000
+# define YYFLAG -1000L
 # define YYERROR goto yyerrlab
 # define YYACCEPT return(0)
 # define YYABORT return(1)
@@ -976,14 +975,14 @@ short yydef[]={
 /*	parser for yacc output	*/
 
 #ifdef YYDEBUG
-int yydebug = 0; /* 1 for debugging */
+long yydebug = 0; /* 1 for debugging */
 #endif
 YYSTYPE yyv[YYMAXDEPTH]; /* where the values are stored */
-int yychar = -1; /* current input token number */
-int yynerrs = 0;  /* number of errors */
+long yychar = -1; /* current input token number */
+long yynerrs = 0;  /* number of errors */
 short yyerrflag = 0;  /* error recovery flag */
 
-yyparse() {
+long yyparse() {
 
 	short yys[YYMAXDEPTH];
 	short yyj, yym;
@@ -1166,41 +1165,41 @@ case 18:
 # line 461 "parser.y"
 { yyval.nodepointer = newnode(ident_node, nop_ident);
 			  yyval.nodepointer->nd.ident.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 19:
 # line 471 "parser.y"
 { yyval.nodepointer = newnode(integer_node, nop_int);
 			  yyval.nodepointer->nd.integer.val = yypvt[-0].integer.val;
 			  yyval.nodepointer->nd.integer.prval = yypvt[-0].integer.prval;
-			  cm(yyval.nodepointer,yypvt[-0].integer.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].integer.attach,-1L); } break;
 case 20:
 # line 477 "parser.y"
 { yyval.nodepointer = newnode(real_node, nop_real);
 			  yyval.nodepointer->nd.real.val = yypvt[-0].real.val;
 			  yyval.nodepointer->nd.real.prval = yypvt[-0].real.prval;
-			  cm(yyval.nodepointer,yypvt[-0].real.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].real.attach,-1L); } break;
 case 21:
 # line 488 "parser.y"
 { yyval.nodepointer = newnode(integer_node, nop_char);
 			  yyval.nodepointer->nd.integer.val = yypvt[-0].character.val;
-			  cm(yyval.nodepointer,yypvt[-0].character.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].character.attach,-1L); } break;
 case 22:
 # line 495 "parser.y"
 { yyval.nodepointer = newnode(ident_node, nop_string);
 			  yyval.nodepointer->nd.ident.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 23:
 # line 503 "parser.y"
 { yyval.nodepointer = newnode(pragma_node, nop_pragma);
 			  yyval.nodepointer->nd.pragmax.id = yypvt[-1].ident.val;
 			  yyval.nodepointer->nd.pragmax.args = null; 
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 24:
 # line 508 "parser.y"
 { yyval.nodepointer = newnode(pragma_node, nop_pragma);
 			  yyval.nodepointer->nd.pragmax.id = yypvt[-2].ident.val;
 			  yyval.nodepointer->nd.pragmax.args = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 34:
 # line 529 "parser.y"
 { yyval.nodepointer = newnode(obj_decl_node, nop_obj_decl);
@@ -1208,7 +1207,7 @@ case 34:
 			  yyval.nodepointer->nd.obj_decl.is_constant = false;
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 35:
 # line 537 "parser.y"
 { yyval.nodepointer = newnode(obj_decl_node, nop_obj_decl);
@@ -1216,7 +1215,7 @@ case 35:
 			  yyval.nodepointer->nd.obj_decl.is_constant = false;
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 36:
 # line 545 "parser.y"
 { yyval.nodepointer = newnode(obj_decl_node, nop_obj_decl);
@@ -1225,7 +1224,7 @@ case 36:
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 37:
 # line 554 "parser.y"
 { yyval.nodepointer = newnode(obj_decl_node, nop_obj_decl);
@@ -1234,14 +1233,14 @@ case 37:
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 38:
 # line 563 "parser.y"
 { yyval.nodepointer = null; } break;
 case 39:
 # line 565 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 40:
 # line 570 "parser.y"
 { yyval.nodepointer = newnode(obj_decl_node, nop_obj_decl);
@@ -1249,7 +1248,7 @@ case 40:
 			  yyval.nodepointer->nd.obj_decl.is_constant = true;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,
-				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 42:
 # line 579 "parser.y"
 { yyval.nodepointer = cmappend(yypvt[-2].nodepointer,yypvt[-0].nodepointer,yypvt[-1].ident.attach); } break;
@@ -1257,7 +1256,7 @@ case 43:
 # line 582 "parser.y"
 { yyval.nodepointer = newnode(id_decl_node, nop_id_decl);
 			  yyval.nodepointer->nd.id_decl.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 45:
 # line 591 "parser.y"
 { yyval.nodepointer = newnode(type_decl_node, nop_type);
@@ -1265,7 +1264,7 @@ case 45:
 			  yyval.nodepointer->nd.type_decl.disc = yypvt[-3].nodepointer;
 			  yyval.nodepointer-> nd.type_decl.typex = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,
-				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 47:
 # line 600 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -1275,7 +1274,7 @@ case 59:
 			  yyval.nodepointer->nd.type_decl.id = yypvt[-3].ident.val;
 			  yyval.nodepointer->nd.type_decl.typex = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,
-				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 61:
 # line 625 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
@@ -1288,23 +1287,23 @@ case 64:
 # line 635 "parser.y"
 { yyval.nodepointer = newnode(derived_type_node, nop_derived_type); 
 			  yyval.nodepointer->nd.derived_type.typex = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 65:
 # line 642 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; 
 			  yyval.nodepointer->nd.rangex.is_range_constraint = true;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 66:
 # line 647 "parser.y"
 { yyval.nodepointer = newnode(range_node, nop_range);
 			  yyval.nodepointer->nd.rangex.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.rangex.right = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 67:
 # line 655 "parser.y"
 { yyval.nodepointer = newnode(enumtype_node, nop_enum);
 			  yyval.nodepointer->nd.enumtype.ids = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 69:
 # line 661 "parser.y"
 { yyval.nodepointer = cmappend(yypvt[-2].nodepointer,yypvt[-0].nodepointer,yypvt[-1].ident.attach);  } break;
@@ -1312,47 +1311,47 @@ case 70:
 # line 664 "parser.y"
 { yyval.nodepointer = newnode(id_decl_node, nop_id_decl);
 			  yyval.nodepointer->nd.id_decl.id = yypvt[-0].ident.val; 
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 71:
 # line 668 "parser.y"
 { yyval.nodepointer = newnode(char_enum_node, nop_char_enum);
 			  yyval.nodepointer->nd.char_enum.ch = yypvt[-0].character.val;
-			  cm(yyval.nodepointer,yypvt[-0].character.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].character.attach,-1L); } break;
 case 76:
 # line 686 "parser.y"
 { yyval.nodepointer = newnode(range_node, nop_digits);
 			  yyval.nodepointer->nd.rangex.accuracy_expr = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 77:
 # line 690 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
 			  yyval.nodepointer->ndf.op = nop_digits;
 			  yyval.nodepointer->nd.rangex.accuracy_expr = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1L); } break;
 case 78:
 # line 698 "parser.y"
 { yyval.nodepointer = newnode(range_node, nop_delta);
 			  yyval.nodepointer->nd.rangex.accuracy_expr = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 79:
 # line 702 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
 			  yyval.nodepointer->ndf.op = nop_delta;
 			  yyval.nodepointer->nd.rangex.accuracy_expr = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1L); } break;
 case 80:
 # line 711 "parser.y"
 { yyval.nodepointer = newnode(array_node, nop_array);
 			  yyval.nodepointer->nd.arrayx.index_list = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.arrayx.ele_type = yypvt[-0].nodepointer;	 
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,-1L); } break;
 case 81:
 # line 717 "parser.y"
 { yyval.nodepointer = newnode(array_node, nop_array);
 			  yyval.nodepointer->nd.arrayx.index_list = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.arrayx.ele_type = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 82:
 # line 723 "parser.y"
 { yyval.nodepointer = newnode(index_node, nop_index);
@@ -1369,11 +1368,11 @@ case 84:
 			  yyval.nodepointer->nd.rangex.type_id = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.rangex.not_constrained = true; 
 			  yyval.nodepointer->nd.rangex.is_range_constraint = true;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 85:
 # line 739 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 86:
 # line 743 "parser.y"
 { yyval.nodepointer = newnode(index_node, nop_index);
@@ -1394,7 +1393,7 @@ case 91:
 { yyval.nodepointer = newnode(record_node, nop_record);
 			  yyval.nodepointer->nd.recordx.field_list = yypvt[-2].nodepointer; 
 			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 93:
 # line 768 "parser.y"
 { yyval.nodepointer = append(yypvt[-1].nodepointer,yypvt[-0].nodepointer); } break;
@@ -1414,7 +1413,7 @@ case 97:
 			  yyval.nodepointer->nd.obj_decl.is_constant = false;
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 98:
 # line 787 "parser.y"
 { yyval.nodepointer = newnode(obj_decl_node, nop_obj_decl);
@@ -1422,11 +1421,11 @@ case 98:
 			  yyval.nodepointer->nd.obj_decl.is_constant = false;
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 99:
 # line 797 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 101:
 # line 803 "parser.y"
 { yyval.nodepointer = append(yypvt[-2].nodepointer,yypvt[-0].nodepointer,yypvt[-1].ident.attach);  } break;
@@ -1437,14 +1436,14 @@ case 102:
 			  yyval.nodepointer->nd.obj_decl.is_constant = false;
 			  yyval.nodepointer->nd.obj_decl.subtypex = yypvt[-1].nodepointer;
 			  yyval.nodepointer->nd.obj_decl.initexp = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1L); } break;
 case 103:
 # line 817 "parser.y"
 { yyval.nodepointer = newnode(case_node, nop_rec_var);
 			  yyval.nodepointer->nd.casex.expr = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.casex.when_list = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach, -1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach, -1L); } break;
 case 104:
 # line 824 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -1455,7 +1454,7 @@ case 105:
 			  p->nd.whenx.choice_list = yypvt[-2].nodepointer;
 			  p->nd.whenx.stmt = yypvt[-0].nodepointer;
 			  yyval.nodepointer = append(yypvt[-4].nodepointer,p);
-			  cm(p,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(p,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 106:
 # line 835 "parser.y"
 { yyval.nodepointer = newnode(choice_node, nop_choice);
@@ -1478,20 +1477,20 @@ case 112:
 # line 855 "parser.y"
 { yyval.nodepointer = newnode(access_node, nop_access);
 			  yyval.nodepointer->nd.accessx.target_type = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 113:
 # line 862 "parser.y"
 { yyval.nodepointer = newnode(type_decl_node, nop_type);
 			  yyval.nodepointer->nd.type_decl.id = yypvt[-1].ident.val;
 			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 114:
 # line 867 "parser.y"
 { yyval.nodepointer = newnode(type_decl_node, nop_type);
 			  yyval.nodepointer->nd.type_decl.id = yypvt[-2].ident.val;
 			  yyval.nodepointer->nd.type_decl.disc = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 115:
 # line 876 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -1521,7 +1520,7 @@ case 131:
 { yyval.nodepointer = newnode(call_node, nop_call);
 			  yyval.nodepointer->nd.call.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.call.args = null;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 132:
 # line 914 "parser.y"
 { yyval.nodepointer = newnode(call_node, nop_call);
@@ -1533,48 +1532,48 @@ case 138:
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.selectx.field = yypvt[-0].ident.val;
 			  yyval.nodepointer->nd.selectx.is_oper = false;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 139:
 # line 936 "parser.y"
 { yyval.nodepointer = newnode(select_node, nop_dot);
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 140:
 # line 940 "parser.y"
 { yyval.nodepointer = newnode(select_node, nop_dot);
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.selectx.field = yypvt[-0].ident.val;
 			  yyval.nodepointer->nd.selectx.is_oper = true;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 141:
 # line 949 "parser.y"
 { yyval.nodepointer = newnode(select_node, nop_quote);
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.selectx.field = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 142:
 # line 954 "parser.y"
 { yyval.nodepointer = newnode(select_node, nop_quote);
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.selectx.field = intern("delta");
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 143:
 # line 959 "parser.y"
 { yyval.nodepointer = newnode(select_node, nop_quote);
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.selectx.field = intern("digits");
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 144:
 # line 964 "parser.y"
 { yyval.nodepointer = newnode(select_node, nop_quote);
 			  yyval.nodepointer->nd.selectx.var = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.selectx.field = intern("range");
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 145:
 # line 972 "parser.y"
 { yyval.nodepointer = newnode(aggregate_node, nop_aggregate); 
 			  yyval.nodepointer->nd.aggregate.agg = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 147:
 # line 978 "parser.y"
 { yyval.nodepointer = cmappend(yypvt[-2].nodepointer,yypvt[-0].nodepointer,yypvt[-1].ident.attach);  } break;
@@ -1587,129 +1586,129 @@ case 149:
 { yyval.nodepointer = newnode(agg_comp_node, nop_agg_comp);
 			  yyval.nodepointer->nd.agg_comp.choice = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.agg_comp.expr = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 156:
 # line 999 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_and);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 157:
 # line 1004 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_and);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 158:
 # line 1010 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_or);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 159:
 # line 1015 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_or);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 160:
 # line 1021 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_xor);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 161:
 # line 1026 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_xor);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 162:
 # line 1032 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_andthen);
 			  yyval.nodepointer->nd.binop.left = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 163:
 # line 1037 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_andthen);
 			  yyval.nodepointer->nd.binop.left = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 164:
 # line 1043 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_orelse);
 			  yyval.nodepointer->nd.binop.left = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 165:
 # line 1048 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_orelse);
 			  yyval.nodepointer->nd.binop.left = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 167:
 # line 1055 "parser.y"
 { yyval.nodepointer = newnode(inop_node, nop_in);
 			  yyval.nodepointer->nd.inop.expr = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.inop.not_in = false;
 			  yyval.nodepointer->nd.inop.rangex = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 168:
 # line 1061 "parser.y"
 { yyval.nodepointer = newnode(inop_node, nop_in);
 			  yyval.nodepointer->nd.inop.expr = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.inop.not_in = false;
 			  yyval.nodepointer->nd.inop.rangex = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 169:
 # line 1067 "parser.y"
 { yyval.nodepointer = newnode(inop_node, nop_in);
 			  yyval.nodepointer->nd.inop.expr = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.inop.not_in = true;
 			  yyval.nodepointer->nd.inop.rangex = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 170:
 # line 1073 "parser.y"
 { yyval.nodepointer = newnode(inop_node, nop_in);
 			  yyval.nodepointer->nd.inop.expr = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.inop.not_in = true;
 			  yyval.nodepointer->nd.inop.rangex = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 172:
 # line 1082 "parser.y"
 { yyval.nodepointer = newnode(binop_node, yypvt[-1].token.token);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1L); } break;
 case 175:
 # line 1091 "parser.y"
 { yyval.nodepointer = newnode(uop_node, yypvt[-1].token.token);
 			  yyval.nodepointer->nd.uop.child = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1L); } break;
 case 176:
 # line 1095 "parser.y"
 { yyval.nodepointer = newnode(binop_node, yypvt[-1].token.token);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1L); } break;
 case 179:
 # line 1104 "parser.y"
 { yyval.nodepointer = newnode(binop_node, yypvt[-1].token.token);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].token.attach,-1L); } break;
 case 181:
 # line 1111 "parser.y"
 { yyval.nodepointer = newnode(binop_node, nop_expon);
 			  yyval.nodepointer->nd.binop.left = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.binop.right = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 183:
 # line 1118 "parser.y"
 { yyval.nodepointer = newnode(uop_node, nop_lp);
 			  yyval.nodepointer->nd.uop.child = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 185:
 # line 1123 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
@@ -1770,17 +1769,17 @@ case 204:
 { yyval.nodepointer = newnode(aggregate_node, nop_qual_expr);
 			  yyval.nodepointer->nd.aggregate.qualifier = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.aggregate.agg = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 205:
 # line 1179 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
 			  yyval.nodepointer->nd.aggregate.qualifier = yypvt[-2].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 206:
 # line 1186 "parser.y"
 { yyval.nodepointer = newnode(new_node, nop_new);
 			  yyval.nodepointer->nd.newx.type_id = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 208:
 # line 1194 "parser.y"
 { yyval.nodepointer = append(yypvt[-1].nodepointer,yypvt[-0].nodepointer); } break;
@@ -1797,17 +1796,17 @@ case 242:
 # line 1248 "parser.y"
 { yyval.nodepointer = newnode(ident_node, nop_lb); 
 			  yyval.nodepointer->nd.ident.id = yypvt[-1].ident.val;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 243:
 # line 1253 "parser.y"
 { yyval.nodepointer = newnode(simple_node, nop_null_stmt);
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 244:
 # line 1259 "parser.y"
 { yyval.nodepointer = newnode(asgn_stmt_node, nop_asgn);
 			  yyval.nodepointer->nd.asgn_stmt.lhs = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.asgn_stmt.rhs = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 245:
 # line 1268 "parser.y"
 { yyval.nodepointer = newnode(if_node, nop_if);
@@ -1815,7 +1814,7 @@ case 245:
 			  yyval.nodepointer->nd.elsifx.then_part = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.ifx.elsif_list = append(yypvt[-4].nodepointer,yypvt[-3].nodepointer); 
 			  cm(yyval.nodepointer,yypvt[-8].ident.attach,yypvt[-6].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 246:
 # line 1276 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -1826,7 +1825,7 @@ case 247:
 			  p->nd.elsifx.expr = yypvt[-2].nodepointer;
 			  p->nd.elsifx.then_part = yypvt[-0].nodepointer;
 			  yyval.nodepointer = append(yypvt[-4].nodepointer,p); 
-			  cm(p,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(p,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 248:
 # line 1286 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -1834,7 +1833,7 @@ case 249:
 # line 1288 "parser.y"
 { yyval.nodepointer = newnode(elsif_node, nop_elsif);
 			  yyval.nodepointer->nd.elsifx.then_part = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 251:
 # line 1297 "parser.y"
 { yyval.nodepointer = newnode(case_node, nop_case);
@@ -1842,7 +1841,7 @@ case 251:
 			  yyval.nodepointer->nd.casex.when_list = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,
 				yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,
-				-1); } break;
+				-1L); } break;
 case 252:
 # line 1305 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -1853,14 +1852,14 @@ case 253:
 			  p->nd.whenx.choice_list = yypvt[-2].nodepointer;
 			  p->nd.whenx.stmt = yypvt[-0].nodepointer;
 			  yyval.nodepointer = append(yypvt[-4].nodepointer,p);
-			  cm(p,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(p,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 255:
 # line 1319 "parser.y"
 { idcheck(yypvt[-4].ident.val,yypvt[-1].ident.val,"LOOP");
 			  yyval.nodepointer = newnode(while_node, nop_loop);
 			  yyval.nodepointer->nd.whilex.label = yypvt[-4].ident.val;
 			  yyval.nodepointer->nd.whilex.bodyx = yypvt[-2].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 256:
 # line 1326 "parser.y"
 { idcheck(yypvt[-5].ident.val,yypvt[-1].ident.val,"LOOP");
@@ -1873,12 +1872,12 @@ case 256:
 				yyval.nodepointer->nd.forx.bodyx = yypvt[-2].nodepointer; 
 				yyval.nodepointer->nd.forx.label = yypvt[-5].ident.val;
 			  }
-			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 257:
 # line 1339 "parser.y"
 { yyval.nodepointer = newnode(while_node, nop_loop);
 			  yyval.nodepointer->nd.whilex.bodyx = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 258:
 # line 1343 "parser.y"
 { yyval.nodepointer = yypvt[-2].nodepointer;
@@ -1886,19 +1885,19 @@ case 258:
 				yyval.nodepointer->nd.whilex.bodyx = yypvt[-1].nodepointer;
 			  else
 				yyval.nodepointer->nd.forx.bodyx = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 259:
 # line 1351 "parser.y"
 { yyval.nodepointer = yypvt[-2].nodepointer; 
 			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 260:
 # line 1356 "parser.y"
 { yyval.nodepointer = newnode(for_node, nop_for);
 			  yyval.nodepointer->nd.forx.cntrl_var = yypvt[-2].ident.val;
 			  yyval.nodepointer->nd.forx.reversex = false;
 			  yyval.nodepointer->nd.forx.lims = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 261:
 # line 1362 "parser.y"
 { yyval.nodepointer = newnode(for_node, nop_for);
@@ -1906,12 +1905,12 @@ case 261:
 			  yyval.nodepointer->nd.forx.reversex = true;
 			  yyval.nodepointer->nd.forx.lims = yypvt[-0].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,-1L); } break;
 case 262:
 # line 1369 "parser.y"
 { yyval.nodepointer = newnode(while_node, nop_while);
 			  yyval.nodepointer->nd.whilex.expr = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 265:
 # line 1380 "parser.y"
 { idcheck(yypvt[-7].ident.val,yypvt[-1].ident.val,"BLOCK");
@@ -1921,7 +1920,7 @@ case 265:
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.subp.except = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-6].ident.attach,yypvt[-5].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 266:
 # line 1391 "parser.y"
 { idcheck(yypvt[-9].ident.val, yypvt[-1].ident.val, "BLOCK");
@@ -1932,7 +1931,7 @@ case 266:
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.subp.except = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-9].ident.attach,yypvt[-8].ident.attach,yypvt[-7].ident.attach,yypvt[-5].ident.attach,
-				yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 267:
 # line 1402 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_declare);
@@ -1940,7 +1939,7 @@ case 267:
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.subp.except = yypvt[-2].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,
-				-1); } break;
+				-1L); } break;
 case 268:
 # line 1410 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_declare);
@@ -1949,59 +1948,59 @@ case 268:
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.subp.except = yypvt[-2].nodepointer; 
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-4].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 269:
 # line 1421 "parser.y"
 { yyval.nodepointer = newnode(exit_node, nop_exit);
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 270:
 # line 1424 "parser.y"
 { yyval.nodepointer = newnode(exit_node, nop_exit);
 			  yyval.nodepointer->nd.exitx.loop_name = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 271:
 # line 1428 "parser.y"
 { yyval.nodepointer = newnode(exit_node, nop_exit);
 			  yyval.nodepointer->nd.exitx.cond = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,
-				-1); } break;
+				-1L); } break;
 case 272:
 # line 1433 "parser.y"
 { yyval.nodepointer = newnode(exit_node, nop_exit);
 			  yyval.nodepointer->nd.exitx.loop_name = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.exitx.cond = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,
-				-1); } break;
+				-1L); } break;
 case 273:
 # line 1442 "parser.y"
 { yyval.nodepointer = newnode(return_node, nop_return);
 			  yyval.nodepointer->nd.returnx.val = null; 
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 274:
 # line 1446 "parser.y"
 { yyval.nodepointer = newnode(return_node, nop_return);
 			  yyval.nodepointer->nd.returnx.val = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 275:
 # line 1453 "parser.y"
 { yyval.nodepointer = newnode(goto_node, nop_goto);
 			  yyval.nodepointer->nd.gotox.label = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 276:
 # line 1460 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 277:
 # line 1463 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 280:
 # line 1469 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_procedure);
 			  yyval.nodepointer->nd.subp.name = yypvt[-0].ident.val; 
 			  yyval.nodepointer->nd.subp.is_oper = false;
 			  yyval.nodepointer->nd.subp.is_separate = false;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 281:
 # line 1475 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_procedure);
@@ -2009,7 +2008,7 @@ case 281:
 			  yyval.nodepointer->nd.subp.is_oper = false;
 			  yyval.nodepointer->nd.subp.is_separate = false;
 			  yyval.nodepointer->nd.subp.spec = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 282:
 # line 1482 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_function);
@@ -2018,7 +2017,7 @@ case 282:
 			  yyval.nodepointer->nd.subp.is_separate = false;
 			  yyval.nodepointer->nd.subp.spec = null;
 			  yyval.nodepointer->nd.subp.ret_type = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1);  } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L);  } break;
 case 283:
 # line 1490 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_function);
@@ -2027,7 +2026,7 @@ case 283:
 			  yyval.nodepointer->nd.subp.is_separate = false;
 			  yyval.nodepointer->nd.subp.spec = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.subp.ret_type = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-1].ident.attach,-1);  } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-1].ident.attach,-1L);  } break;
 case 284:
 # line 1499 "parser.y"
 { yyval.ident.val = yypvt[-0].ident.val;
@@ -2042,11 +2041,11 @@ case 286:
 # line 1508 "parser.y"
 { yyval.nodepointer = newnode(ident_node, nop_oper_string);
 			  yyval.nodepointer->nd.ident.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 287:
 # line 1513 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 289:
 # line 1519 "parser.y"
 { yyval.nodepointer = cmappend(yypvt[-2].nodepointer,yypvt[-0].nodepointer,yypvt[-1].ident.attach); } break;
@@ -2057,7 +2056,7 @@ case 290:
 			  yyval.nodepointer->nd.param_decl.is_in = yypvt[-1].param_mode.in;
 			  yyval.nodepointer->nd.param_decl.is_out = yypvt[-1].param_mode.out;
 			  yyval.nodepointer->nd.param_decl.subtyp = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1L); } break;
 case 291:
 # line 1530 "parser.y"
 { yyval.nodepointer = newnode(param_decl_node, nop_param);
@@ -2066,7 +2065,7 @@ case 291:
 			  yyval.nodepointer->nd.param_decl.is_out = yypvt[-3].param_mode.out;
 			  yyval.nodepointer->nd.param_decl.subtyp = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.param_decl.initexp = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 292:
 # line 1539 "parser.y"
 { yyval.param_mode.in = true;
@@ -2094,14 +2093,14 @@ case 296:
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-4].nodepointer; 
 			  yyval.nodepointer->nd.subp.except = yypvt[-3].nodepointer; 
 			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-5].ident.attach,yypvt[-2].ident.attach,
-			     yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			     yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 297:
 # line 1568 "parser.y"
 { yyval.nodepointer = null; } break;
 case 298:
 # line 1570 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 300:
 # line 1575 "parser.y"
 { yyval.nodepointer = append(yypvt[-1].nodepointer,yypvt[-0].nodepointer); } break;
@@ -2130,11 +2129,11 @@ case 303:
 				yyval.nodepointer->nd.call.var = yypvt[-1].nodepointer;
 				yyval.nodepointer->nd.call.args = null;
 			  }
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 304:
 # line 1609 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 307:
 # line 1616 "parser.y"
 { yyval.nodepointer = newnode(package_node, nop_package);
@@ -2143,7 +2142,7 @@ case 307:
 			  yyval.nodepointer->nd.packagex.priv_decl = yypvt[-1].nodepointer; 
 			  yyval.nodepointer->nd.packagex.is_separate = false;
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-3].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 308:
 # line 1625 "parser.y"
 { yyval.nodepointer = newnode(package_node, nop_package);
@@ -2153,7 +2152,7 @@ case 308:
 			  yyval.nodepointer->nd.packagex.is_separate = false;
 			  idcheck(yypvt[-5].ident.val,yypvt[-0].ident.val,"PACKAGE");
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-5].ident.attach,yypvt[-4].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 309:
 # line 1636 "parser.y"
 { yyval.nodepointer = newnode(package_node, nop_body);
@@ -2164,7 +2163,7 @@ case 309:
 			  yyval.nodepointer->nd.packagex.except = yypvt[-2].nodepointer2.p2;
 			  yyval.nodepointer->nd.packagex.is_separate = false;
 			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-6].ident.attach,yypvt[-5].ident.attach,
-				yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 310:
 # line 1647 "parser.y"
 { yyval.nodepointer = newnode(package_node, nop_body);
@@ -2177,7 +2176,7 @@ case 310:
 			  idcheck(yypvt[-6].ident.val,yypvt[-1].ident.val,"PACKAGE BODY");
 			  cm(yyval.nodepointer,yypvt[-8].ident.attach,yypvt[-7].ident.attach,yypvt[-6].ident.attach,
 				yypvt[-5].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 311:
 # line 1660 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -2190,7 +2189,7 @@ case 313:
 case 314:
 # line 1667 "parser.y"
 { yyval.nodepointer = append(yypvt[-1].nodepointer,yypvt[-0].nodepointer);
-			  cm(yypvt[-0].nodepointer,yypvt[-2].ident.attach,-1); } break;
+			  cm(yypvt[-0].nodepointer,yypvt[-2].ident.attach,-1L); } break;
 case 315:
 # line 1671 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -2211,16 +2210,16 @@ case 319:
 case 320:
 # line 1688 "parser.y"
 { yyval.nodepointer = newnode(simple_node, nop_private);
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 321:
 # line 1691 "parser.y"
 { yyval.nodepointer = newnode(simple_node, nop_limited);
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 322:
 # line 1698 "parser.y"
 { yyval.nodepointer = newnode(use_node, nop_use); 
 			  yyval.nodepointer->nd.usex.list = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 323:
 # line 1703 "parser.y"
 { yyval.nodepointer = newnode(name_list_node, nop_name);
@@ -2237,25 +2236,25 @@ case 325:
 			  yyval.nodepointer->nd.obj_rename.id_list = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.obj_rename.typex = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.obj_rename.old_name = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 326:
 # line 1720 "parser.y"
 { yyval.nodepointer = newnode(obj_rename_node, nop_except_ren);
 			  yyval.nodepointer->nd.obj_rename.id_list = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.obj_rename.old_name = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 327:
 # line 1725 "parser.y"
 { yyval.nodepointer = newnode(pack_ren_node, nop_pack_ren);
 			  yyval.nodepointer->nd.pack_ren.id = yypvt[-3].ident.val;
 			  yyval.nodepointer->nd.pack_ren.old_name = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 328:
 # line 1730 "parser.y"
 { yyval.nodepointer = newnode(pack_ren_node, nop_task_ren);
 			  yyval.nodepointer->nd.pack_ren.id = yypvt[-3].ident.val;
 			  yyval.nodepointer->nd.pack_ren.old_name = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 329:
 # line 1735 "parser.y"
 { yyval.nodepointer = yypvt[-3].nodepointer;
@@ -2264,31 +2263,31 @@ case 329:
 			  else
 				yyval.nodepointer->ndf.op = nop_proc_ren;
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach, yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach, yypvt[-0].ident.attach,-1L); } break;
 case 331:
 # line 1748 "parser.y"
 { yyval.nodepointer = newnode(task_node, nop_task);
 			  yyval.nodepointer->nd.taskx.name = yypvt[-1].ident.val;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 332:
 # line 1752 "parser.y"
 { yyval.nodepointer = newnode(task_node, nop_task_type);
 			  yyval.nodepointer->nd.taskx.name = yypvt[-1].ident.val;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 333:
 # line 1756 "parser.y"
 { yyval.nodepointer = newnode(task_node, nop_task);
 			  yyval.nodepointer->nd.taskx.name = yypvt[-2].ident.val; 
 			  yyval.nodepointer->nd.taskx.entryx = yypvt[-1].nodepointer2.p1;
 			  yyval.nodepointer->nd.taskx.rep_spec = yypvt[-1].nodepointer2.p1;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 334:
 # line 1762 "parser.y"
 { yyval.nodepointer = newnode(task_node, nop_task);
 			  yyval.nodepointer->nd.taskx.name = yypvt[-2].ident.val; 
 			  yyval.nodepointer->nd.taskx.entryx = yypvt[-1].nodepointer2.p1;
 			  yyval.nodepointer->nd.taskx.rep_spec = yypvt[-1].nodepointer2.p1;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 335:
 # line 1770 "parser.y"
 { yyval.nodepointer2.p1 = yypvt[-2].nodepointer;  yyval.nodepointer2.p2 = yypvt[-1].nodepointer;
@@ -2312,7 +2311,7 @@ case 339:
 			  yyval.nodepointer->nd.taskx.bodyx = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.taskx.except = yypvt[-2].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-9].ident.attach,yypvt[-8].ident.attach,yypvt[-7].ident.attach,yypvt[-6].ident.attach,
-				yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-4].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 340:
 # line 1796 "parser.y"
 { yyval.nodepointer = newnode(task_node, nop_task_body);
@@ -2321,25 +2320,25 @@ case 340:
 			  yyval.nodepointer->nd.taskx.bodyx = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.taskx.except = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-10].ident.attach,yypvt[-9].ident.attach,yypvt[-8].ident.attach,yypvt[-7].ident.attach,
-				yypvt[-5].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+				yypvt[-5].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 341:
 # line 1807 "parser.y"
 { yyval.nodepointer = newnode(entry_node, nop_entry);
 			  yyval.nodepointer->nd.entryx.id = yypvt[-1].ident.val;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 342:
 # line 1811 "parser.y"
 { yyval.nodepointer = newnode(entry_node, nop_entry);
 			  yyval.nodepointer->nd.entryx.id = yypvt[-4].ident.val;
 			  yyval.nodepointer->nd.entryx.rangex = yypvt[-2].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 343:
 # line 1817 "parser.y"
 { yyval.nodepointer = newnode(entry_node, nop_entry);
 			  yyval.nodepointer->nd.entryx.id = yypvt[-2].ident.val;
 			  yyval.nodepointer->nd.entryx.formal = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 344:
 # line 1822 "parser.y"
 { yyval.nodepointer = newnode(entry_node, nop_entry);
@@ -2347,30 +2346,30 @@ case 344:
 			  yyval.nodepointer->nd.entryx.rangex = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.entryx.formal = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 345:
 # line 1830 "parser.y"
 { yyval.nodepointer = newnode(accept_node, nop_accept);
 			  yyval.nodepointer->nd.acceptx.name = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 346:
 # line 1834 "parser.y"
 { yyval.nodepointer = newnode(accept_node, nop_accept);
 			  yyval.nodepointer->nd.acceptx.name = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.acceptx.stmts = yypvt[-2].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 347:
 # line 1839 "parser.y"
 { yyval.nodepointer = newnode(accept_node, nop_accept);
 			  yyval.nodepointer->nd.acceptx.name = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.acceptx.stmts = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 348:
 # line 1848 "parser.y"
 { yyval.nodepointer = newnode(delay_node, nop_delay);
 			  yyval.nodepointer->nd.delayx.expr = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 352:
 # line 1860 "parser.y"
 { nodep p;
@@ -2381,14 +2380,14 @@ case 352:
 			  p = append(p,yypvt[-4].nodepointer);
 			  p = append(p,yypvt[-3].nodepointer);
 			  yyval.nodepointer->nd.select_wait.or_list = p;
-			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 353:
 # line 1871 "parser.y"
 { yyval.nodepointer = null; } break;
 case 354:
 # line 1873 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 355:
 # line 1877 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -2399,20 +2398,20 @@ case 357:
 # line 1882 "parser.y"
 { yyval.nodepointer = newnode(select_when_node, nop_sel_when); 
 			  yyval.nodepointer->nd.select_when.whenx = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 358:
 # line 1886 "parser.y"
 { yyval.nodepointer = newnode(select_when_node, nop_sel_when); 
 			  yyval.nodepointer->nd.select_when.whenx = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.select_when.alt = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 359:
 # line 1892 "parser.y"
 { yyval.nodepointer = null; } break;
 case 360:
 # line 1894 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 361:
 # line 1898 "parser.y"
 { yyval.nodepointer = append(yypvt[-1].nodepointer,yypvt[-0].nodepointer); } break;
@@ -2422,7 +2421,7 @@ case 362:
 case 363:
 # line 1902 "parser.y"
 { yyval.nodepointer = newnode(simple_node, nop_terminate);
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 364:
 # line 1906 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -2432,7 +2431,7 @@ case 366:
 			  yyval.nodepointer->nd.cond_entry.call = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.cond_entry.else_part = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-6].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 367:
 # line 1920 "parser.y"
 { yyval.nodepointer = newnode(cond_entry_node, nop_cond_ent); 
@@ -2440,7 +2439,7 @@ case 367:
 			  yyval.nodepointer->nd.cond_entry.stmt = yypvt[-5].nodepointer;
 			  yyval.nodepointer->nd.cond_entry.else_part = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 368:
 # line 1933 "parser.y"
 { yyval.nodepointer = newnode(timed_entry_node, nop_timed_ent);
@@ -2448,12 +2447,12 @@ case 368:
 			  yyval.nodepointer->nd.timed_entry.stmt = yypvt[-6].nodepointer;
 			  yyval.nodepointer->nd.timed_entry.or_part = append(yypvt[-4].nodepointer,yypvt[-3].nodepointer);
 			  cm(yyval.nodepointer,yypvt[-8].ident.attach,yypvt[-5].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 369:
 # line 1943 "parser.y"
 { yyval.nodepointer = newnode(abort_node, nop_abort);
 			  yyval.nodepointer->nd.abortx.tasks = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 371:
 # line 1949 "parser.y"
 { yyval.nodepointer = cmappend(yypvt[-2].nodepointer,yypvt[-0].nodepointer,yypvt[-1].ident.attach);  } break;
@@ -2507,7 +2506,7 @@ case 384:
 # line 1998 "parser.y"
 { yyval.nodepointer = newnode(use_node, nop_with); 
 			  yyval.nodepointer->nd.usex.list = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 385:
 # line 2003 "parser.y"
 { yyval.nodepointer = newnode(name_list_node, nop_name);
@@ -2522,38 +2521,38 @@ case 387:
 # line 2014 "parser.y"
 { yyval.nodepointer = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.subp.is_separate = true;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 388:
 # line 2018 "parser.y"
 { yyval.nodepointer = newnode(package_node, nop_body);
 			  yyval.nodepointer->nd.packagex.name = yypvt[-3].ident.val; 
 			  yyval.nodepointer->nd.packagex.is_separate = true; 
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 389:
 # line 2024 "parser.y"
 { yyval.nodepointer = newnode(task_node, nop_task_body);
 			  yyval.nodepointer->nd.taskx.name = yypvt[-3].ident.val; 
 			  yyval.nodepointer->nd.taskx.is_separate = true; 
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 390:
 # line 2031 "parser.y"
 { yyval.nodepointer = newnode(subunit_node, nop_subunit); 
 			  yyval.nodepointer->nd.subunitx.name = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.subunitx.bodyx = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 391:
 # line 2039 "parser.y"
 { yyval.nodepointer = newnode(except_decl_node, nop_except_decl);
 			  yyval.nodepointer->nd.except_decl.id_list = yypvt[-3].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 392:
 # line 2047 "parser.y"
 { yyval.nodepointer = newnode(when_node, nop_when);
 			  yyval.nodepointer->nd.whenx.choice_list = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.whenx.stmt = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 393:
 # line 2053 "parser.y"
 { yyval.nodepointer = newnode(choice_node, nop_choice);
@@ -2570,24 +2569,24 @@ case 396:
 case 397:
 # line 2068 "parser.y"
 { yyval.nodepointer = newnode(raise_node, nop_raise);
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 398:
 # line 2071 "parser.y"
 { yyval.nodepointer = newnode(raise_node, nop_raise);
 			  yyval.nodepointer->nd.raisex.except = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 399:
 # line 2078 "parser.y"
 { yyval.nodepointer = newnode(generic_node, nop_generic);
 			  yyval.nodepointer->nd.genericx.param = yypvt[-2].nodepointer1.p;
 			  yyval.nodepointer->nd.genericx.unit = yypvt[-1].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-2].nodepointer1.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].nodepointer1.attach,yypvt[-0].ident.attach,-1L); } break;
 case 400:
 # line 2084 "parser.y"
 { yyval.nodepointer = newnode(generic_node, nop_generic);
 			  yyval.nodepointer->nd.genericx.param = yypvt[-2].nodepointer1.p;
 			  yyval.nodepointer->nd.genericx.unit = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].nodepointer1.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].nodepointer1.attach,yypvt[-0].ident.attach,-1L); } break;
 case 401:
 # line 2090 "parser.y"
 { yyval.nodepointer1.p = null;
@@ -2605,7 +2604,7 @@ case 406:
 			  yyval.nodepointer->nd.type_decl.id = yypvt[-3].ident.val;
 			  yyval.nodepointer-> nd.type_decl.typex = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,
-				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 407:
 # line 2109 "parser.y"
 { yyval.nodepointer = newnode(type_decl_node, nop_type);
@@ -2613,45 +2612,45 @@ case 407:
 			  yyval.nodepointer->nd.type_decl.disc = yypvt[-3].nodepointer;
 			  yyval.nodepointer-> nd.type_decl.typex = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-4].ident.attach,
-				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 408:
 # line 2116 "parser.y"
 { yyval.nodepointer = newnode(gen_with_node, nop_gen_with); 
 			  yyval.nodepointer->nd.gen_with.subp = yypvt[-1].nodepointer; 
 			  yyval.nodepointer->nd.gen_with.box = false;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 409:
 # line 2121 "parser.y"
 { yyval.nodepointer = newnode(gen_with_node, nop_gen_with); 
 			  yyval.nodepointer->nd.gen_with.subp = yypvt[-3].nodepointer; 
 			  yyval.nodepointer->nd.gen_with.name = yypvt[-1].nodepointer;
 			  yyval.nodepointer->nd.gen_with.box = false;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 410:
 # line 2127 "parser.y"
 { yyval.nodepointer = newnode(gen_with_node, nop_gen_with); 
 			  yyval.nodepointer->nd.gen_with.subp = yypvt[-3].nodepointer; 
 			  yyval.nodepointer->nd.gen_with.box = true;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 411:
 # line 2133 "parser.y"
 { yyval.nodepointer = newnode(simple_node, nop_disc_type);
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 412:
 # line 2136 "parser.y"
 { yyval.nodepointer = newnode(range_node, nop_range);
 			  yyval.nodepointer->nd.rangex.not_constrained = true;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 413:
 # line 2140 "parser.y"
 { yyval.nodepointer = newnode(range_node, nop_delta);
 			  yyval.nodepointer->nd.rangex.not_constrained = true;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 414:
 # line 2144 "parser.y"
 { yyval.nodepointer = newnode(range_node, nop_digits);
 			  yyval.nodepointer->nd.rangex.not_constrained = true;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 418:
 # line 2155 "parser.y"
 { yyval.nodepointer = yypvt[-3].nodepointer;
@@ -2660,7 +2659,7 @@ case 418:
 			  else
 				yyval.nodepointer->ndf.op = nop_proc_ginst;
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 419:
 # line 2163 "parser.y"
 { yyval.nodepointer = newnode(subp_node, nop_func_ginst);
@@ -2668,7 +2667,7 @@ case 419:
 			  yyval.nodepointer->nd.subp.is_oper = yypvt[-3].ident.flag;
 			  yyval.nodepointer->nd.subp.is_separate = false;
 			  yyval.nodepointer->nd.subp.bodyx = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 420:
 # line 2172 "parser.y"
 { yyval.nodepointer = newnode(package_node, nop_pack_ginst);
@@ -2676,26 +2675,26 @@ case 420:
 			  yyval.nodepointer->nd.packagex.is_separate = false;
 			  yyval.nodepointer->nd.packagex.bodyx = yypvt[-1].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-0].ident.attach,-1); } break;
+				yypvt[-0].ident.attach,-1L); } break;
 case 421:
 # line 2180 "parser.y"
 { yyval.nodepointer = newnode(instant_node, nop_instant);
 			  yyval.nodepointer->nd.instant.name = yypvt[-1].ident.val;
 			  yyval.nodepointer->nd.instant.is_oper = yypvt[-1].ident.flag;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 422:
 # line 2185 "parser.y"
 { yyval.nodepointer = newnode(instant_node, nop_instant);
 			  yyval.nodepointer->nd.instant.name = yypvt[-2].ident.val;
 			  yyval.nodepointer->nd.instant.is_oper = yypvt[-2].ident.flag;
 			  yyval.nodepointer->nd.instant.arg = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,-1L); } break;
 case 426:
 # line 2200 "parser.y"
 { yyval.nodepointer = newnode(rep_spec_node, nop_len_spec); 
 			  yyval.nodepointer->nd.rep_spec.name = yypvt[-3].nodepointer;
 			  yyval.nodepointer->nd.rep_spec.expr = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-4].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 427:
 # line 2209 "parser.y"
 { yyval.nodepointer = newnode(rec_rspec_node, nop_rec_spec); 
@@ -2703,13 +2702,13 @@ case 427:
 			  yyval.nodepointer->nd.rec_rspec.algn = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.rec_rspec.loc = yypvt[-3].nodepointer;
 			  cm(yyval.nodepointer,yypvt[-8].ident.attach,yypvt[-6].ident.attach,yypvt[-5].ident.attach,yypvt[-2].ident.attach,
-				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+				yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 428:
 # line 2217 "parser.y"
 { yyval.nodepointer = null; } break;
 case 429:
 # line 2219 "parser.y"
-{ yyval.nodepointer = yypvt[-1].nodepointer;  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+{ yyval.nodepointer = yypvt[-1].nodepointer;  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 430:
 # line 2222 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -2717,30 +2716,30 @@ case 431:
 # line 2224 "parser.y"
 { yypvt[-1].nodepointer->nd.location.name = yypvt[-2].nodepointer;
 			  yyval.nodepointer = append(yypvt[-3].nodepointer,yypvt[-1].nodepointer);
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 432:
 # line 2229 "parser.y"
 { yyval.nodepointer = newnode(location_node, nop_at);
 			  yyval.nodepointer->nd.location.expr = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.location.rangex = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 433:
 # line 2235 "parser.y"
-{ yyval.nodepointer = yypvt[-0].nodepointer; cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+{ yyval.nodepointer = yypvt[-0].nodepointer; cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 434:
 # line 2240 "parser.y"
 { yyval.nodepointer = newnode(rep_spec_node, nop_addr_spec); 
 			  yyval.nodepointer->nd.rep_spec.name = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.rep_spec.expr = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-5].ident.attach,yypvt[-3].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 435:
 # line 2248 "parser.y"
 { yyval.nodepointer = newnode(code_node, nop_code);
 			  yyval.nodepointer->nd.code.expr = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 436:
 # line 2255 "parser.y"
-{ yyval.nodepointer = yypvt[-1].nodepointer; cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+{ yyval.nodepointer = yypvt[-1].nodepointer; cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 437:
 # line 2258 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; } break;
@@ -2761,7 +2760,7 @@ case 442:
 { yyval.nodepointer = newnode(arg_node, nop_arg);
 			  yyval.nodepointer->nd.arg.name = yypvt[-2].ident.val;
 			  yyval.nodepointer->nd.arg.exp = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-2].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 446:
 # line 2290 "parser.y"
 { yyval.nodepointer = newnode(simple_node, nop_null); } break;
@@ -2772,14 +2771,14 @@ case 460:
 			  yyval.nodepointer->nd.macrox.is_oper = false;
 			  yyval.nodepointer->nd.macrox.is_separate = false;
 			  yyval.nodepointer->nd.macrox.ret_type = yypvt[-0].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1);  } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L);  } break;
 case 461:
 # line 2334 "parser.y"
 { yyval.nodepointer = yypvt[-8].nodepointer;
 			  yyval.nodepointer->nd.macrox.decl = yypvt[-6].nodepointer;
 			  yyval.nodepointer->nd.macrox.bodyx = yypvt[-4].nodepointer; 
 			  yyval.nodepointer->nd.macrox.except = yypvt[-3].nodepointer; 
-			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-5].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-7].ident.attach,yypvt[-5].ident.attach,yypvt[-2].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 462:
 # line 2341 "parser.y"
 { yyval.nodepointer = null; } break;
@@ -2790,7 +2789,7 @@ case 465:
 # line 2347 "parser.y"
 { yyval.nodepointer = newnode(call_form_node, nop_macro_desig);
 			  yyval.nodepointer->nd.call_form.list = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); 
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); 
 			  in_call_form = false; } break;
 case 466:
 # line 2353 "parser.y"
@@ -2799,14 +2798,14 @@ case 468:
 # line 2357 "parser.y"
 { yyval.nodepointer = newnode(id_decl_node, nop_callf_ident);
 			  yyval.nodepointer->nd.id_decl.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 469:
 # line 2361 "parser.y"
 {in_call_form = false; } break;
 case 470:
 # line 2363 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1);
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L);
 			  in_call_form = true; } break;
 case 471:
 # line 2368 "parser.y"
@@ -2828,26 +2827,26 @@ case 476:
 { yyval.nodepointer = newnode(param_decl_node, nop_macro_param);
 			  yyval.nodepointer->nd.param_decl.id_list = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.param_decl.subtyp = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,-1L); } break;
 case 477:
 # line 2388 "parser.y"
 { yyval.nodepointer = newnode(param_decl_node, nop_macro_param);
 			  yyval.nodepointer->nd.param_decl.id_list = yypvt[-4].nodepointer;
 			  yyval.nodepointer->nd.param_decl.subtyp = yypvt[-2].nodepointer;
 			  yyval.nodepointer->nd.param_decl.initexp = yypvt[-0].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-1].ident.attach,-1L); } break;
 case 478:
 # line 2396 "parser.y"
 { yyval.nodepointer = newnode(param_decl_node, nop_macro_arr_param);
 			  if (yypvt[-2].nodepointer->ndf.next) 
 			     	ada_perror("Only one identifier allowed on array declaration");
  			  yyval.nodepointer->nd.param_decl.id_list = yypvt[-2].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 483:
 # line 2409 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer; 
 			  yyval.nodepointer->ndf.op = nop_decl_callf; 
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 484:
 # line 2414 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; yyval.nodepointer->ndf.op = nop_name_callf; } break;
@@ -2855,7 +2854,7 @@ case 485:
 # line 2417 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer; 
 			  yyval.nodepointer->ndf.op = nop_stmt_callf;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1);  } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L);  } break;
 case 486:
 # line 2422 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; yyval.nodepointer->ndf.op = nop_type_callf; } break;
@@ -2866,7 +2865,7 @@ case 488:
 # line 2429 "parser.y"
 { yyval.nodepointer = newnode(call_form_node, nop_decl_callf);
 			  yyval.nodepointer->nd.call_form.list = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); 
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); 
 			  in_call_form = false;} break;
 case 489:
 # line 2435 "parser.y"
@@ -2875,11 +2874,11 @@ case 491:
 # line 2439 "parser.y"
 { yyval.nodepointer = newnode(id_decl_node, nop_callf_ident);
 			  yyval.nodepointer->nd.id_decl.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 492:
 # line 2443 "parser.y"
 { yyval.nodepointer = newnode(macro_list_node, nop_callf_arg_list);
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 case 493:
 # line 2446 "parser.y"
 { in_call_form = false; } break;
@@ -2887,7 +2886,7 @@ case 494:
 # line 2448 "parser.y"
 { yyval.nodepointer = newnode(macro_list_node, nop_callf_arg_list);
 			  yyval.nodepointer->nd.macro_list.list = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1); 
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L); 
 			  in_call_form = true; } break;
 case 495:
 # line 2453 "parser.y"
@@ -2896,7 +2895,7 @@ case 496:
 # line 2455 "parser.y"
 { yyval.nodepointer = newnode(macro_list_node, nop_callf_stmt_arg);
 			  yyval.nodepointer->nd.macro_list.list = yypvt[-1].nodepointer;
-			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1);
+			  cm(yyval.nodepointer,yypvt[-3].ident.attach,yypvt[-0].ident.attach,-1L);
 			  in_call_form = true;  } break;
 case 497:
 # line 2462 "parser.y"
@@ -2914,7 +2913,7 @@ case 503:
 # line 2477 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer; 
 			  yyval.nodepointer->ndf.op = nop_decl_subst; 
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L); } break;
 case 504:
 # line 2482 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; yyval.nodepointer->ndf.op = nop_name_subst; } break;
@@ -2922,7 +2921,7 @@ case 505:
 # line 2485 "parser.y"
 { yyval.nodepointer = yypvt[-1].nodepointer; 
 			  yyval.nodepointer->ndf.op = nop_stmt_subst;
-			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1);  } break;
+			  cm(yyval.nodepointer,yypvt[-0].ident.attach,-1L);  } break;
 case 506:
 # line 2490 "parser.y"
 { yyval.nodepointer = yypvt[-0].nodepointer; yyval.nodepointer->ndf.op = nop_type_subst; } break;
@@ -2936,7 +2935,7 @@ case 509:
 # line 2499 "parser.y"
 { yyval.nodepointer = newnode(ident_node, nop_decl_subst);
 			  yyval.nodepointer->nd.ident.id = yypvt[-0].ident.val;
-			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1); } break;
+			  cm(yyval.nodepointer,yypvt[-1].ident.attach,yypvt[-0].ident.attach,-1L); } break;
 		}
 		goto yystack;  /* stack new state and value */
 

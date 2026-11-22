@@ -60,7 +60,7 @@ static char rcsid[] =
  *                      of interned identifier s
  *                      (in range 0..hashsize-1)
  */
-#define hashsize 256   /* can't be larger cause stored in byte */
+#define hashsize 256L   /* can't be larger cause stored in byte */
 
 struct ob_form {
         char    *ob_string;
@@ -75,10 +75,10 @@ char *strsav(s)
 char *s;
 {
         char *p;
-        int size;
+        long size;
 
         size = strlen(s) + 1;
-        p = (char *)zalloc(size, 0);
+        p = (char *)zalloc(size, 0L);
         strcpy(p,s);
         return(p);
 }
@@ -86,7 +86,7 @@ char *s;
 char *strapnd(s, t)
     char *s, *t;
 {
-    register int size = strlen(s) + strlen(t) + 1;
+    register long size = strlen(s) + strlen(t) + 1;
     register char *p;
 
     p = (char *)realloc(s, size);	/* doesn`t use zalloc so
@@ -98,9 +98,9 @@ char *strapnd(s, t)
 char *intern(s)
 char *s;
 {
-        int     h;
+        long     h;
         ob_type *p;
-        int     len;
+        long     len;
         char    *q;
 
         h = hash(s);
@@ -110,26 +110,26 @@ char *s;
                         return(p->ob_string);
                 p = p->ob_link;
         }
-        p = (ob_type *)zalloc(sizeof(ob_type), 0);
+        p = (ob_type *)zalloc(sizeof(ob_type), 0L);
         p->ob_link = hash_table[h];
         hash_table[h] = p;
         len = strlen(s) + 2;   /* byte for null and hash val */
-        q = (char *)zalloc(len, 0);
+        q = (char *)zalloc(len, 0L);
         *q++ = h;
         strcpy(q, s);
         return(p->ob_string = q);
 }
 
-int hashval(s)
+long hashval(s)
 char *s;
 {
         return(s[-1]&0377);
 }
 
-       int hash(s)
+       long hash(s)
 char *s;
 {
-        int r = 0;
+        long r = 0;
         char *t = s;
 
         while(*t)

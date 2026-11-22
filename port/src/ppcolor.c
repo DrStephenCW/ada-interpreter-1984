@@ -32,9 +32,9 @@ static char rcsid[] =
 # include "color.h"
 # include "pp.h"
 
-extern pp_count_init();
+extern long pp_count_init();
 extern color_name pp_count_color();
-extern int pp_depth;
+extern long pp_depth;
 
 color_name pp_color(p,c_use)
     nodep p;
@@ -58,7 +58,7 @@ color_name pp_color(p,c_use)
         case ppc_circular:
             {
                 color_name color;
-                static int color_num = 0;
+                static long color_num = 0;
 
                 do {
                     color = (color_name)(color_num++ % 8);
@@ -67,18 +67,18 @@ color_name pp_color(p,c_use)
             }
         case ppc_depth:
             {
-                int color_num;
+                long color_num;
 
                 color_num = pp_depth % 7;
-                if (color_num >= (int)cur_color.bg) color_num++;
+                if (color_num >= (long)cur_color.bg) color_num++;
                 return (color_name)color_num;           
             }
         default:
-            error("pp: invalid color usage (#%d)", (int)c_use);
+            error("pp: invalid color usage (#%d)", (long)c_use);
     }
 };
 
-pp_color_init(color_use)
+long pp_color_init(color_use)
     enum pp_color_use color_use;
 {
     switch (color_use) {

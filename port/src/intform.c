@@ -34,13 +34,13 @@ static char rcsid[] =
 # include "tab.h"
 # include "parser.h"
 /* port: block-scope externs, repeated at file scope */
-extern nill();
+extern long nill();
 extern nodep maptree();
 extern nodep maptreelist();
 
 extern char *adaread(), *parsething();
 
-extern int sizetab[];		/* size of each type of node indexed by
+extern long sizetab[];		/* size of each type of node indexed by
 				   nop_?? type */
 
 nodep ada_parse(ada_str,construct) /* ada callable function to parse
@@ -65,7 +65,7 @@ nodep ada_parse(ada_str,construct) /* ada callable function to parse
     return p;
 }
 
-ada_eval(p)
+long ada_eval(p)
     nodep p;
 {
     interp(p);
@@ -119,15 +119,15 @@ nodep body_int_form(f)
      ada_copytreelist does traverse the ndf.next link of the root.  It
      thus copies a list of items.		*/
 
-static pre_copy_tree(n, p)
+static long pre_copy_tree(n, p)
     nodep n, *p;
 {
-    register int i;
+    register long i;
     register char *m, *nn;
-    int size;
+    long size;
         
     if (n) {
-	size = sizetab[(int)n->ndf.op];   /* get a node for copy */
+	size = sizetab[(long)n->ndf.op];   /* get a node for copy */
 	m = (char *) (*p =(nodep)zalloc(size,false));
 	nn = (char *)n;
         for (i = 0; i < size; i++)  *m++ = *nn++; /* copy the node */
@@ -138,7 +138,7 @@ nodep ada_copytree(t)
     nodep t;
 {
     nodep p;
-    extern nill();
+    extern long nill();
     extern nodep maptree();
 
     p = maptree(t, pre_copy_tree, nill, nill, nill);
@@ -149,7 +149,7 @@ nodep ada_copytree(t)
 nodep ada_copytreelist(t)
     nodep t;
 {
-    extern nill();
+    extern long nill();
     extern nodep maptreelist();
     return maptreelist(t, pre_copy_tree, nill, nill, nill);
 }
@@ -159,7 +159,7 @@ nodep ada_copytreelist(t)
     parent, so care must be taken to set this to null if the tree has
     been spliced out of a list */
 
-static free_attach(n)	/*  frees an attachment, and recursively
+static long free_attach(n)	/*  frees an attachment, and recursively
 			    attachments of attachments, etc. */
     nodep n;
 {
@@ -169,7 +169,7 @@ static free_attach(n)	/*  frees an attachment, and recursively
     }
 }
 
-static free_node(n)
+static long free_node(n)
     nodep n;
 {
     apply_all_attach(n, free_attach);
@@ -177,7 +177,7 @@ static free_node(n)
     free(n);
 }
 
-free_tree(r)
+long free_tree(r)
     nodep r;
 {
     maptreelist(r, nill, free_node, nill, nill);

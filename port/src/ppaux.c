@@ -39,14 +39,14 @@ FILE * ppfile;
 static boolean vbars, number;
 static boolean print_attach, print_comment;
 
-static  indent = 0;
-static int  linenum;
-static int  pplevel;
-static int  lastcut;
-static int  blinesbefore;
-static int  blinesafter;
+static  long indent = 0;
+static long  linenum;
+static long  pplevel;
+static long  lastcut;
+static long  blinesbefore;
+static long  blinesafter;
 
-static int  foldwidth,		/* wider lines will be folded */
+static long  foldwidth,		/* wider lines will be folded */
             attachcol,		/* column in which attachments will start 
 				*/
             maxattcol,		/* largest column in which attachments
@@ -58,8 +58,8 @@ static int  foldwidth,		/* wider lines will be folded */
 				   maxwidth */
 boolean pp_first;
 
-# define Qsize 350
-# define Ssize 30
+# define Qsize 350L
+# define Ssize 30L
 
 enum qtype {
     qch, 			/* text character */
@@ -76,11 +76,11 @@ typedef struct {
 } Q;
 
 struct S {
-    int     indent;
+    long     indent;
     boolean setindent;
     boolean pack;
     boolean vbar;
-    int     blines;
+    long     blines;
     boolean firstcut;
     nodep attach;
 };
@@ -90,11 +90,11 @@ static  Q queue[Qsize];
 static  Q * get,
        *put,
        *last = &queue[Qsize-1];
-static int  width,
+static long  width,
             size;
 
-pp_init (mxwidth, attcol, pr_attach, pr_comment, vrt_bar, num)
-    int     mxwidth,
+long pp_init (mxwidth, attcol, pr_attach, pr_comment, vrt_bar, num)
+    long     mxwidth,
             attcol;
     boolean pr_attach, pr_comment, vrt_bar, num;
 {
@@ -121,8 +121,8 @@ pp_init (mxwidth, attcol, pr_attach, pr_comment, vrt_bar, num)
 }
 
 
-ps () {				/* print stack -- for debugging only */
-    int     sp,
+long ps () {				/* print stack -- for debugging only */
+    long     sp,
             ind;
     char    f1,
             f2,
@@ -138,12 +138,12 @@ ps () {				/* print stack -- for debugging only */
     }
 }
 
-pq () {				/* print queue -- for debugging only */
+long pq () {				/* print queue -- for debugging only */
     static  Q * x;
-    int     s,
+    long     s,
             w;
     enum qtype ty;
-    int     wid,
+    long     wid,
             ind;
     char    ch;
     boolean si;
@@ -190,9 +190,9 @@ pq () {				/* print queue -- for debugging only */
     }
 }
 
-static  enq (ty, wid, ch, ind, si)
+static  long enq (ty, wid, ch, ind, si)
     enum qtype ty;
-    int     wid,
+    long     wid,
             ind;
     char    ch;
     boolean si;
@@ -215,9 +215,9 @@ static  enq (ty, wid, ch, ind, si)
     }
 }
 
-        deq (ty, wid, ch, ind, si)
+        long deq (ty, wid, ch, ind, si)
     enum qtype * ty;
-    int    *wid,
+    long    *wid,
            *ind;
     char   *ch;
     boolean * si;
@@ -239,12 +239,12 @@ static  enq (ty, wid, ch, ind, si)
     }
 }
 
-static  lowcut (pos, cutlev)
-    int    *cutlev,
+static  long lowcut (pos, cutlev)
+    long    *cutlev,
            *pos;
 {
     Q * p;
-    int     i;
+    long     i;
 
     p = put;
     *cutlev = 999999;
@@ -261,9 +261,9 @@ static  lowcut (pos, cutlev)
     }
 }
 
-static  outattach (att, col)
+static  long outattach (att, col)
     char   *att;
-    int     col;
+    long     col;
 {
     char   *last;
     boolean first = true;
@@ -292,13 +292,13 @@ static  outattach (att, col)
     } while (*att != '\0');
 }
 
-static  printattach (a, col, attachcol)
+static  long printattach (a, col, attachcol)
     nodep a;
-    int     col,
+    long     col,
             attachcol;
 {
-    int     i;
-    int     comcol;
+    long     i;
+    long     comcol;
     char   *as;
 
     if (a != null) {
@@ -341,10 +341,10 @@ static  printattach (a, col, attachcol)
     }
 }
 
-        doindent (indent)
-    int     indent;
+        long doindent (indent)
+    long     indent;
 {
-    int     l,
+    long     l,
             i;
 
     if (vbars) {
@@ -383,10 +383,10 @@ static  printattach (a, col, attachcol)
     }
 }
 
-static  checkblanklines (lev)
-    int     lev;
+static  long checkblanklines (lev)
+    long     lev;
 {
-    int     l;
+    long     l;
 
     for (l = 1; l <= lev; l++) {
 	if (liststk[l].firstcut) {
@@ -398,8 +398,8 @@ static  checkblanklines (lev)
 }
 
 
-doblanklines () {
-    int     i;
+long doblanklines () {
+    long     i;
 
     if (pp_first)
 	pp_first = false;
@@ -415,17 +415,17 @@ doblanklines () {
     blinesafter = 0;
 }
 
-static  lineout (pos, lev)
-    int     pos;
-    int     lev;
+static  long lineout (pos, lev)
+    long     pos;
+    long     lev;
 {
     enum qtype ty;
-    int     wid,
+    long     wid,
             ind;
     char    ch;
-    int     i;
-    int     col;
-    int     linecut;
+    long     i;
+    long     col;
+    long     linecut;
     boolean si;
 
     if (lev < 99999)
@@ -449,8 +449,8 @@ static  lineout (pos, lev)
 	    else {
 		if (ch <= lev) {
 		    if (si && size > pos) {
-			int oldindent = liststk[ch].indent;
-			int i;
+			long oldindent = liststk[ch].indent;
+			long i;
 
 			liststk[ch].indent = col - 1;
 			for (i = ch+1; i <= pplevel; i++)
@@ -484,7 +484,7 @@ static  lineout (pos, lev)
     }
 }
 
-pp_stok(s, pre, post)		/* outputs a token with special effects.
+long pp_stok(s, pre, post)		/* outputs a token with special effects.
 				   pre and post are strings which are 
 				   printed before and after the token,
 				   respectively.  They should not take any
@@ -494,8 +494,8 @@ pp_stok(s, pre, post)		/* outputs a token with special effects.
            *pre,
            *post;
 {
-    int     lev;
-    int     pos,
+    long     lev;
+    long     pos,
             cutlev;
 
     if (strlen (s) + width + indent > foldwidth) {
@@ -504,39 +504,39 @@ pp_stok(s, pre, post)		/* outputs a token with special effects.
     }
 
     while (*pre)
-	enq (qch, 0, *pre++, 0, false);
+	enq (qch, 0L, *pre++, 0L, false);
     while (*s)
-	enq (qch, 1, *s++, 0, false);
+	enq (qch, 1L, *s++, 0L, false);
     while (*post)
-	enq (qch, 0, *post++, 0, false);
+	enq (qch, 0L, *post++, 0L, false);
 }
 
-pp_tok (t)
+long pp_tok (t)
     char   *t;
 {
     pp_stok (t, "", "");
 }
 
-pp_set_color(col)
+long pp_set_color(col)
     color_name col;
 {
     if (col != samecolor) {		/* don't put colors in queue */
         if (size == 0)
 	    set_fg(col);
         else
-	    enq (qcol, 0, col, 0, false);
+	    enq (qcol, 0L, col, 0L, false);
     }
 }
 
-pp_cut (sp) int sp; {
-    cut (sp, 0, false);
+long pp_cut (sp) long sp; {
+    cut (sp, 0L, false);
 }
-        cut (sp, ind, si)
-    int     sp,
+        long cut (sp, ind, si)
+    long     sp,
             ind;
     boolean si;
 {
-    int     i;
+    long     i;
 
     if (size == 0) {
 	if (lastcut > pplevel)
@@ -547,22 +547,22 @@ pp_cut (sp) int sp; {
     else {
 	enq (qcut, sp, pplevel, ind, si);
 	if (pplevel <= lastcut && !liststk[pplevel].pack)
-	    lineout (0, pplevel);
+	    lineout (0L, pplevel);
     }
 }
 
-pp_cleanup (endnl)
+long pp_cleanup (endnl)
 boolean endnl;
 {
     if (size > 0)
-	lineout (0, 0);
+	lineout (0L, 0L);
     if (endnl)
 	fputchr (ppfile, '\n');
 }
 
-pp_begin (p, ind, bl, si, vb, pk)
+long pp_begin (p, ind, bl, si, vb, pk)
     nodep p;
-    int     ind,
+    long     ind,
             bl;
     boolean si, vb, pk;
 {
@@ -574,7 +574,7 @@ pp_begin (p, ind, bl, si, vb, pk)
     liststk[pplevel].attach = p ? p -> ndf.ag : null;
     liststk[pplevel].blines = bl;
     liststk[pplevel].firstcut = true;
-    cut (0, pk ? 0 : liststk[pplevel].indent, si);
+    cut (0L, pk ? 0 : liststk[pplevel].indent, si);
 }
 
 static boolean test_attach(p)
@@ -588,15 +588,15 @@ static boolean test_attach(p)
     return false;
 }
 
-pp_end ()
+long pp_end ()
 {
-    int     lev;
-    int     pos,
+    long     lev;
+    long     pos,
             cutlev;
 
     if (test_attach(liststk[pplevel].attach))
 	while (size > 0) {
-	    pp_cut (0);
+	    pp_cut (0L);
 	    lowcut (&pos, &cutlev);
 	    lineout (pos, cutlev);
 	}
@@ -605,8 +605,8 @@ pp_end ()
     pplevel--;
 }
 
-pp_space () {
-    enq (qch, 1, ' ', 0, false);
+long pp_space () {
+    enq (qch, 1L, ' ', 0L, false);
 }
 
   /* capitalizes s according to the requested style.  s must be all lower

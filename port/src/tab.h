@@ -25,7 +25,7 @@ Initial revision (Arcturus release 1.3E)
  */
 
 struct symtabform {              
-        int     symtab_size;
+        long     symtab_size;
         fixp    *symtab_tab;
         fixp    symtab_owner;
 	struct  symtabform *symtab_static_link;

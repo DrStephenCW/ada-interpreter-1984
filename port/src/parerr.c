@@ -31,10 +31,10 @@ static char rcsid[] =
 # include "macros.h"
 # include "oblist.h"
 
-# define YYLAST 1884		/* kludge for now */
+# define YYLAST 1884L		/* kludge for now */
 
 extern char *parstok[];
-extern int yychar, yystate;
+extern long yychar, yystate;
 
 char *perrtok[100], **erp = perrtok;	/* probably much too large */
  
@@ -45,7 +45,7 @@ extern short yychk[], yydef[];
 
 
 char *tokstring(token)
-    int token;
+    long token;
 {
     char tempstring[2];
 
@@ -58,10 +58,10 @@ char *tokstring(token)
     return parstok[token - 257];
 }
 
-vlookahead(yystate)		/* Computes the valid lookahead set when */
-    int yystate;		/* an error occurs */
+long vlookahead(yystate)		/* Computes the valid lookahead set when */
+    long yystate;		/* an error occurs */
 {
-    int m, n, ch;
+    long m, n, ch;
 
     erp = perrtok;
     if (yydef[yystate] != -2) {
@@ -82,10 +82,10 @@ vlookahead(yystate)		/* Computes the valid lookahead set when */
 }
 
 
-parser_help(f)
+long parser_help(f)
     FILE *f;
 {
-    int     col = 1;
+    long     col = 1;
 
     erp = perrtok;
     while (*erp != null) {
@@ -100,7 +100,7 @@ parser_help(f)
 
 }
 
-write_help_file()
+long write_help_file()
 {
     FILE *f;
     

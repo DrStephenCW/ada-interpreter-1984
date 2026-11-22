@@ -99,7 +99,7 @@ static char rcsid[] =
 extern nodep intstk[], *intsp, *intstk_end;
 
 extern nodep handler;		/* exception handler -- set by raise */
-extern int stack_level;
+extern long stack_level;
 
 extern	typep typeonly();
 
@@ -115,7 +115,7 @@ extern symtabp parameter_table;	/* global to pass parameter table to
     where the types are not assignment compatible, but one is a derived
     type or a subtype of a derived type whos parent type is the other. */
 
-checkrange(t,r)
+long checkrange(t,r)
     typep t;
     typedval *r;
 {
@@ -128,7 +128,7 @@ checkrange(t,r)
         }                                    
 }
 
-rangecheck(t, r)
+long rangecheck(t, r)
     typep t;
     typedval *r;
 {
@@ -155,7 +155,7 @@ rangecheck(t, r)
 		subtype x is new standard.integer;
 */
 
-dodot(p, mode, result)                          
+long dodot(p, mode, result)                          
 nodep p;
 enum int_modes mode;        
 typedval *result;
@@ -340,9 +340,9 @@ typedval *result;
 	else system_error("Can't handle mode (%d) in 'dodot'", mode);
 }
 
-blockmove(dst, src, n)
+long blockmove(dst, src, n)
 char *dst, *src;
-int n;
+long n;
 {
         /* we must be careful which end we copy from            */
         /* in case we do assignments between slices of          */
@@ -366,7 +366,7 @@ int n;
 boolean blockcompare(dst, src, n)
 char *dst;
 char *src;
-int n;
+long n;
 {
         while(n--)              
                 if(*dst++ != *src++)
@@ -384,7 +384,7 @@ int n;
 	The hard stuff is objects or parameters.  See the big table
 	below. */
 
-doident(f, mode, result)               
+long doident(f, mode, result)               
     fixp f;
     enum int_modes mode;
     typedval *result;
@@ -495,7 +495,7 @@ doident(f, mode, result)
 static	symtabp docall_save_currtab;
 			/* contains value for abort_call below */
 
-static	docall_abort() 	/* pushed onto control-c stack; otherwise, when
+static	long docall_abort() 	/* pushed onto control-c stack; otherwise, when
 			   checking for control-c's in compiled code, the
 			   scoping is all wrong, and Boom!
 
@@ -507,24 +507,24 @@ static	docall_abort() 	/* pushed onto control-c stack; otherwise, when
 {	currtab _ docall_save_currtab;
 }
 
-docall(p, mode, result)
+long docall(p, mode, result)
     nodep p;
     enum int_modes mode;        
     typedval *result;
 {                             
-	register int i;
-	int nargs;		/* number of arguments to subp */
+	register long i;
+	long nargs;		/* number of arguments to subp */
 	typedval lhs;		/* for getting type of call var */
 	fixp fix;		/* fixp of subp we're calling */
 	typep argtypes[MAXARGS];/* table of types of actual params */
 	typep formtypes[MAXARGS];/* table of types of formal params */
-	int argtab[MAXARGS];	/* table of eval'd actual params */
+	long argtab[MAXARGS];	/* table of eval'd actual params */
 	boolean named_param;	/* true if we've seen a named parameter */
         fixp paramlist;		/* pointer to symbols for formals */
         register fixp formals;	/* used to traverse formal params */
         register nodep acts;	/* used to traverse actual params */
 	nodep subp_int;		/* internal form for subprogram decls & body */
-        int val;		/* used as temp for value of actual param */
+        long val;		/* used as temp for value of actual param */
         symp s, t;		/* Used to traverse symbol lists */
 	symtabp oldscope;	/* saved scope of caller */
 	symtabp newscope;	/* saved scope of callee */
@@ -697,7 +697,7 @@ docall(p, mode, result)
 	tab _ &loctab;	/* optimization to use local table in C stack frame */
 			/* old code: tab _ newtab(16,null); */
 	tab->symtab_tab _ lochash;
-	{int i; for(i _ 0; i < 16; i++) lochash[i] _ null;};
+	{long i; for(i _ 0; i < 16; i++) lochash[i] _ null;};
 			/* zero out hash table */
 	tab->symtab_size _ 16;
 	tab->symtab_owner _ null;
@@ -819,13 +819,13 @@ docall(p, mode, result)
 	array and what not. */
 
         if(fix->fx.func.code) {        /* compiled C or Ada */ 
-	    int argtab[MAXARGS];
-	    int argcount _ 0;
+	    long argtab[MAXARGS];
+	    long argcount _ 0;
 
 	    for (formals _ paramlist; 
 		 formals; 
 		 formals _ formals -> fx.var.param_link){
-		int *val _ formals -> fxf.dyna -> sy.var.value;
+		long *val _ formals -> fxf.dyna -> sy.var.value;
                 arrayp p;
 
 		if (formals->fx.var.param_base_type->tyf.class eq un_arrayform) {
@@ -838,11 +838,11 @@ docall(p, mode, result)
 		    typ = typ->ty.index.range;
 		    p -> arr_first _ typ->ty.srange.lbound;
 		    p -> arr_last _ typ->ty.srange.ubound;
-		    val _ (int *)p;
+		    val _ (long *)p;
                 }
 		if (blocktype(formals->fxf.dyna->sy.var.type) or 
 		    formals->fx.var.param_is_out)
-		    argtab[argcount++] _ (int)val;
+		    argtab[argcount++] _ (long)val;
 		else
 		    argtab[argcount++] _ *val;
             }
@@ -864,7 +864,7 @@ docall(p, mode, result)
 				       fix->fx.func.code);  /* asm function */
 	    popfunc();
             /* restore correct scoping context */
-	    {int i; for (i _ 0; i < 16; i++) freelist(lochash[i]);} 
+	    {long i; for (i _ 0; i < 16; i++) freelist(lochash[i]);} 
 		/* free symps allocated in the local table; this is part
 		of the optimization of not zalloc'ing a local table. */
 	    currtab _ newscope;
@@ -899,7 +899,7 @@ docall(p, mode, result)
      variable handler.		*/
 
 	    struct retstkform rets;
-	    int exception;
+	    long exception;
 
 	    /* enter actual argument values into the symbol table for 
 	  	this subprogram. */
@@ -1000,16 +1000,16 @@ boolean argmatch(f, p2)
     return matchaux (f -> fx.func.int_form -> nd.subp.spec, p2);
 }
 
-doblock(p)
+long doblock(p)
     nodep p;
 {
     struct retstkform rets;
-    int exception;
+    long exception;
     typedval *dummy;
     symtabp save_currtab = currtab;
 
     if (p->nd.subp.table eq null) {
-	symtabp tab = newtab(32,null);
+	symtabp tab = newtab(32L,null);
 
 	tab->symtab_static_link = currtab;
 	p->nd.subp.table _ tab;
@@ -1029,9 +1029,9 @@ doblock(p)
 
 typep mkarrtype();      /* forward declaration, should re-order */
 
-doindex(typ, val, mode, p, result)
+long doindex(typ, val, mode, p, result)
     typep typ;		/* typep for the array */
-    int val;		/* base of the array */
+    long val;		/* base of the array */
     enum int_modes mode;	/* evaluation mode */
     nodep p;		/* internal form of indices */
     typedval *result;	/* result to pass back to eval */
@@ -1041,8 +1041,8 @@ doindex(typ, val, mode, p, result)
     word addr;
     typep lsttyp;
     typep eletyp;
-    int     n = 0;		/* counts number of indices */
-    int     off = 0;		/* offset into array */
+    long     n = 0;		/* counts number of indices */
+    long     off = 0;		/* offset into array */
 
     if (p -> ndf.op eq nop_range)
 				/* for a slice there is no arg node (some
@@ -1107,8 +1107,8 @@ doindex(typ, val, mode, p, result)
     while (lsttyp) {
 	typep rngtyp;
 	typep nxttyp;
-	int     nxtsize;
-	int     inx;
+	long     nxtsize;
+	long     inx;
 
 	rngtyp = lsttyp -> ty.index.range;
 	nxttyp = lsttyp -> ty.index.next;
@@ -1126,7 +1126,7 @@ doindex(typ, val, mode, p, result)
 	if (blocktype (eletyp))
 	    result -> val = addr;
 	else
-	    if (eletyp -> tyf.size == sizeof (int))
+	    if (eletyp -> tyf.size == sizeof (long))
 		result -> val.integer = *addr.ptr;
 	    else
 		if (eletyp -> tyf.size == 1)
@@ -1148,7 +1148,7 @@ doindex(typ, val, mode, p, result)
     derived type and its parent type.  It also needs to handle numeric
     conversion */
 
-do_type_conv(typ, mode, p, result)
+long do_type_conv(typ, mode, p, result)
     typep typ;
     enum int_modes mode;
     nodep p;
@@ -1194,7 +1194,7 @@ do_type_conv(typ, mode, p, result)
     else error("Invalid type conversion");
 }
 
-subp_name(id, class)    /* called by pragmas */
+long subp_name(id, class)    /* called by pragmas */
     char *id;
     enum symbolclasses class;
 {
@@ -1212,7 +1212,7 @@ subp_name(id, class)    /* called by pragmas */
 	also put in an entry in the control-c exception stack to trap
 	here and put currtab back to it's correct value.  (shw)	*/
 
-subp_swapin(fix)
+long subp_swapin(fix)
     fixp fix;
 {
     char    name[128];
@@ -1224,7 +1224,7 @@ subp_swapin(fix)
     currtab = savetab;		/* and back to original spot */
 }
 
-package_name(id)        /* called by pragma package_name */
+long package_name(id)        /* called by pragma package_name */
     char *id;
 {
     register symp sym;
@@ -1236,7 +1236,7 @@ package_name(id)        /* called by pragma package_name */
     enter(currtab, fix, sym);
 }
 
-package_swapin(fix)
+long package_swapin(fix)
     fixp fix;
 {
     char    name[128];
@@ -1250,7 +1250,7 @@ package_swapin(fix)
 
 static boolean writeout;		/* hack */
 
-dopackspec(p)                                        
+long dopackspec(p)                                        
     nodep p;
 {
     register symp sym;
@@ -1278,7 +1278,7 @@ dopackspec(p)
     fix -> fx.pack.int_form = p;
 
     if (p->nd.packagex.table == null) {
-        tab = newtab (32, fix);
+        tab = newtab (32L, fix);
 	tab -> symtab_static_link = currtab;
         p -> nd.packagex.table _ tab;
     }
@@ -1294,7 +1294,7 @@ dopackspec(p)
     currtab = save_currtab;
 }
 
-dopackbody(p) 
+long dopackbody(p) 
     nodep p;
 {
     register fixp fix;		/* fixp of package symbol */
@@ -1310,7 +1310,7 @@ dopackbody(p)
     fix -> fx.pack.body_int_form = p;
 
     if (p->nd.packagex.table == null) {
-        tab = newtab (32, fix);
+        tab = newtab (32L, fix);
         tab -> symtab_static_link = fix->fx.pack.int_form->nd.packagex.table;
         p -> nd.packagex.table _ tab;
     }
@@ -1331,18 +1331,18 @@ dopackbody(p)
 
 typep mkrangetype(basetype, lower, upper) /* should call this in tyint.c */
 typep basetype;
-int lower, upper;
+long lower, upper;
 {
         register typep t = newtype(srangeform);
 
-        t->tyf.size = sizeof(int);
+        t->tyf.size = sizeof(long);
         t->ty.srange.lbound = lower;
         t->ty.srange.ubound = upper;
         t->ty.srange.basetype = basetype;
         return t;
 }
 
-doattr(p, result)
+long doattr(p, result)
 nodep p;
 typedval *result;
 {
@@ -1410,7 +1410,7 @@ typedval *result;
         }
 }
 
-doattr2(p, result)
+long doattr2(p, result)
 nodep p;
 typedval *result;
 {
@@ -1490,7 +1490,7 @@ typedval *result;
 }
 
 /* this function is no longer used */
-nodep mk_constrained_string_node(n) {
+nodep mk_constrained_string_node(n) long n; {
 /* this routine returns an internal form which pretty prints as:        */
 /*      string(1..n)                                                    */
 /* where n is the argument to this function                             */
@@ -1532,7 +1532,7 @@ typep basetype, range;
 {
         register typep a = newtype(con_arrayform);
         register typep i = newtype(indexform);
-        int len = rangelength(range);
+        long len = rangelength(range);
 
         i->ty.index.range = range;
         i->tyf.size = len;
@@ -1542,27 +1542,27 @@ typep basetype, range;
         return a;
 }
 
-dostring(s, result)
+long dostring(s, result)
 char *s;
 typedval *result;
 {
-        int len = strlen(s);
-        int *p = (int *)zalloc(len * sizeof(int), false);
-        register int i;
+        long len = strlen(s);
+        long *p = (long *)zalloc(len * sizeof(long), false);
+        register long i;
 
-        result->typ = mkarrtype(strtype, mkrangetype(inttype, 1, len));
+        result->typ = mkarrtype(strtype, mkrangetype(inttype, 1L, len));
         for(i = 0; i< len; i++)
                 p[i] = s[i]&0377;
         result->val.ptr = p;
 }
 
-catenate(l,r,result)
+long catenate(l,r,result)
     typedval l,r,*result;
 {
     register char  *p,
                    *g;
-    register int    len;
-    int     low;
+    register long    len;
+    long     low;
 
     if (l.typ -> tyf.class == con_arrayform) {
 	if (r.typ -> tyf.class == con_arrayform) {
@@ -1591,7 +1591,7 @@ catenate(l,r,result)
 			r.typ -> ty.con_array.index_list -> tyf.size - 1));
 	    p = (char *) zalloc (result -> typ -> tyf.size); 
 				/* allocate storage for the array */
-	    result -> val.ptr = (int *) p;
+	    result -> val.ptr = (long *) p;
 	    g = (char *) l.val.ptr;	/* copy the left operand */
 	    for (len = 0; len < l.typ -> tyf.size; len++)
 		*p++ = *g++;
@@ -1618,7 +1618,7 @@ catenate(l,r,result)
 				tyf.size));
 			/* allocate space for the result */
 		p = (char *) zalloc (result -> typ -> tyf.size);
-		result -> val.ptr = (int *) p;
+		result -> val.ptr = (long *) p;
 		g = (char *) l.val.ptr;		/* copy the array */
 		for (len = 0; len < l.typ -> tyf.size; len++)
 		    *p++ = *g++;
@@ -1628,7 +1628,7 @@ catenate(l,r,result)
 			*p++ = *g++;
 		}
 		else
-		    *(int *) p = r.val.integer;
+		    *(long *) p = r.val.integer;
 	    }
 	    else
 		error ("invalid type in catenate");
@@ -1651,14 +1651,14 @@ catenate(l,r,result)
 			low + r.typ -> ty.con_array.index_list -> tyf.size));
 			/* allocate space for the result */
 	    p = (char *) zalloc (result -> typ -> tyf.size);
-	    result -> val.ptr = (int *) p;
+	    result -> val.ptr = (long *) p;
 	    if (blocktype (l.typ)) {		/* copy the single element */
 		g = (char *) l.val.ptr;
 		for (len = 0; len < l.typ -> tyf.size; len++)
 		    *p++ = *g++;
 	    }
 	    else {  /* anyone have a better idea? */
-		register int *pp = (int *)p;
+		register long *pp = (long *)p;
 		*pp++ = l.val.integer;
 		p = (char *)pp;
 	    }
@@ -1671,16 +1671,16 @@ catenate(l,r,result)
 }
 	  
 
-agg_eval(p, result, expected_type)
+long agg_eval(p, result, expected_type)
 nodep p;
 typedval *result;
 typep expected_type;
 {
-	register int len;
+	register long len;
 	register typep res_type;
 	register typep ele_type;
-	int *agg_space;
-	int agg_len = 0;
+	long *agg_space;
+	long agg_len = 0;
 	typedval a;
 
 	switch(expected_type->tyf.class) {
@@ -1702,7 +1702,7 @@ typep expected_type;
 				     mkrangetype(expected_type
 						  -> ty.un_array.index_list
 						  -> ty.index.range,
-						 1,
+						 1L,
 						 len)); 
 			/* above range should start at min of type */
 		break;
@@ -1714,7 +1714,7 @@ typep expected_type;
 	}
 	/* now that we know length and result type, process aggregate */
 
-	agg_space = (int *)zalloc(len * ele_type -> tyf.size, false);
+	agg_space = (long *)zalloc(len * ele_type -> tyf.size, false);
 
         while(p != null) {
                 if(p->ndf.op != nop_agg_comp)

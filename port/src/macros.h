@@ -32,10 +32,10 @@ Initial revision (Arcturus release 1.3E)
  */
 
 /* Willson macro file */
-#define true 1
-#define false 0
-#define null 0
-#define boolean int
+#define true 1L
+#define false 0L
+#define null 0L
+#define boolean long
 #define and &&
 #define or ||
 #define not !

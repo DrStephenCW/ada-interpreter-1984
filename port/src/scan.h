@@ -30,8 +30,8 @@ Revision 1.1  82/12/12  21:37:55  tadman
 Initial revision (Arcturus release 1.3E)
  */
 
-# define true 1
-# define false 0
+# define true 1L
+# define false 0L
 
 typedef union {
     struct {
@@ -41,7 +41,7 @@ typedef union {
     } ident;
 
     struct {
-	int  val;
+	long  val;
 	char *prval;
 	nodep attach;
     }  integer;

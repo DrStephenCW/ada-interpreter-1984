@@ -58,17 +58,17 @@ static char rcsid[] =
 #include "pp.h"
 
 static FILE *dirf;
-static int max_dir_count;
+static long max_dir_count;
 static enum pp_color_use color_use;
-static int symbol_count;
+static long symbol_count;
 
 extern color_name pp_count_color();
 extern char *calloc();
 
-get_dir_counts(fix)
+long get_dir_counts(fix)
     register fixp fix;
 {
-    register int    count;
+    register long    count;
 
     if ((fix -> fxf.class == func_id
 		|| fix -> fxf.class == proc_id)
@@ -78,7 +78,7 @@ get_dir_counts(fix)
 	    ? count : max_dir_count;
 }
 
-dir_color_init()
+long dir_color_init()
 {
     switch (color_use) {
 	case ppc_count: 
@@ -101,7 +101,7 @@ color_name dir_color(fix)
 	case ppc_none: 
 	    return samecolor;
 	case ppc_count: {
-	    int count;
+	    long count;
 
 	    if ((fix -> fxf.class == func_id
 			    || fix -> fxf.class == proc_id)
@@ -124,12 +124,12 @@ color_name dir_color(fix)
 	(ppcref calls it).
 */
 
-fdirsym(f, fix) FILE *f; fixp fix;
+long fdirsym(f, fix) FILE *f; fixp fix;
 {	dirf _ f;
 	dirsym(fix);
 }
 
-       dirsym(fix)
+       long dirsym(fix)
     fixp fix;
 {
     set_fg(dir_color(fix));
@@ -174,14 +174,14 @@ fdirsym(f, fix) FILE *f; fixp fix;
     fputf (dirf, " %s;", fix -> fxf.name);
 }
 
-static count_symbols(fix)
+static long count_symbols(fix)
     fixp fix;
 {
     if (fix->fxf.class != obj_id || ! fix->fx.var.is_enum_lit)
 	symbol_count++;
 }
 
-static enter_symbols(fix,f)
+static long enter_symbols(fix,f)
     fixp fix;
     fixp **f;
 {
@@ -190,7 +190,7 @@ static enter_symbols(fix,f)
 }
 
 
-static int sym_class_order(fix)
+static long sym_class_order(fix)
     fixp fix;
 {
     switch (fix -> fxf.class) {
@@ -215,10 +215,10 @@ static int sym_class_order(fix)
     }
 }
 
-static int symbol_compare(sym1, sym2)
+static long symbol_compare(sym1, sym2)
     fixp *sym1, *sym2;
 {
-    register int t1, t2;
+    register long t1, t2;
 
     t1 = sym_class_order(*sym1);
     t2 = sym_class_order(*sym2);
@@ -227,12 +227,12 @@ static int symbol_compare(sym1, sym2)
     return strcmp((*sym1)->fxf.name, (*sym2)->fxf.name);
 }
 
-static dodir(tab)
+static long dodir(tab)
     symtabp tab;
 {
     fixp *fixs, *f;
-    int i;
-    int sym_class, class;
+    long i;
+    long sym_class, class;
 
     symbol_count = 0;
     maptab(tab, count_symbols);
@@ -262,7 +262,7 @@ static dodir(tab)
     free(fixs);
 }
 
-static int strpcmp(a,b)		/* compare two pointers to strings */
+static long strpcmp(a,b)		/* compare two pointers to strings */
     char **a, **b;
 {
     return strcmp(*a, *b);
@@ -270,10 +270,10 @@ static int strpcmp(a,b)		/* compare two pointers to strings */
 
 /* douse prints the packages used by this one in alphabetical order */
 
-douse(u)
+long douse(u)
     usep u;
 {
-    int use_count = 0;
+    long use_count = 0;
     usep uu;
     char **packs, **p;
 
@@ -304,7 +304,7 @@ douse(u)
     free(packs);
 }
 
-dir(fix, f, c_use) 
+long dir(fix, f, c_use) 
     fixp fix;
     FILE *f;
     enum pp_color_use c_use;

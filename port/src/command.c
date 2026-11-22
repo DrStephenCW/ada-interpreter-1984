@@ -56,19 +56,19 @@ static char rcsid[] =
 #include "adaio.h"
 
 extern boolean append_next_string;      /* see parsestring() */
-int lines_read;
+long lines_read;
 
-int control_c_handler();
+long control_c_handler();
 
 char *getenv();
 
-putchr(c) 
+long putchr(c) 
 char c;
 {
         fputc(c,adaout);
 }
 
-fputchr(des, c)
+long fputchr(des, c)
    FILE *des;
    char c;
 {
@@ -78,40 +78,40 @@ fputchr(des, c)
 	fputc(c, des);
 }
 
-putstr(x) 
+long putstr(x) 
 char *x;
 {
         fputs(x, adaout);
 }                              
 
-putf(fmt,a,b,c,d,e,f,g)
-{
+long putf(fmt,a,b,c,d,e,f,g)
+long fmt, a, b, c, d, e, f, g; {
     printf(fmt,a,b,c,d,e,f,g);
 }
 
-fputf(des, fmt, a,b,c,d,e,f,g)
-{
+long fputf(des, fmt, a,b,c,d,e,f,g)
+long des, fmt, a, b, c, d, e, f, g; {
     if (des == null)
 	error("status error: trying to write unopened file");
     else
 	fprintf(des, fmt, a,b,c,d,e,f,g);
 }
 
-fgetf(des, fmt, a,b,c,d,e,f,g)
-{
+long fgetf(des, fmt, a,b,c,d,e,f,g)
+long des, fmt, a, b, c, d, e, f, g; {
     if (des == null)
 	error("status error: trying to read unopened file");
     else
 	fscanf(des, fmt, a,b,c,d,e,f,g);
 }
 
-getchr(p)
+long getchr(p)
 char *p;
 {                      
         *p = (getchar() & 0177); /* remove parity to avoid sign extension */
 }
 
-fgetchr(des,p)
+long fgetchr(des,p)
     FILE *des;
     char *p;            
 {
@@ -121,21 +121,21 @@ fgetchr(des,p)
 	*p = fgetc(des);
 }
         
-fgetstr(f,s)
+long fgetstr(f,s)
     FILE *f;
     char *s;
 {
     if (f == null)
 	error("status error: trying to write unopened file");
     else
-	return (int)fgets(s,1024,f);
+	return (long)fgets(s,1024L,f);
 }
 
-getstr(s)
+long getstr(s)
 char *s;
 {
         char ch;
-        int (*old_interrupt)();
+        long (*old_interrupt)();
         old_interrupt _ signal(SIGINT,control_c_handler);
         if ((ch = getchar()) == EOF) {
                 signal(SIGINT, old_interrupt);
@@ -161,14 +161,14 @@ FILE_TYPE standard_msg() {
 }
 
 
-init_io()
+long init_io()
 {
 }
 
 
 
-uui_init(argc, argv)
-int argc;
+long uui_init(argc, argv)
+long argc;
 char *argv[];
 {
         cur_color.fg _ white;
@@ -180,17 +180,17 @@ char *argv[];
 }
 
 
-finit()
+long finit()
 {
 }
 
 
 
-uui_term()
+long uui_term()
 {
 }
 
-reset_std_io() {
+long reset_std_io() {
         adain = standard_input();
         adaout = standard_output();
         adamsg = standard_msg();
@@ -198,24 +198,24 @@ reset_std_io() {
 
 
 
-uui_restore()
+long uui_restore()
 {
 }
 
 
 
-uui_reset()
+long uui_reset()
 {
         reset_std_io();
 }
 
-add_sym_for_completion(s)
-{
+long add_sym_for_completion(s)
+long s; {
 }
 
 extern FILE *stdbrk;
 
-prompt(f) 
+long prompt(f) 
     FILE *f;
 {
     if (append_next_string) {
@@ -236,8 +236,8 @@ prompt(f)
     lines_read = 0;
 }
 
-error_xy(x,y)
-    int x,y;
+long error_xy(x,y)
+    long x,y;
 {
     if (x <= lines_read)
         printf("%*s^\n",y+3,"");
@@ -245,36 +245,36 @@ error_xy(x,y)
         append_next_string = true;
 }
 
-set_give_tool_name(val)
-{
+long set_give_tool_name(val)
+long val; {
 }
 
-sysputf(s,a,b,c,d,e,f,g)
-{
+long sysputf(s,a,b,c,d,e,f,g)
+long s, a, b, c, d, e, f, g; {
      printf("\n");
      printf(s,a,b,c,d,e,f,g);
      printf("\n");
 }
 
-set_color(c) color_pair c; {
-        int a;
-        int b; 
+long set_color(c) color_pair c; {
+        long a;
+        long b; 
         if (!color_able()) return;
         a = cur_color.fg == c.fg;
         b = cur_color.bg == c.bg; 
                         
         if (a && b) return; 
         if (!(a || b))
-                printf("%c[%d;%dm",27,
+                printf("%c[%d;%dm",27L,
                        color_to_bg(c.bg),color_to_fg(c.fg));
         else if (!a)
-                printf("%c[%dm",27,color_to_fg(c.fg));
+                printf("%c[%dm",27L,color_to_fg(c.fg));
         else
-                printf("%c[%dm",27,color_to_bg(c.bg));
+                printf("%c[%dm",27L,color_to_bg(c.bg));
         cur_color = c;
 }
 
-set_both(f,b) color_name f,b;
+long set_both(f,b) color_name f,b;
 {
     color_pair t;
     t.fg = f;
@@ -283,13 +283,13 @@ set_both(f,b) color_name f,b;
 }
 
 
-what_color(cp) color_pair *cp; {
+long what_color(cp) color_pair *cp; {
         cp->fg = cur_color.fg;
         cp->bg = cur_color.bg;
 }
 
-color_able() {
-        static int is_color_term = -1;
+long color_able() {
+        static long is_color_term = -1;
         if (is_color_term == -1) {
             char *term = getenv("TERM");
             is_color_term = (term && ((strcmp(term,"cs10") == 0) ||

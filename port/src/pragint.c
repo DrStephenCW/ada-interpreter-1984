@@ -36,7 +36,7 @@ static char rcsid[] =
 #include "int.h"
 #include "sym.h"
 
-dopragma(p) nodep p;
+long dopragma(p) nodep p;
 {
         nodep firstarg;
         nodep secondarg;

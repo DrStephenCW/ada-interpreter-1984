@@ -1,9 +1,10 @@
 /* call.c -- portable replacement for call.s (VAX assembly).
-   call(end, n, fn) calls fn with the n ints that end just before "end". */
-typedef int (*ifn)();
-int call(int *end, int n, ifn f)
+   call(end, n, fn) calls fn with the n words that end just before "end".
+   A word is a long: 32 bits on 32-bit Linux, 64 on 64-bit. */
+typedef long (*ifn)();
+long call(long *end, long n, ifn f)
 {
-	int *a = end - n;
+	long *a = end - n;
 	switch (n) {
 	case 0: return f();
 	case 1: return f(a[0]);

@@ -54,7 +54,7 @@ typep tyeval();		/* forward declaration */
 
 typep lookuptypeid(id, needcomplete)
     char *id;
-{
+long needcomplete; {
     register    fixp f;
     register    typep typ;
 
@@ -67,10 +67,10 @@ typep lookuptypeid(id, needcomplete)
     return (f -> fxf.dyna -> sy.var.type);
 }
 
-int rec_fields(tab, fieldp, recsize)
+long rec_fields(tab, fieldp, recsize)
     symtabp tab;
     nodep fieldp;
-    int recsize;
+    long recsize;
 {
     nodep whens;
     fixp ids, temp;
@@ -98,10 +98,10 @@ int rec_fields(tab, fieldp, recsize)
 	    }
 	}
 	else {			/* must be a varient part */
-	    int r = recsize;
+	    long r = recsize;
 	    whens = fieldp->nd.casex.when_list;
 	    while (whens) {
-		int size = rec_fields(tab, whens->nd.whenx.stmt, r);
+		long size = rec_fields(tab, whens->nd.whenx.stmt, r);
 	        if (size > recsize) recsize = size;
 	    	whens = whens->ndf.next;
 	    }
@@ -143,7 +143,7 @@ typep tyeval(p, d, new)
                         nodep tgn;
                         t = newtype(accessform);
                         t->tyf.int_form = p;
-                        t->tyf.size = sizeof(int *);
+                        t->tyf.size = sizeof(long *);
 
                         tgn = p->nd.accessx.target_type;
                         if(tgn->ndf.op == nop_ident)
@@ -156,17 +156,17 @@ typep tyeval(p, d, new)
 			break;
                 case nop_record: {
                         typep t;
-                        int recsize;
+                        long recsize;
                         nodep fieldp;
 			symtabp tab;
 
                         t = newtype(recordform);
                         t->tyf.int_form = p;
-			tab  = newtab(16, null);
+			tab  = newtab(16L, null);
                         t->ty.record.fieldtab = tab;
 
                         fieldp = p->nd.recordx.field_list;
-			recsize = rec_fields(tab, d, 0);
+			recsize = rec_fields(tab, d, 0L);
 			recsize = rec_fields(tab, fieldp, recsize);
                         t->tyf.size = recsize;
 		        ret = t;
@@ -176,7 +176,7 @@ typep tyeval(p, d, new)
 			nodep ixnode;
                         typep t;
                         typep inxtyp, lsttyp;
-                        int size = 0;
+                        long size = 0;
                         boolean unconstrained = false;
 
                         ixnode = p->nd.index.typex;
@@ -269,7 +269,7 @@ typep tyeval(p, d, new)
 		    else {
                         newtyp = newtype(srangeform);
                         newtyp->tyf.int_form = p;
-                        newtyp->tyf.size = sizeof(int);
+                        newtyp->tyf.size = sizeof(long);
                         eval(p->nd.rangex.left, eval_mode, &low, null);
                         if(basetype)     {
                                 rangecheck(basetype, &low);
@@ -293,16 +293,16 @@ typep tyeval(p, d, new)
 		    fixp f;
                     symp s;
                     typep enumtyp;
-                    int len;
+                    long len;
                     char **nametab;
 
                     enumtyp = newtype(enumform);
                     enumtyp->tyf.int_form = p;
-                    enumtyp->tyf.size = sizeof(int);
+                    enumtyp->tyf.size = sizeof(long);
                     len = 0;
                     for(id = p->nd.enumtype.ids; id; id = id->ndf.next)
                         len++;
-                    nametab = (char **)zalloc(len * sizeof(char *) , 0);
+                    nametab = (char **)zalloc(len * sizeof(char *) , 0L);
                     len = 0;
 		    for(id = p->nd.enumtype.ids; id; id = id->ndf.next) {
 			f = newfix(varfixform, obj_id);

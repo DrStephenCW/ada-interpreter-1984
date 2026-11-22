@@ -39,7 +39,7 @@ static char rcsid[] =
 	sym.c
 */
 
-blocktype(t)
+long blocktype(t)
 typep t;
 {
 	switch(t->tyf.class) {
@@ -51,7 +51,7 @@ typep t;
 	return false;
 }
 
-rangelength(t)  
+long rangelength(t)  
 typep t;
 {
         if(t->tyf.class == srangeform || 
@@ -73,7 +73,7 @@ typep base(t)
     return t;
 }
 
-compatible(a,b) 
+long compatible(a,b) 
 typep a,b;
 {
         if (a == b)  
@@ -94,7 +94,7 @@ typep a,b;
         return(base(a) == base(b));
 }
 
-typecheck(a,b) 
+long typecheck(a,b) 
 typep a,b;
 {
         if (a eq b or compatible(a,b)) return; 
@@ -115,7 +115,7 @@ typep a,b;
 	error(null);
 }
 
-int	typecount;
+long	typecount;
 
 typep newtype(form)
 enum typeforms form;

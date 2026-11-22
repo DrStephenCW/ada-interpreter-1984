@@ -122,7 +122,7 @@ static retsp ret;
     handler for the raised exception.  If it can't then it generates an
     error at the point where the exception was raised. */
 
-raise(exception_name)
+long raise(exception_name)
     nodep exception_name;
 {
     typedval result;
@@ -133,7 +133,7 @@ raise(exception_name)
             if (handler == null)
 	        error ("No handler for exception");
 	    ret->exception = retstk->exception;
-	    unwind_retstk(ret,2);
+	    unwind_retstk(ret,2L);
 	}
         else error("Raise without exception name not in a handler");
     }
@@ -144,7 +144,7 @@ raise(exception_name)
     if (handler == null)
 	error("No handler for exception");
     ret->exception = result.val.fptr;
-    unwind_retstk(ret,2);	/* 2 means exception */
+    unwind_retstk(ret,2L);	/* 2 means exception */
 }
 
   /* This function is used to raise a predefined exception.  It takes the
@@ -155,15 +155,15 @@ raise(exception_name)
      a the point where the exception was raised. */
 
 /*VARARGS2*/		/* for lint */
-sysraise(exception, error_msg, arg1, arg2, arg3, arg4, arg5)
+long sysraise(exception, error_msg, arg1, arg2, arg3, arg4, arg5)
     fixp exception;
     char *error_msg;
-{
+long arg1, arg2, arg3, arg4, arg5; {
     handler = find_handler(exception);
     if (handler == null)
 	error(error_msg, arg1, arg2, arg3, arg4, arg5);
     ret->exception = exception;
-    unwind_retstk(ret,2);
+    unwind_retstk(ret,2L);
 }
 
 

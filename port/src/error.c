@@ -45,9 +45,9 @@ extern	char	*Mail_Program;
     and cleanup is attempted.  If this attempt causes another failure
     health is downgraded again to dead and no more cleanup is attempted */
 
-fatal_error(msg,a,b,c,d,e) 
+long fatal_error(msg,a,b,c,d,e) 
     char *msg;
-{       
+long a, b, c, d, e; {       
     static enum { alive, sick, dead } health = alive;   
     char fmt[100], err_mess[200];
 
@@ -72,7 +72,7 @@ fatal_error(msg,a,b,c,d,e)
     }
 
      /* at this point, we could re-execl the system */
-    exit (1);                   /* exit and close files */
+    exit (1L);                   /* exit and close files */
 }
 
 /*      System_error prints an error message and calls the break package.
@@ -85,7 +85,7 @@ fatal_error(msg,a,b,c,d,e)
 */
 
 /*VARARGS1*/		/* for lint */
-system_error(msg,a,b,c,d,e) {       
+long system_error(msg,a,b,c,d,e) long msg, a, b, c, d, e; {       
         char fmt[100], err_mess[200];
 
         if (msg) {      /* if called with null argument won't print
@@ -100,7 +100,7 @@ system_error(msg,a,b,c,d,e) {
         ada_break(true);	/* recoverable, because the user may wish
 				   to try to execute some commands before
 				   exiting. */
-        exit(1);
+        exit(1L);
 }
 
 /*      Error prints an error message and calls the break package.  It is
@@ -109,9 +109,9 @@ system_error(msg,a,b,c,d,e) {
 */
 
 /*VARARGS1*/		/* for lint */
-error(msg,a,b,c,d,e) 
+long error(msg,a,b,c,d,e) 
     char *msg;
-{
+long a, b, c, d, e; {
     char    fmt[100];
 
     if (msg) {			/* if called with null argument won`t
@@ -145,18 +145,18 @@ error(msg,a,b,c,d,e)
 
 static struct sgttyb tsave,newt;
 
-set_users_terminal()
+long set_users_terminal()
 {
 	save_term(tsave);
 	set_term(tsave,newt);
 }
 
-reset_users_terminal()
+long reset_users_terminal()
 {
 	reset_term(tsave);
 }
 
-get_user_comment(prompt,f)
+long get_user_comment(prompt,f)
     char *prompt;
     FILE *f;
 {
@@ -180,7 +180,7 @@ get_user_comment(prompt,f)
 	destination and delivery system should be derived by examining
 	the code.  */
 
-automatic_bug_report(s)
+long automatic_bug_report(s)
     char *s;
 {
     char    mail_command[80],
@@ -215,7 +215,7 @@ automatic_bug_report(s)
         /* bug asks the user for a description of the bug and mails it
            to ada-bugs. */
 
-bug()
+long bug()
 {
         char file_name[80], mail_command[80];
         FILE *f;
@@ -241,7 +241,7 @@ bug()
            to bug, so it is included here.  It asks the user for his/her
            questions and mails it to ada-questions */
 
-question()
+long question()
 {
         char file_name[80], mail_command[80];
         FILE *f;

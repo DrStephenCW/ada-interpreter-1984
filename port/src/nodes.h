@@ -195,10 +195,10 @@ nop_xor,		/*$ ~xor~  ~^~		binop_node */
 };
 
 char *toktab[];
-#define tokname(tok) (toktab[(int)tok])
+#define tokname(tok) (toktab[(long)tok])
 #define nodename(p) (tokname(p->ndf.op))
 
 typedef enum tokentypes tokenlist[];
 
-int     *intdebugp;
+long     *intdebugp;
 #define intdebug (*intdebugp)

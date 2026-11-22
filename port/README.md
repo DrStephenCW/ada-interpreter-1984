@@ -1,8 +1,9 @@
 # Arcturus 1.6-A, buildable
 
 This is the UC Irvine Arcturus Ada environment and interpreter, as linked on
-January 5, 1984. It has been ported so that it builds and runs on a modern
-x86 Linux machine, including WSL2 on Windows. See [CREDITS.md](../CREDITS.md)
+January 5, 1984. It has been ported so that it builds and runs on modern
+Linux, 64-bit or 32-bit, on x86 or ARM. That includes WSL2 on Windows and
+Amazon Linux 2023 on Graviton. See [CREDITS.md](../CREDITS.md)
 for who wrote it.
 
 ```
@@ -22,9 +23,10 @@ function fact(n: in integer) return integer is
 
 ## Running it
 
-The prebuilt binary `bin/ada-i386-static` is a static 32-bit x86 Linux
-program. It needs no libraries, so it runs on any x86-64 Linux, including
-WSL2 on Windows. WSL1 cannot run 32-bit programs.
+`bin/` has prebuilt static binaries for 64-bit ARM (`ada-aarch64-static`,
+for Graviton and other ARM64 Linux), 64-bit x86 (`ada-x86_64-static`) and
+32-bit x86 (`ada-i386-static`). They need no libraries. The `arcturus`
+script picks the one for your machine, or `./ada` if you built one.
 
 ```
 ./arcturus                      # interactive; end with control-D or quit;
@@ -51,17 +53,22 @@ directory starts where you left off. Delete those files to start fresh.
 
 ## Building it
 
-You need gcc with 32-bit support. On Debian, Ubuntu or WSL, install it with
-`sudo apt install gcc-multilib make`. Then:
+You need gcc and make:
+
+- Amazon Linux 2023, Fedora: `sudo dnf install gcc make`
+- Debian, Ubuntu, WSL: `sudo apt install gcc make`
+
+Then:
 
 ```
 make                     # builds ./ada, which ./arcturus prefers
-make LDFLAGS=-static     # a static binary like the one in bin/
+make LDFLAGS=-static     # a static binary like the ones in bin/
+make CC="gcc -m32"       # a 32-bit x86 build (needs gcc-multilib)
 ```
 
-The code is built 32-bit because the 1984 sources keep pointers in `int`s
-throughout. On a 32-bit build that is harmless; on a 64-bit build it would
-crash.
+The 1984 sources keep pointers in `int`s throughout, which only works when
+an int and a pointer are the same size. `port.py` makes every `int` a
+`long` (see "64-bit" below), so the same sources build 64-bit and 32-bit.
 
 ## What is here
 
@@ -74,6 +81,7 @@ crash.
 | `examples/` | `hello.ada` and `tour.ada` |
 | `bin/` | The prebuilt static binary |
 | `port.py` | Regenerates `src/` and `lib/` from the tape files |
+| `wide.py` | The 64-bit changes, used by `port.py` |
 | `notice.py` | The copyright-notice replacement, also used by `port.py` |
 | `tools/` | The VAX a.out reader, and the decoder for the 1984 saved core image |
 
@@ -118,7 +126,7 @@ marked `port:` in the code. To regenerate from the tape:
   - `static` is dropped from a function that was used before it was
     defined.
   - `perror` is renamed `ada_perror`.
-  - `<varargs.h>` and `<sgtty.h>` get small shims, and `call.s` (VAX
+  - `<sgtty.h>` gets a small shim, `<varargs.h>` becomes `<stdarg.h>`, and `call.s` (VAX
     assembly) becomes `compat/call.c`.
   - Old lex's `yyin = stdin` initializer is set at startup, and `yywrap`
     and `yyreject` are provided.
@@ -139,6 +147,30 @@ marked `port:` in the code. To regenerate from the tape:
     directory.
   - At end of piped input inside an error break, the program exits instead
     of looping.
+- **64-bit.** `wide.py` makes these changes, all mechanical, each on the
+  line it changes, so line numbers still match the 1984 files:
+  - Every `int` becomes `long`. A `long` is a pointer's size on Linux,
+    64-bit or 32-bit.
+  - Every implicit `int` gets an explicit `long`: a function with no return
+    type, `static x;`, `extern f();`, `register i;`, and a K&R parameter
+    that is never declared (it gets `long name;` before the `{`).
+  - A constant passed as a whole argument, like the `-1` in `f(x, -1)`,
+    gets an `L`. So does `#define null 0`. Otherwise `-1` would arrive in a
+    64-bit parameter as 4294967295.
+  - `src/decls64.h` is generated and included in every file. It declares
+    each function with its real return type, so a call made before the
+    definition doesn't cut a pointer down to 32 bits.
+
+  A few hand edits go with them, all in `port.py`. `cm` in `parser.c`
+  uses `<stdarg.h>`, since arguments now come in registers. A real takes
+  a word, as an integer does, because array indexing relies on it. `dump.c`
+  had a variable that clashed with a function name. The memory report
+  counts heap growth from startup. ARM chars are unsigned, so the build
+  uses `-fsigned-char`, as on the VAX.
+
+  Ada's `integer` is still 32 bits (`integer'last` is 2147483647), as in
+  1984. Integer division by zero stops the program on x86, as it did in
+  1984, but gives 0 on ARM, which doesn't trap it.
 - **Copyright notices.** The 1983 notice in each file is replaced by a
   pointer to CREDITS.md, with the same number of lines.
 

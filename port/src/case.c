@@ -47,7 +47,7 @@ struct choice_item *dupli_check();
 
 /* Keep used choice_items in a list for reuse when we're done with them. */
 
-free_valid_choice_list(ptr)
+long free_valid_choice_list(ptr)
 struct choice_item *ptr;
 {       if (ptr) {
                 free_valid_choice_list(ptr->next_choice_item);
@@ -57,7 +57,7 @@ struct choice_item *ptr;
 }
 
 
-runcase(p)
+long runcase(p)
     register nodep p;
                         /* interpret a case statement */
 {   switch(p->ndf.op) {
@@ -65,7 +65,7 @@ runcase(p)
                 typedval r;
                 register nodep q,m,x;
                 struct choice_item *valid_choice_list,*new_choice;
-                int choice_count;
+                long choice_count;
                 boolean all_choices_accounted_for;
 
                 x = null;
@@ -136,7 +136,7 @@ runcase(p)
     } 
 } /* end runcase */
 
-docase(p)
+long docase(p)
     nodep p;
 {
     struct retstkform   rets;
@@ -191,6 +191,6 @@ struct choice_item *dupli_check(n_choice,v_c_list)
 
 
 
-case_error1()  {
+long case_error1()  {
    error("choice duplication in case stmt\n");
 }

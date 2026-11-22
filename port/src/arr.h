@@ -35,7 +35,7 @@ Initial revision (Arcturus release 1.3E)
 /*	Arrays are always integer arrays, even for characters! */
 
 typedef struct {
-	int arr_first;
-	int arr_last;
-	int *arr_base;
+	long arr_first;
+	long arr_last;
+	long *arr_base;
 } *arrayp;

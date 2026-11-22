@@ -81,8 +81,8 @@ char *macro_pname(p)
 
 fixp macro_lookup(id,fn,a)
     char *id;
-    boolean (*fn)();
-    int a;
+    long boolean (*fn)();
+    long a;
 {
     register fixp f;
     register usep up;

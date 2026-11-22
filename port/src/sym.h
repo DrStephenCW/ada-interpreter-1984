@@ -116,7 +116,7 @@ struct fixform {
             struct typeform *type;  /* return type */           
             nodep   int_form;    /* pointer to internal form of decl's
 				and body */
-            int     (*code)();  /* pointer to compiled code */
+            long     (*code)();  /* pointer to compiled code */
         } func;
 
    	struct packfixform {	/* package */
@@ -142,17 +142,17 @@ struct symbolform {
     /* every symbol contains the following information: */
     struct SYF {
         symp link;		/* a link to the previous invocation */
-	int level;		/* nesting level in dynamic stack */
+	long level;		/* nesting level in dynamic stack */
     } syf;
 
   /* depending on the type of symbol, it will contain one of the following: */
     union {
 	struct varsymbolform {		/* object or parameter */
             struct typeform *type;	/* its type (integer, float, ...) */
-            int    *value;              /* points to actual value, the size */
+            long    *value;              /* points to actual value, the size */
                                         /*  of which can vary - integer,    */
 
-	    int value_space;	/* saves malloc for scalars */
+	    long value_space;	/* saves malloc for scalars */
 				/* value is initialized to point */
 				/* here by newsym1() */
         } var;
@@ -209,13 +209,13 @@ struct typeform {
     struct TYF {
         enum typeforms class;
         nodep int_form;
-        int size;
+        long size;
     } tyf;
 
     union {
 	struct srangetypeform {         
-            int lbound;		/* lower bound of range */
-            int ubound;		/* upper bound */
+            long lbound;		/* lower bound of range */
+            long ubound;		/* upper bound */
             typep basetype;	/* base type (character, integer,...) */
 	} srange;
                              
@@ -226,8 +226,8 @@ struct typeform {
 	} urange;
                              
 	struct enumtypeform {
-            int lbound;		/* lower bound (always zero?) */
-            int ubound;		/* number of elements in enumeration - 1 */
+            long lbound;		/* lower bound (always zero?) */
+            long ubound;		/* number of elements in enumeration - 1 */
             char **names;	/* the names of the elements of the enum */
 	} enumer;
 

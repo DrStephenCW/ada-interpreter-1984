@@ -78,19 +78,19 @@ static char rcsid[] =
 # define throw longjmp
 
 extern FILE *yyin;
-extern int yylineno, yycol;
-extern int yytchar, yychar;
+extern long yylineno, yycol;
+extern long yytchar, yychar;
 extern char *yysptr, yysbuf[];
 extern char *Library, *Default_Editor;
 extern char *tail();		/* returns last component of a pathname */
 
 
 boolean append_next_string = false;	/* see parsestring below */
-int *parsenv;                   /* for parse errors */
+long *parsenv;                   /* for parse errors */
                                 /* allows us to return gracefully from */
                                 /* anywhere in the parser */
 extern FILE *yyin;              /* input file for scanner (lex) */
-extern int yylineno, yycol;     /* current line and col while parsing */
+extern long yylineno, yycol;     /* current line and col while parsing */
 
 extern nodep parser();			/* the ada parser */
 extern char *getenv();
@@ -109,14 +109,14 @@ extern char *getenv();
 struct inclform {
         FILE *filesave;
         struct inclform *incllink;
-        int linesave;
-        int colsave;
+        long linesave;
+        long colsave;
 	char chsave;
 };
 
 struct inclform *inclstack;
 
-pushfile () {
+long pushfile () {
     register struct inclform   *p;
 
     p = (struct inclform   *) zalloc (sizeof (struct inclform), false);
@@ -130,7 +130,7 @@ pushfile () {
     inclstack = p;
 }
 
-popfile () {
+long popfile () {
     register struct inclform   *p;
     p = inclstack;
     if (p == null)
@@ -148,12 +148,12 @@ popfile () {
 }
 # endif STACKFILES
 
-int err_row, err_col;
-extern int yyprline, yyprcol;
+long err_row, err_col;
+extern long yyprline, yyprcol;
 
 /*VARARGS1*/
 char *ada_perror(s,a,b,c,d,e)       /* come where if a parsing error occured */
-{
+long s, a, b, c, d, e; {
         static char error[256];
         sprintf(error,s,a,b,c,d,e);     /* translate error into simple string */
         err_row = yyprline;
@@ -286,7 +286,7 @@ char *parsestring(s,p)
     return parsething(s,p,interactive_input);
 }
 
-       incl(name, printerr, construct)
+       long incl(name, printerr, construct)
     char *name;
     boolean printerr;
     enum parser_construct construct;
@@ -326,14 +326,14 @@ char *parsestring(s,p)
     if (printerr || opened) interp(p);
 }
 
-include(name, printerr)
+long include(name, printerr)
     char *name;
     boolean printerr;
 {
     incl(name, printerr, compilation);
 }
 
-command_include(name, printerr)
+long command_include(name, printerr)
     char *name;
     boolean printerr;
 {
@@ -376,7 +376,7 @@ boolean call_edit(name,s)       /* s = error string */
     editor _ tail(editor_path);	/* check last component of pathname */
     if (strcmp (editor, "vi") == 0) {
 	    putf ("error: %s\n", s);
-	    sleep (2);
+	    sleep (2L);
 	    sprintf (command, "%s +%d %s", editor_path, err_row, name);
     }
     else if (strcmp (editor, "emacs") == 0) {
@@ -396,7 +396,7 @@ boolean call_edit(name,s)       /* s = error string */
     }
     else {		/* unknown editor */
 		putf ("Unknown editor; error: %s\n", s);
-		sleep (2);
+		sleep (2L);
 		sprintf (command, "%s %s", editor_path, name);
     }
     system (command);
@@ -406,8 +406,8 @@ boolean call_edit(name,s)       /* s = error string */
 extern char *Edit_File;
     /* edit has to pretty print the object to a file
        and then call the editor.  It then removes the temporary file. */
-edit(iform) 
-    int *iform;  
+long edit(iform) 
+    long *iform;  
 {
     FILE * f;
     char   *editor;
@@ -428,7 +428,7 @@ edit(iform)
     unlink (Edit_File);
 }
 
-parser_error(err)
+long parser_error(err)
     char *err;
 {
     error_xy(err_row-1, err_col-1);     /* tell Ray where the error is */
@@ -443,7 +443,7 @@ parser_error(err)
    as if they were typed to the ada top level. */
 
 
-ada_include(ada_file_name)
+long ada_include(ada_file_name)
     arrayp ada_file_name;
 {
     char file_name[80];
@@ -452,7 +452,7 @@ ada_include(ada_file_name)
     include(file_name, true);
 }
 
-ada_include_commands(ada_file_name)
+long ada_include_commands(ada_file_name)
     arrayp ada_file_name;
 {
     char file_name[80];
@@ -461,7 +461,7 @@ ada_include_commands(ada_file_name)
     command_include(file_name, true);
 }
 
-ada_load(ada_file_name)
+long ada_load(ada_file_name)
     arrayp ada_file_name;
 {
     char file_name[80];

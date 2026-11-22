@@ -36,16 +36,16 @@ attached to each node of the internal form.
 ****************************************************************/
 
 
-int apply_attach(p,fn,op)	/* apply the function fn to all attachments
+long apply_attach(p,fn,op)	/* apply the function fn to all attachments
 				   of type op attached to the node pointed to
 				   by p.  fn is a function of one argument, a
 				   nodep. Returns the number of such 
 				   attachments. */
     nodep p;
-    int (*fn)();
+    long (*fn)();
     enum tokentypes op;
 {
-    int howmany = 0;
+    long howmany = 0;
 
     p = p->ndf.ag;
     while (p) {
@@ -59,11 +59,11 @@ int apply_attach(p,fn,op)	/* apply the function fn to all attachments
 }
 
 
-apply_all_attach(p,fn)		/* apply fn, a function of one argument, to
+long apply_all_attach(p,fn)		/* apply fn, a function of one argument, to
 				   all attachments attached to the node
 				   pointed to by p */
     register nodep p;
-    int (*fn)();
+    long (*fn)();
 {
     register nodep q;
 
@@ -115,7 +115,7 @@ nodep extract_attach(p,op)	/* remove the first attachment of type op
     return null;
 }
 
-remove_attach(p,op)		/* remove all attachments of type op from the
+long remove_attach(p,op)		/* remove all attachments of type op from the
 				   node pointed to by p */
     nodep p;
     enum tokentypes op;
@@ -133,7 +133,7 @@ remove_attach(p,op)		/* remove all attachments of type op from the
     }
 }
 
-insert_attach(p,a)		/* attach the attachment pointed to by a to
+long insert_attach(p,a)		/* attach the attachment pointed to by a to
 				   the beginning of the list of attachments
 				   attached to the node pointed to by p */
     nodep p,a;
@@ -142,7 +142,7 @@ insert_attach(p,a)		/* attach the attachment pointed to by a to
     p->ndf.ag = a;
 }
 
-append_attach(p,a)		/* attach the attachment pointed to by a to
+long append_attach(p,a)		/* attach the attachment pointed to by a to
 				   the end of the list of attachments
 				   attached to the node pointed to by p.  If
 				   order doesn't matter, use insert_attach

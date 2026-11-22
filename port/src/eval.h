@@ -41,12 +41,12 @@ enum int_modes {        /* second arg to interp */
 };
              
 typedef union {
-	int *ptr;	/* used for indirecting through word */
+	long *ptr;	/* used for indirecting through word */
 	symp sptr;
 	typep tptr;
 	nodep nptr;
 	fixp fptr;
-        int integer;
+        long integer;
         float real;
 } word;
 
@@ -61,13 +61,13 @@ typedef struct {
     the implementation of exit statements and exception handling */
 
 struct retstkform {
-    int *retenv;		/* return environment for setjmp/longjmp */
+    long *retenv;		/* return environment for setjmp/longjmp */
     typedval *retvalsav;	/* pointer to result for return */
     nodep *intsp_save;		/* return stack pointer */
     symtabp currtab;		/* value of currtab upon entry */
     nodep p;			/* internal form of caller */
     fixp exception;		/* last exception handled on this level */
-    int must_prop_exception;	/* true if exceptions must be propogated */
+    long must_prop_exception;	/* true if exceptions must be propogated */
 				/* PAR 22-Aug-83 */
     struct retstkform *link;	/* stack link */
 };
@@ -90,4 +90,4 @@ typedval dummy;
 typedval *retval;               /* global used by return to return current */
                                 /* type and value */
 
-#define MAXARGS 20
+#define MAXARGS 20L

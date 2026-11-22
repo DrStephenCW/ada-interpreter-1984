@@ -126,7 +126,7 @@ char	*Edit_File = ",ada.edit";
 			   included.
 			*/
 
-int 	pagesize = 1024;
+long 	pagesize = 1024;
 			/* Used by save and restore.  The initialized data
 			   segment starts on a page boundary, and pagesize
 			   is used to calculate this address from etext, 

@@ -32,7 +32,7 @@ static char rcsid[] =
 #include "tab.h"
 #include "eval.h"
 /* port: block-scope externs, repeated at file scope */
-extern nill();
+extern long nill();
 
      /*	This file implements the goto statement.  There are two cases
 	that need to be handled.  This first is when the goto statement
@@ -62,7 +62,7 @@ extern  typep tyeval ();
 
 extern nodep intstk[], *intsp, *intstk_end;
 
-extern int curr_generation;
+extern long curr_generation;
 
 nodep goto_p;			/* used by the interpreter to do the goto */
 
@@ -95,7 +95,7 @@ retsp find_subp()
 	if it is, it saves a pointer to it.  If it finds more than one
 	it complains. */
 
-static fix_pre(n)
+static long fix_pre(n)
     nodep n;
 {
     if (n->ndf.op == nop_lb && n->nd.ident.id == label) {
@@ -172,12 +172,12 @@ static fix_pre(n)
 	same list as the label, or null if the label and goto are in
 	the same list. */
 
-       fixgoto(goto_node)
+       long fixgoto(goto_node)
     nodep goto_node;
 {
     nodep p;
     retsp ret;
-    extern nill();
+    extern long nill();
 
     label_p = null;
 
@@ -220,7 +220,7 @@ nodep dogoto(goto_node)
         while (ret && ret->p != goto_node->nd.gotox.throw_dest)
 	    ret = ret->link;
         if (ret == null)  error("Internal error in GOTO");
-        unwind_retstk(ret,3);
+        unwind_retstk(ret,3L);
     }
 }
 

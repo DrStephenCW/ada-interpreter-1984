@@ -31,7 +31,7 @@ static char rcsid[] =
 
 struct {
 	char *rsw_string;
-	int rsw_tok;
+	long rsw_tok;
 } rswtab[] = {
 	"abort",	ABORT,
 	"accept",	ACCEPT,
@@ -101,13 +101,13 @@ struct {
 #define numrsw (sizeof(rswtab) / sizeof(*rswtab))
 
 
-int rswcheck(s)
+long rswcheck(s)
     char *s;
 {
-	register int i;
-	register int r = numrsw;
-	register int l = 0;
-	int c;
+	register long i;
+	register long r = numrsw;
+	register long l = 0;
+	long c;
 
 	while(1) {
 		i = (l+r) / 2;
@@ -124,10 +124,10 @@ char *optab[] = { "*", "+", "-", "/", "<", "=", ">",
 	            "**", "<=", ">=", "or", 
 		    "and", "mod", "not", "rem", "xor", null };
 
-int chkopr(s)
+long chkopr(s)
     char *s;
 {
-    int l;
+    long l;
     char **t;
 
     if ((l = strlen(s)) <= 3 && l >= 1)

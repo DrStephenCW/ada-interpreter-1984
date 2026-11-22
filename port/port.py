@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Make a buildable copy of Arcturus 1.6-A for 32-bit Linux (gcc -m32).
+"""Make a buildable copy of Arcturus 1.6-A for modern Linux, 64-bit or 32-bit.
 
 Usage: port.py TAPE_ADA_DIR REBUILT_DIR OUT_DIR
 
@@ -36,7 +36,18 @@ SUBST = {
                   ('funcinit ("del", symdel);', '{ extern delete_sym(); funcinit ("rm", delete_sym); }	/* port: as in the 1984 binary */'),
                   ('funcinit ("psyms", sympsyms);', '{ extern printall(); funcinit ("printall", printall); }	/* port: as in the 1984 binary */'),
                   ('    funcinit ("putsym", putsym);\n', '    funcinit ("putsym", putsym);\n    { extern touch(); funcinit ("touch", touch); }	/* port: as in the 1984 binary */\n'),
-                  ('static\tcheck_top_level() {', 'check_top_level() {')],
+                  ('static\tcheck_top_level() {', 'check_top_level() {'),
+                  # a real is kept in a word, like an integer; on the VAX both
+                  # were 4 bytes, and array indexing (intaux.c) relies on it
+                  ('realtype -> tyf.size = sizeof (float);', 'realtype -> tyf.size = sizeof (int);	/* port: was sizeof (float) */'),
+                  # these return a FILE_TYPE (a pointer), not an int
+                  ('extern standard_input(), standard_output(), standard_msg();',
+                   'extern FILE_TYPE standard_input(), standard_output(), standard_msg();	/* port */')],
+    # memory used is the growth of the heap; on a modern system the heap
+    # doesn't start at "end", so count from where it was at startup
+    'misc.c':    [('((sbrk(0) - (int)end) / 1024));', '(((int)sbrk(0) - port_brk0) / 1024));	/* port: was sbrk(0) - (int)end */'),
+                  ('sbrk(0) - (int)end);', '(int)sbrk(0) - port_brk0);	/* port: was sbrk(0) - (int)end */'),
+                  ('char *malloc();', 'char *malloc();\nextern int port_brk0;	/* port: in compat/port.c */')],
     # VAX F_float is the top half of a D_float, so 1984 code that handed a
     # 32-bit float to a double slot printed nearly the right value.  IEEE
     # floats don't work that way; these places reinterpret the bits.
@@ -60,9 +71,20 @@ SUBST = {
                    '\tsysputf("[port: saving a memory image is not supported on this machine]\\n");\n\treturn false;	/* port */\n\tdata_addr _ (int)sbrk(0);\n'),
 ('\t\t\t\tsysputf("Can\'t continue from this type of error");',
                    '\t\t\t\tsysputf("Can\'t continue from this type of error");\n\t\t\tif (feof(stdin)) exit(1);	/* port: stop at end of piped input */')],
+    # the old <varargs.h> walked the stack; on 64-bit machines arguments
+    # come in registers, so cm takes them through <stdarg.h>.
+    'parser.c':  [('# include <varargs.h>', '# include <stdarg.h>	/* port: was <varargs.h> */'),
+                  ('static cm(va_alist)\n    va_dcl\n{\n    va_list pvar;\n    nodep p, m;\n\n    va_start(pvar);\n    m = (nodep)va_arg(pvar,nodep);',
+                   'static cm(nodep m, ...)	/* port: was cm(va_alist) va_dcl */\n{\n    va_list pvar;\n    nodep p;\n\n    va_start(pvar, m);\n    /* port: m is the first argument, the syntax node */')],
+    # give the struct behind FILE_TYPE a tag, so decls64.h can name it
+    'adaio.h':   [('typedef struct {\n\tint ibufp;', 'typedef struct adafile {	/* port: tag added */\n\tint ibufp;')],
     'command.c': [('return (int)fgets(s,f);', 'return (int)fgets(s,1024,f);')],
     'dump.c':    [(re.compile(r'\bconst\b'), 'cnst'),
-                  ('\nmaptab(tab, f, arg1, arg2)', '\nstatic maptab(tab, f, arg1, arg2)')],   # misc.c has the real one
+                  (re.compile(r'\bmaptab\b'), 'dump_maptab'),
+                  # its static variable newline would clash with the declared
+                  # function newline() (see wide.py)
+                  ('static boolean newline;', 'static boolean dump_newline;	/* port: was newline */'),
+                  ('    newline = false;', '    dump_newline = false;')],   # port: misc.c has the real maptab
     'scanner.c': [('FILE *yyin ={stdin}, *yyout ={stdout};', 'FILE *yyin, *yyout;')],
 }
 RENAME_PERROR = ('paraux.c', 'parser.c', 'pragint.c', 'scanner.c')
@@ -70,6 +92,7 @@ RENAME_PERROR = ('paraux.c', 'parser.c', 'pragint.c', 'scanner.c')
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from notice import replace_notice
+import wide
 
 def move_knr_externs(text):
     """pcc accepted 'extern' declarations between a K&R parameter list
@@ -107,6 +130,7 @@ def unstatic_used_before(text):
             text = text[:m.start()] + ' ' * 7 + text[m.start() + 7:]
     return text
 
+ported = {}
 for o, path in sorted(SRC.items()):
     t = open(path, encoding='latin-1').read()
     name = o + '.c'
@@ -123,11 +147,20 @@ for o, path in sorted(SRC.items()):
             assert a in t, (name, a); t = t.replace(a, b)
     if name in RENAME_PERROR:
         t = re.sub(r'\bperror\s*\(', 'ada_perror(', t)
-    open(os.path.join(out, name), 'w', encoding='latin-1').write(t)
+    ported[name] = wide.widen(t)
 for h in os.listdir(tape):
     if h.endswith('.h'):
-        t = open(os.path.join(tape, h), encoding='latin-1').read()
-        open(os.path.join(out, h), 'w', encoding='latin-1').write(replace_notice(t))
+        t = replace_notice(open(os.path.join(tape, h), encoding='latin-1').read())
+        for a, b in SUBST.get(h, []):
+            assert a in t, (h, a); t = t.replace(a, b)
+        ported[h] = wide.widen(t)
+for name, t in ported.items():
+    open(os.path.join(out, name), 'w', encoding='latin-1').write(t)
+compat = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'compat')
+texts = {n: t for n, t in ported.items() if n.endswith('.c')}
+for n in os.listdir(compat):
+    if n.endswith('.c'): texts['compat/' + n] = open(os.path.join(compat, n)).read()
+open(os.path.join(out, 'decls64.h'), 'w').write(wide.decls_header(texts))
 
 # run-time files, read by the interpreter when it starts
 lib = os.path.join(out, '..', 'lib'); os.makedirs(lib, exist_ok=True)

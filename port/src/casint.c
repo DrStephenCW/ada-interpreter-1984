@@ -64,8 +64,8 @@ static char rcsid[] =
 #include "oblist.h"
 /* port: block-scope externs, repeated at file scope */
 extern char *macro_pname();
-extern map();
-extern nill();
+extern long map();
+extern long nill();
 
 extern char *macro_pname(), *macro_hash_name();
 extern nodep ada_copytree();
@@ -102,7 +102,7 @@ typep look_for_type(ty)
     return fix->fxf.dyna->sy.var.type;
 }
 
-lookup_types()
+long lookup_types()
 {
     if (type_intnode) return;
     type_intnode = look_for_type("intnode");
@@ -113,7 +113,7 @@ lookup_types()
     type_typenode = look_for_type("typenode");
 }
 
-domacro(p,mode)
+long domacro(p,mode)
     nodep p;
     enum int_modes mode;
 {
@@ -193,7 +193,7 @@ the internal form of the body) prevents this currently.
 	if (writeout && currtab == usrtab)
 	    subp_writeout(f);
 
-	p -> nd.macrox.table = newtab(32, f);
+	p -> nd.macrox.table = newtab(32L, f);
  	p -> nd.macrox.table -> symtab_static_link = currtab;
     }
     else system_error("Bad mode in eval in nop_macro");
@@ -272,7 +272,7 @@ boolean macro_call(p, mode, result)
 
  /* evaluate the formal parameters into a table.  */
 
-    tab = newtab (16, null);
+    tab = newtab (16L, null);
 
     paramlist = macro_params(ip->nd.macrox.designator, p, tab);
 
@@ -289,11 +289,11 @@ boolean macro_call(p, mode, result)
 	/* no compiled macros for now */
 # ifdef COMPILED
     if (sym -> sy.func.code) {	/* compiled C or Ada */
-	int     argtab[MAXARGS];
-	int     argcount = 0;
+	long     argtab[MAXARGS];
+	long     argcount = 0;
 
 	for (formals = paramlist; formals; formals = formals -> sy.var.param_link) {
-	    int    *val = formals -> sy.var.value;
+	    long    *val = formals -> sy.var.value;
 	    arrayp p;
 
 	    if (formals -> sy.var.param_base_type -> tyf.class 
@@ -307,11 +307,11 @@ boolean macro_call(p, mode, result)
 		typ = typ -> ty.index.range;
 		p -> arr_first _ typ->ty.srange.lbound;
 		p -> arr_last _ typ->ty.srange.ubound;
-		val = (int *) p;
+		val = (long *) p;
 	    }
 	    if (blocktype (formals -> fxf.dyna -> sy.var.type) or
 		    formals -> fx.var.param_is_out)
-		argtab[argcount++] = (int) val;
+		argtab[argcount++] = (long) val;
 	    else
 		argtab[argcount++] = * val;
 	}
@@ -505,7 +505,7 @@ fixp do_one_param_list(params,args,tab)
 	    if (formals->fx.var.param_is_out) {
 		formals->fx.var.int_form = copy_argument_list(acts);
 	    	*(formals -> fxf.dyna -> sy.var.value) = 
-		    (int)formals -> fx.var.int_form;
+		    (long)formals -> fx.var.int_form;
 	    	formals -> fxf.dyna -> sy.var.type = type_intnode;
 		return paramlist;
 	    }
@@ -515,7 +515,7 @@ fixp do_one_param_list(params,args,tab)
 			     	  acts -> nd.arg.exp :
 		    	     	  acts);
 	    	*(formals -> fxf.dyna -> sy.var.value) = 
-		    (int)formals -> fx.var.int_form;
+		    (long)formals -> fx.var.int_form;
 	    	formals -> fxf.dyna -> sy.var.type = type_intnode;
 	    }
 	}
@@ -631,16 +631,16 @@ boolean macro_match(f, p2)
 static nodep mac_result, call_form;
 static boolean parentf;
 
-static macro_expand_pre(n,p)
+static long macro_expand_pre(n,p)
     nodep n, *p;
 {
     if (n == call_form) *p = mac_result;
 }
 
-static macro_expand_map(p)
+static long macro_expand_map(p)
     nodep *p;
 {
-    extern map();
+    extern long map();
     map(p);		/* wasteful, but works for now */
 # ifdef FRANK
     if (parentf) {		/*  prevents smaptree from searching past
@@ -651,14 +651,14 @@ static macro_expand_map(p)
 # endif FRANK
 }
 
-dyn_macro_expand(p, c)
+long dyn_macro_expand(p, c)
     nodep p, c;		/* p pointer to result of macro,
 			   c pointer to calling form */
 {
     nodep parent;
     register nodep q;
-    int len;
-    extern nill();
+    long len;
+    extern long nill();
     
     call_form = c;	/* put into globals */
     mac_result = p;

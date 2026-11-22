@@ -17,3 +17,11 @@ __attribute__((constructor)) static void lib_from_env(void)
 	char *e = getenv("ARCTURUS_LIB");
 	if (e && *e) Library = e;
 }
+
+/* where the heap started, for memreport (misc.c) */
+long port_brk0;
+char *sbrk();
+__attribute__((constructor)) static void note_brk0(void)
+{
+	port_brk0 = (long)sbrk(0);
+}

@@ -58,7 +58,7 @@ nodep	*intsp = intstk - 1;
 nodep	*intstk_end = &intstk[5000];
 retsp	retstk = null;
 
-extern	int stack_level;	/* depth of the dynamic symbol stack */
+extern	long stack_level;	/* depth of the dynamic symbol stack */
 
 symtabp	parameter_table;	/* formal parameters are entered here */
 
@@ -141,28 +141,28 @@ extern	char *macro_pname();
 
 
 
-clearinterp() {
+long clearinterp() {
 	intsp = intstk - 1;
 	retstk = null;
 }
 
 
-copy(dst, src, n)
+long copy(dst, src, n)
 char *dst, *src;
-int n;
+long n;
 {
 	while (n--)
 		*dst++ = *src++;
 }
 
 
-interp(p) nodep p;
+long interp(p) nodep p;
 {
 	eval(p, decl_mode, &dummy, null);
 }
 
 
-exprinterp(p) nodep p;
+long exprinterp(p) nodep p;
 {
 	eval(p, eval_mode, &dummy, null);
 }
@@ -374,13 +374,13 @@ again:	check_control_c();
 			if (typ == texttype) {
 				char name[128];
 				savename(name, f);
-				*s->sy.var.value = (int)strsav(name);
+				*s->sy.var.value = (long)strsav(name);
 			}
 			else
 				if (blocktype(typ)) {
 					/* arrays and records get
 					   their own space */
-					s->sy.var.value = (int*)zalloc(typ->tyf.size, true);
+					s->sy.var.value = (long*)zalloc(typ->tyf.size, true);
 					if (p->nd.obj_decl.initexp)
 						blockmove(s->sy.var.value,
 						    init.val.ptr,
@@ -484,7 +484,7 @@ again:	check_control_c();
 	case nop_in: {
 		typedval l;
 		typep rtyp;
-		int resval;
+		long resval;
 		/* "x in a..b" and "x not in a..b" */
 
 
@@ -535,7 +535,7 @@ again:	check_control_c();
 					f->fx.var.int_form = r.typ->tyf.int_form;
 					enter(currtab, f, s);
 					putf("\n(%s: ", f->fxf.name);
-					dopp(f->fx.var.int_form, adaout, 0, 0);
+					dopp(f->fx.var.int_form, adaout, 0L, 0L);
 					putf(")\n");
 				}
 				else
@@ -598,7 +598,7 @@ again:	check_control_c();
 			str = (typedval*)zalloc(sizeof(typedval), false);
 			dostring(p->nd.ident.id, str);
 			/* remember it */
-			p->nd.ident.curr_binding = (int*)str;
+			p->nd.ident.curr_binding = (long*)str;
 			p->nd.ident.gen_number = curr_generation;
 		}
 		result->typ = str->typ;
@@ -615,7 +615,7 @@ again:	check_control_c();
 				error("undefined: %s", p->nd.ident.id);
 			/* lookup is slow, so remember
 			   what it found */
-			p->nd.ident.curr_binding = (int*)f;
+			p->nd.ident.curr_binding = (long*)f;
 			p->nd.ident.gen_number = curr_generation;
 		}
 		doident(f, mode, result);
@@ -632,13 +632,13 @@ again:	check_control_c();
 
 		/* allocator */
 		ptr = newtype(accessform);
-		ptr->tyf.size = sizeof(int*);
+		ptr->tyf.size = sizeof(long*);
 		ptr->ty.access.targettype =
 			lookuptypeid(p->nd.newx.type_id->nd.ident.id, true);
 		result->typ = ptr;
 		/* new object, cleared */
 		result->val.ptr =
-			(int*)zalloc(ptr->ty.access.targettype->tyf.size, true);
+			(long*)zalloc(ptr->ty.access.targettype->tyf.size, true);
 		break;
 	}
 	case nop_lp:
@@ -671,7 +671,7 @@ again:	check_control_c();
 	case nop_equal:
 	case nop_nequal: {
 		typedval l, r;
-		int res;
+		long res;
 
 		eval(p->nd.binop.left, eval_mode, &l, null);
 		eval(p->nd.binop.right, eval_mode, &r, null);
@@ -965,7 +965,7 @@ again:	check_control_c();
 			else
 				s->sy.func.type = undeftype;
 			if (p->nd.subp.table == null)
-				p->nd.subp.table = newtab(32, f);
+				p->nd.subp.table = newtab(32L, f);
 			/* scope for the body */
 			p->nd.subp.table->symtab_static_link = currtab;
 			p = p->ndf.next;
@@ -988,7 +988,7 @@ again:	check_control_c();
 		else	docall(p, mode, result);
 		break;
 	case nop_arg: {
-		int i;
+		long i;
 
 		/* evaluate actual parameters into result[] */
 		i = 0;
@@ -1113,7 +1113,7 @@ again:	check_control_c();
 	case nop_expr_callf:
 	case nop_name_callf:
 	case nop_type_callf: {
-		int defined;
+		long defined;
 		/* macro calls in expressions */
 		defined = macro_call(p, mode, result);
 		if (mode != macro_mode && mode != symbol_mode) {
@@ -1130,7 +1130,7 @@ again:	check_control_c();
 	case nop_decl_callf:
 	case nop_stmt_callf:
 	case nop_top_callf: {
-		int defined;
+		long defined;
 		/* macro calls in declarations and
 		   statements: the expansion is spliced
 		   into the list in place of the call,

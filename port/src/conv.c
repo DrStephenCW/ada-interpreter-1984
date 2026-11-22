@@ -39,10 +39,10 @@ static char rcsid[] =
 /*	Further error checking will be required if these are to be	*/
 /*	used as part of an I/O package					*/
 
-int aatoi(s)		/* ada version of atoi (ascii to integer) */
+long aatoi(s)		/* ada version of atoi (ascii to integer) */
     char *s;
 {
-    int n = 0, e = 0;
+    long n = 0, e = 0;
 
     while ((*s >= '0' && *s <= '9') || *s == '_') {
 	if ( *s != '_')  n = 10 * n + *s - '0';   /* check for overflow */
@@ -60,10 +60,10 @@ int aatoi(s)		/* ada version of atoi (ascii to integer) */
     return n;
 }
 
-int abatoi(s)	/* converts an ada based integer (in ascii) to an integer */
+long abatoi(s)	/* converts an ada based integer (in ascii) to an integer */
     char *s;
 {
-    int b = 0, n = 0, e = 0;
+    long b = 0, n = 0, e = 0;
 
     while ((*s >= '0' && *s <= '9') || *s == '_') {
 	if ( *s != '_')  b = 10 * b + *s - '0';   /* check for overflow */
@@ -96,7 +96,7 @@ float aatof(s)	/* ada version of atof (ascii to float) */
     char *s;
 {
     float n = 0.0, f = 0.0;
-    int e = 0;
+    long e = 0;
     boolean negexp = false;
 
     while ((*s >= '0' && *s <= '9') || *s == '_') {
@@ -136,7 +136,7 @@ float abatof(s)	/* converts an ada based float (in ascii) to a float */
     char *s;
 {
     float n = 0.0, f = 0.0;
-    int b = 0, e = 0;
+    long b = 0, e = 0;
     boolean negexp = false;
 
     while ((*s >= '0' && *s <= '9') || *s == '_') {
