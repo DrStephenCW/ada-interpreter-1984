@@ -18,7 +18,7 @@ Quick start, on Linux (x86 or ARM, including Graviton) or WSL2:
 
 ```
 cd port
-./arcturus < examples/tour.ada   # uses the prebuilt binary in bin/
+./arcturus -e < examples/tour.ada   # prebuilt binary in bin/; -e echoes the input
 make && ./arcturus               # or build it yourself with gcc
 ```
 

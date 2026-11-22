@@ -29,8 +29,9 @@ for Graviton and other ARM64 Linux), 64-bit x86 (`ada-x86_64-static`) and
 script picks the one for your machine, or `./ada` if you built one.
 
 ```
-./arcturus                      # interactive; end with control-D or quit;
-./arcturus < examples/tour.ada  # run a script
+./arcturus                         # interactive; end with control-D or quit;
+./arcturus < examples/tour.ada     # run a script
+./arcturus -e < examples/tour.ada  # run a script, echoing each line it reads
 ```
 
 Each line you type is read on its own:
@@ -171,6 +172,9 @@ marked `port:` in the code. To regenerate from the tape:
   Ada's `integer` is still 32 bits (`integer'last` is 2147483647), as in
   1984. Integer division by zero stops the program on x86, as it did in
   1984, but gives 0 on ARM, which doesn't trap it.
+- **Echo.** `-e` (or `--echo`, or `ARCTURUS_ECHO=1`) echoes each input
+  line after its prompt, so a script's output reads like a session. It is
+  in `compat/port.c`; the 1984 program ignores its arguments.
 - **Copyright notices.** The 1983 notice in each file is replaced by a
   pointer to CREDITS.md, with the same number of lines.
 
