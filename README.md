@@ -1,5 +1,7 @@
 # Arcturus: an Ada interpreter from 1984
 
+_This project, aside from [`original/`](original/), was done with Claude Opus 5.5 Medium Effort guided by Stephen Clarke-Willson_
+
 Arcturus was an interactive Ada programming environment, written in C at the
 University of California, Irvine, in 1982-84. It was built around an
 interpreter that runs Ada as you type it. The team is listed in
@@ -25,3 +27,18 @@ make && ./arcturus               # or build it yourself with gcc
 The files in `original/` keep their 1983 copyright notices exactly as found.
 In `rebuild/` and `port/`, each of those notices has been replaced by a
 pointer to CREDITS.md.
+
+## The whole story
+
+This is the third of three repositories that, read together, tell the
+story from a weekend parser in 1981 to the interpreter here:
+
+1. [DrStephenCW/ada-parser-1981](https://github.com/DrStephenCW/ada-parser-1981):
+   the Ada parser Stephen wrote in MLISP on the UC Irvine PDP-10 in January
+   1981, and what came of it.
+2. [Above-the-Garage/ada-parser-1981-go](https://github.com/Above-the-Garage/ada-parser-1981-go):
+   that parser ported to Go in 2026, with
+   [From a Weekend Parser to ADARPE](https://github.com/Above-the-Garage/ada-parser-1981-go/blob/main/docs/adarpe-story-1981.md),
+   the 1981 Lisp environment that came between the parser and Arcturus.
+3. This repository: Arcturus, the C interpreter of 1982-84, recovered and
+   running again.
