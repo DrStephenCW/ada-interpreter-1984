@@ -1,0 +1,135 @@
+--. $Header:   /ub/darpa/ada/RCS/uci_ada_fns.v  Revision 1.8  83/06/14  16:33:07  ada  Exp$ 
+--. Arcturus was written by the UC Irvine Arcturus team (Programming
+--. Environment Project, 1982-84).  See CREDITS.md for who they were.
+--. [2026: the original copyright notice was replaced by this pointer.]
+--.
+--.
+--.
+--.
+--.
+--.
+--.
+--.
+--.
+--.
+--.
+
+--. $Log:	/ub/darpa/ada/RCS/uci_ada_fns.v $
+--. Revision 1.8  83/06/14  16:33:07  ada
+--. Same as 1.7.4.1.
+--. 
+--. Revision 1.7.4.1  83/06/14  14:15:40  tadman
+--. Added procedures include, include_commands, and load.
+--. 
+--. Revision 1.7  83/04/05  14:46:12  ada
+--. added procedure putsym.
+--. 
+--. Revision 1.6  83/03/10  16:43:23  ada
+--. same as 1.4.2.1
+--. 
+--. Revision 1.4.2.1  83/02/04  14:28:38  willson
+--. took out i/o stuff, moved it into text_io package.
+--. 
+--. Revision 1.4  83/01/12  09:40:49  ada
+--. Added coyright notice.
+--. 
+--. Revision 1.3  83/01/11  14:39:22  ada
+--. Same as 1.2.2.1
+--. 
+--. Revision 1.2.2.1  83/01/05  10:52:51  willson
+--. Added header for procedure fix.
+--. 
+--. Revision 1.2  82/12/20  15:15:05  willson
+--. Changed csh procedure to take new boolean flag; true => save terminal state;
+--. false => allow subshell to alter terminal state.
+--. 
+--. Revision 1.1  82/12/12  21:47:45  tadman
+--. Initial revision (Arcturus release 1.3E)
+--. 
+
+package uci is
+
+-- flags hooked into ada interpreter
+intdebug: boolean := false;	-- prints each node as it is interpreted
+counting : boolean := false;    -- indicates whether we're counting node visits
+                                -- during evaluation.
+croak_ok : boolean := false;	-- procedure die only works if this is true;
+				-- for people who don't want to kill themselves
+				-- accidentally (say by mistyping "dir").
+write_core_file : boolean := false;
+				-- if true then when quitting we should write
+				-- a core file along with the ADA.SAVE file
+				-- (helps keep 'em in sync).
+
+-- subr's initialized by init() 
+
+procedure history(filename : string := "/dev/tty");
+procedure export;
+procedure die;
+procedure save(filename : string := "ada.core");
+procedure restore(filename : string := "ada.core");
+procedure include(filename: string);
+procedure include_commands(filename: string);
+procedure load(filename: string);
+procedure fix;
+procedure news;              
+procedure memreport;
+procedure treesize(s : symbol);
+procedure profile_on;
+procedure profile_off;
+procedure stack_trace;
+procedure symbol_table(s: symbol := usr'sym);
+procedure static_link(s: symbol);
+procedure csh(s : string := ""; term_save : boolean := true);
+procedure edit(x: symbol);
+procedure rm(x: symbol);
+procedure where;
+procedure how;
+procedure printall;        
+procedure touch(sym : symbol);
+procedure cref( sym: symbol;
+		filename: string := "";
+		nroff: boolean := false);
+procedure bktr(depth: integer := integer'last);
+procedure putsym(sym : symbol);
+procedure quit(write_core : boolean := write_core_file);
+
+-- procedures for text objects
+procedure type_out(t: string);
+procedure textedit(t: string);
+
+procedure break;
+procedure dumpcore;
+
+procedure clear_counters;       -- clear all counters.
+
+--. procedures for questions and bug reports
+
+procedure bug;		-- make a bug report
+procedure question;	-- ask a question
+
+end uci;
+
+package body uci is
+
+procedure getstr(item : in out string) is 
+	point : integer := item'first;
+	ch : character;
+begin
+	getchr(ch);
+	while point <= item'last and then ch /= ascii.lf loop
+	  item(point) := ch;
+	  getchr(ch);
+	  point := point + 1;
+	end loop;
+	if point < item'last then item(point) := character'val(0);
+	end if;
+end;
+
+procedure news is
+begin
+  csh("more ~darpa/ada_news");   -- For use on uciunix machine for information
+				 --- on system updates. 
+end;
+
+end uci;

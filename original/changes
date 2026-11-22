@@ -1,0 +1,138 @@
+1)	Removed routine 'go' and break_id_node, since they didn't work
+	on the left side of assignments and they were a big hack anyway.
+1.a)	Removed id_changed hack from toplev.c
+1.b)	Removed 'break_id_node' from int.c
+1.c)	Changed comment in intaux.c that refered to 'user' to 'usr'
+
+2)	Changed the name of the directory the 'usr' package is stored into
+	to be called 'usr', thus, hopefully in the long run, causing less
+	confusion and allowing us to extend this to all the packages in
+	the system.  [dump.c]
+
+3)	Added a subroutine that can be called explicitly to dump the current
+	environment as a text file.  First step at making export laundry.
+	Don't use it yet. (You can't anyway, it's not implemented.)
+	It will just bitch and complain if you do try it.
+	[dump.c]
+
+4)	Added additional comments to dump.c
+
+5)	Removed ADA-to-C translator.  Didn't work and confused people.
+	[cpp.c]
+
+6)	Removed files, cpp.c and office.c, which were worthless and out-
+	of-date.  [Makefile].
+
+7)	Changed the name of the package uci_ada_functions to be uci.
+	Too hard to type the old name.  The file name is still the same.
+	[uci_ada_fns, user_package].
+
+8)	Added
+	  procedure die;	leaves the system without saving anything
+				if croak_ok is true.
+	  procedure export;	calls export laundry
+	  procedure history(filename : string := "/dev/tty");
+				writes a copy of every nodep that made it
+				past the interpreter to the named file.
+				This list grows without limit.  (It does
+				anyway in the current system, since we
+				never free internal form trees.)
+
+	to package uci.
+
+9)	Made the system always print memory statistics when it exits,
+	since I think people should be aware of this for a while, at least.
+9 1/2)	Made a new routine, quick_memreport, that only prints the total
+	usage, since memreport talks too much.  [misc.c, init.c]
+
+10)	Moved maptab from dump.c to misc.c.
+
+11)	misc.c got screwed up somehow.  The version numbers went 
+
+	most recent: 1.3 (same 1.2.4.1) 
+	next most recent 1.3.4.1.  
+
+	Presumably at some point someone took out the stuff they had
+	put in for constrp's, since there is no such thing in the
+	current system.  But misc.c didn't know that and still had code
+	in it that referenced constrp's.  How this happened I don't
+	know.  Probably no one noticed because misc.c is recompiled
+	rather infrequently.  I took all that out and also deleted the
+	log entry that said it was ever put in. [misc.c]
+
+12)	Changed the indentation of the uses list in the 'dir' command
+	to match the rest of the listing.  [dir.c].
+
+13)	Taught procedure dir to print the contents of functions and
+	procedures as well as packages.  Also changed the headers it
+	printed for the body and visible part to be more descriptive.
+	(visible: -> package specification:, body: -> package
+	implementation:, and added subprogram:.) [dir.c].
+
+14)	Changed the formatting of the dir procedure to print
+	fewer newlines, since more will fit on a screen that way.  I
+	changed the routine dirsym to not print newlines at the end of
+	each symbol.  I changed the dir routine to print three on a
+	line, but the formatting isn't perfect, since I can't get
+	the length of each thing that dirsym prints very easily.  I
+	dunno, I might change this back.  I had to also change ppcref.c
+	since it called fdirsym which called dirsym which it assumed
+	would print a newline. [dir.c, ppcref.c].
+
+15)	Put back in del procedure.  The cheap way it works for now is
+	to merely set the class of the fixform to be undef_id.  The
+	symbol isn't actually deleted.  Made dir procedure print them as
+	<deleted>.  This should be changed to actually delete the
+	symbol.  Also, modified del routine to only work from toplevel,
+	otherwise havoc could result, because the fixp bindings are
+	only updated every time we hit the top level.
+
+16)	New flag "write_core_file", which is the new default argument
+	to "quit."  If true, then a "save" will be done whenever quit
+	is invoked.  The idea is to keep ADA.SAVE and ada.core in sync.
+	If you call quit with this argument true, then quit must be
+	called from the toplevel (since the same is true of "save"); an
+	error will be reported if this isn't the case.
+
+17)	xxdebugflag in int.h should be removed before the next system
+	build.  I left it in because I didn't want to check out int.h.
+	It isn't referenced anywhere anymore.
+
+18)	The bug with creating the 'usr' directory seems to have gone away.
+
+19)	I made redefining identifiers in 'usr' a lot more reliable,
+	though it still isn't perfect.  I put in some
+
+		f->fxf.class = class;
+
+	statements.  Before, if you did something like type in a
+	procedure, called 'p', and then redefined 'p' to be a type
+	definition, everything got royally screwed up.  Now that
+	happens less often.
+
+20)	Added subroutine 'touch' which, when given a symbol, makes sure that
+	it has been swapped into the system.  Changed do_ident to call this,
+	and also made it available via an Ada procedure.
+	[uci_ada_fns, init.c, symtab.c, intaux.c].
+
+21)	Moved and renamed subroutine top_level_error to check_top_level and
+	put it in misc.c.  [init.c, misc.c]
+
+22)	Renamed procedure psyms to be printall, since that is the internal
+	name.  I think maybe it should go away altogether, since we have
+	better printing tools.
+
+23)	Changed the name of dir to ls and del to rm.  More Unix-like.
+	Why should be emulate a dinosaur like tops-20?
+
+24)	There was an error in the old dir (now ls) specification, in that
+	it never referenced ls_color, instead assuming no_color.
+
+25)	Undid change # 14:  everything prints in single columns again.
+	Note the following definition of dir that you can use if you want:
+	  procedure dir(s : symbol := usr'sym) is begin
+	     dir(s, filename => ",dirfile");
+	     csh("more ,dirfile");
+	  end;
+
+26)	Undid 1/2 of change # 23: dir is still dir, but del is rm.

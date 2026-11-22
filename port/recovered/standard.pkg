@@ -1,0 +1,17 @@
+--. [port: the package below is the one saved in the January 1984
+--.  ada.core, decoded with tools/core2ada.py.  The 84/03/16 revision on
+--.  tape spells out type character, which this interpreter can't read.]
+
+package standard is
+-- types initialized by init() 
+type integer;
+type character;
+type float;
+type text;
+type boolean is (false, true);
+type file_type;
+type symbol;
+end standard;
+
+package body standard is
+end standard;

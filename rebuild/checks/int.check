@@ -1,0 +1,96 @@
+== clearinterp  (lines 144-147, 4 groups)
+== copy  (lines 153-156, 4 groups)
+== interp  (lines 160-162, 3 groups)
+== exprinterp  (lines 166-168, 3 groups)
+== eval  (lines 184-1230, 508 groups)
+  W  194| 	   popped on every way out of eval */
+  W  211| 	   whose value is in *result), returns (a declaration of names
+  W  212| 	   that the caller will enter), or goes back to "again" with
+  W  213| 	   p set to the next statement in the list.
+  W  217| 	   Case labels are in the order of the tokentypes enumeration
+  W  218| 	   wherever that does not matter.  */
+  W  223| 	case nop_expr: {
+  W  232| 	case nop_with:
+  W  234| 		   always visible, so there is nothing
+  W  235| 		   to do here.  */
+  W  268| 			   an undefined type for it, unless it
+  W  269| 			   is already declared at this
+  W  270| 			   level. */
+  W  299| 			   declaration, the new type is
+  W  300| 			   copied over the old one so
+  W  301| 			   that everything which points
+  W  302| 			   to the old type now sees the
+  W  303| 			   full one.  Otherwise make a
+  W  304| 			   new symbol.  */
+  W  343| 	case nop_obj_decl: {
+  W  399| 	case nop_except_decl: {
+  W  406| 		   fixform */
+  W  431| 			a, b : in out integer := 0
+  W  433| 		   is a list of names with a mode, a type
+  W  434| 		   and a default value.  Each name is entered
+  W  435| 		   in parameter_table and linked through
+  W  436| 		   param_link to the next one, so that docall
+  W  437| 		   can match actuals to formals in order.
+  W  438| 		   The later declarations in the formal part
+  W  439| 		   are evaluated first, so that the last name
+  W  440| 		   here can be linked to them.
+  W  442| 		   Returns the first name.
+  W  484| 	case nop_in: {
+  W  552| 			   first, so that the address of
+  W  553| 			   the left side can't be changed
+  W  554| 			   by it */
+  W  568| 	case nop_int:
+  W  587| 	case nop_string: {
+  W  591| 		   once per command (generation) and
+  W  592| 		   the result hung on the node, the
+  W  593| 		   same trick that nop_ident uses for
+  W  594| 		   symbols.  */
+  W  608| 	case nop_ident: {
+  W  630| 	case nop_new: {
+  W  644| 	case nop_lp:
+  W  671| 	case nop_equal:
+  W  672| 	case nop_nequal: {
+  W  700| 	case nop_andthen: {
+  W  713| 	case nop_orelse: {
+  W  726| 	case nop_amper: {
+  W  738| 	case nop_not: {
+  W  747| 	case nop_neg: {
+  W  761| 	case nop_pos: {
+  W  773| 	case nop_null_stmt:
+  W  788| 	case nop_elsif: {	typedval r;
+  W  824| 	case nop_loop:
+  W  834| 	case nop_for:
+  W  844| 	case nop_exit:
+  W  872| 	case nop_lb:
+  W  883| 	case nop_body:
+  W  889| 	case nop_procedure: {
+  W  894| 		   a body).  Subprograms declared at top level
+  W  895| 		   are written out to usr so that they can be
+  W  896| 		   edited and saved.  */
+  W  907| 			   declared in a package specification
+  W  908| 			   goes with the declaration in the
+  W  909| 			   package's table.  */
+  W  921| #ifdef notdef
+  W  923| 			    of the 1984 binary; their text is
+  W  924| 			    lost)
+  W  928| #endif
+  W  930| 			   level replaces the old one */
+  W  982| 	case nop_call:
+  W  990| 	case nop_arg: {
+  W  996| 		   argument being evaluated */
+  W 1007| 	case nop_declare:
+  W 1023| 	case nop_quote:
+  W 1027| 	case nop_pragma:
+  W 1054| 	case nop_case:
+  W 1064| 	case nop_obj_ren: {
+  W 1083| 	case nop_raise:
+  W 1087| 	case nop_macro:
+  W 1100| 	case nop_macro_arr_param: {
+  W 1113| 	case nop_expr_callf:
+  W 1114| 	case nop_name_callf:
+  W 1115| 	case nop_type_callf: {
+groups: 522 flags: 86
+MISMATCH eval lines 734-734
+   binary calls {'catenate/5': 1} strings []
+   source calls {'catenate/3': 1} strings []
+call/string mismatches: 1

@@ -1,0 +1,7 @@
+#!/bin/sh
+# Run Arcturus 1.6-A.  Uses the binary built here (./ada), or the prebuilt
+# one in bin/, and the run-time files in lib/.
+here=$(cd "$(dirname "$0")" && pwd)
+ARCTURUS_LIB="$here/lib/"; export ARCTURUS_LIB
+if [ -x "$here/ada" ]; then exec "$here/ada" "$@"; fi
+exec "$here/bin/ada-i386-static" "$@"

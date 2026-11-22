@@ -1,0 +1,68 @@
+#define integer int
+#define character char
+#define false 0
+#define true 1
+#define null 0
+#define or |
+#define and &
+#define mod %
+#define not(expr) (!(expr))
+
+static IN(expr, lowerbound, upperbound)
+int expr, lowerbound, upperbound;
+{
+        if ((expr >= lowerbound) && (expr <= upperbound)) return true;
+        else return false;
+}
+
+#define getint(n) GETINT(&n)
+
+static GETINT(n)
+int *n;
+{       scanf("%d", n);
+}
+
+#define getchr(c) GETCHR(&c)
+
+static GETCHR(c) 
+char *c; 
+{       scanf("%c", c);
+}
+
+static putint(n)
+{       printf("%d",n);
+}
+
+static putstr(n)
+{       printf("%s",n);
+}
+
+static putchr(n)
+{       printf("%c",n);
+}
+
+static new_line() {
+        printf("\n");
+}
+
+/*
+
+arrayp ADASTR(cstr)	/* given a C null terminated byte string, */
+char *cstr;		/* return a descriptor for an ada string */
+
+{
+        register int i;
+        register int len _ strlen(cstr);        /* length of C string */
+        register int size _ astr->arr_size;     /* size of ada array */
+
+        if (len > size)  error("String overflow (copying c str to ada)");
+
+        for (i _ 0 ; i < len; i++)              /* copy non-blank part */
+                astr->arr_base[i] _ cstr[i];
+
+        for (i _ len; i < size; i++)            /* fill in rest with blanks */
+                astr->arr_base[i] _ ' ';
+
+}
+
+*/

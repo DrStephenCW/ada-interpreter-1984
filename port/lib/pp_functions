@@ -1,0 +1,60 @@
+--. pp_functions -- parameters and entry points of the prettyprinter.
+--.
+--. [Reconstructed 2026.  The file pp_functions (rev 1.4, 83/03/10, willson:
+--.  "Export stuff added") did not survive on tape.  This text was decoded
+--.  from the package's internal form saved in the January 1984 ada.core,
+--.  using tools/core2ada.py.  The declarations, names, types, ranges and
+--.  default values are the original ones; layout and comments are not.]
+
+package pp_functions is
+	type pp_color_use is (no_color, counts, random, circular, depth);
+	type pp_capitalize is (lower, upper, initial, mixed);
+	pp_export : boolean := false;
+	pp_nroff : boolean := false;
+	pp_vert_bars : boolean := false;
+	pp_comments : boolean := true;
+	pp_attachments : boolean := false;
+	pp_width : integer range 40..120 := 70;
+	pp_attach_column : integer range 30..110 := 40;
+	pp_color : pp_color_use := no_color;
+	pp_identifiers : pp_capitalize := lower;
+	pp_reserved_words : pp_capitalize := lower;
+	pp_indent : integer range 0..10 := 4;
+	pp_number : boolean := false;
+	procedure pp(sym : symbol;
+		filename : string := "";
+		nroff : boolean := pp_nroff;
+		vert_bars : boolean := pp_vert_bars;
+		comments : boolean := pp_comments;
+		attachments : boolean := pp_attachments;
+		width : integer range 40..120 := pp_width;
+		attach_column : integer range 30..110 := pp_attach_column;
+		color : pp_color_use := pp_color;
+		identifiers : pp_capitalize := pp_identifiers;
+		reserved_words : pp_capitalize := pp_reserved_words;
+		number : boolean := pp_number;
+		indent : integer range 0..10 := pp_indent;
+		export : boolean := pp_export);
+	ifp_nroff : boolean := false;
+	ifp_vert_bars : boolean := false;
+	ifp_comments : boolean := true;
+	ifp_attachments : boolean := false;
+	ifp_width : integer range 40..120 := 70;
+	ifp_attach_column : integer range 30..110 := 40;
+	procedure ifp(sym : symbol;
+		filename : string := "";
+		nroff : boolean := false;
+		vert_bars : boolean := false;
+		comments : boolean := true;
+		attachments : boolean := false;
+		width : integer range 40..120 := 70;
+		attach_column : integer range 30..110 := 40);
+	dir_color : pp_color_use := no_color;
+	procedure dir(symtab : symbol := standard.usr'sym;
+		filename : string := "";
+		color : pp_color_use := no_color);
+end pp_functions;
+
+
+package body pp_functions is
+end pp_functions;

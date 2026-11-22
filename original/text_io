@@ -1,0 +1,91 @@
+--. $Header:   /usr/ics/darpa/ada/RCS/text_io.v  Revision 1.2  83/03/10  16:54:46  ada  Exp$
+--. ******************************************************************
+--.
+--. Copyright 1983      Thomas A. Standish
+--.	 	        Programming Environment Project
+--.                     Department of Information and Computer Science
+--.                     University of California
+--.                     Irvine, California  92717
+--.
+--. All rights reserved. No part of this software may be sold or distributed
+--- in any form or by any means without the prior written permission of the 
+--- author.
+--.
+--. Report problems and direct all inquiries to ada%uci@rand-relay (ARPA net).
+--.
+
+--. $Log:	/usr/ics/darpa/ada/RCS/text_io.v $
+--. Revision 1.2  83/03/10  16:54:46  ada
+--. same as 1.1.2.1
+--. 
+--. Revision 1.1.2.1  83/03/10  16:29:01  willson
+--. minor upgrade
+--. 
+package io_exceptions is
+status_error	: exception;
+mode_error	: exception;
+name_error	: exception;
+use_error	: exception;
+device_error	: exception;
+end_error	: exception;
+data_error	: exception;
+layout_error	: exception;
+end io_exceptions;
+package body io_exceptions is end;
+
+package text_io is
+
+-- type file_type is limited private; --> defined in standard
+type file_mode is (in_file, out_file);
+type count is range 0 .. integer'last;
+subtype positive_count is count range 1 .. count'last;
+subtype field is integer range 0..integer'last;
+subtype number_base is integer range 2..16;
+
+unbounded : constant integer := 0;
+
+procedure create(file: in out file_type; 
+		mode : in file_mode := out_file;
+		name : in string := "";
+		form : in string := "");
+procedure open(file: in out file_type; 
+		mode : in file_mode;
+		name : in string := "";
+		form : in string := "");
+procedure close(file : in out file_type);
+function standard_input return file_type;
+function standard_msg return file_type;
+function standard_output return file_type;
+function current_input return file_type;
+function current_output return file_type;
+function current_msg return file_type;
+procedure set_input(file: file_type);
+procedure set_output(file: file_type);
+procedure set_msg(file: file_type);
+procedure fputreal(file: file_type; item: float; width, mantissa: integer := 0);
+procedure fputstr(file: file_type; item: string);
+procedure fputint(file: file_type; item: integer; width: integer := 0);
+procedure fputchr(file: file_type; item: character);
+procedure putstr(item: string);
+procedure putint(item: integer; width: integer := 0);
+procedure putchr(item: character);
+procedure putreal(item: float; width, mantissa: integer := 0);
+procedure new_line(spacing: integer := 1);
+procedure fnew_line(file: file_type; spacing: integer := 1);
+procedure getchr(item: out character);
+procedure getreal(item: out float);
+procedure getint(item: out integer);
+procedure getstr(item : in out string);
+procedure fgetchr(file: file_type; item: out character);
+procedure fgetint(file: file_type; item: out integer);
+procedure fgetreal(file: file_type; item: out float);
+procedure fgetstr(file : file_type; item: out string);
+function end_of_file(file: file_type) return boolean;
+procedure put_line(item : in string);
+procedure fput_line (file : in file_type; item : in string);
+procedure get_line(item : out string; last : out natural);
+procedure fget_line(file : in file_type; 
+		item : out string; 
+		last : out natural);
+end text_io;
+package body text_io is end;

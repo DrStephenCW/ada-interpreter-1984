@@ -1,0 +1,17 @@
+== check_control_c  (lines 76-79, 4 groups)
+== ignore_control_c  (lines 81-84, 4 groups)
+== set_flag  (lines 86-90, 4 groups)
+== reinit  (lines 92-103, 11 groups)
+== trap_handler  (lines 105-115, 11 groups)
+== break_handler  (lines 117-120, 4 groups)
+== control_c_handler  (lines 122-126, 5 groups)
+== ada_break  (lines 134-167, 20 groups)
+  W  140| 	   the user types end-of-file */
+== signalinit  (lines 170-182, 7 groups)
+== adainit  (lines 187-190, 4 groups)
+== read_core_file  (lines 213-235, 17 groups)
+  W  219| 	   so keep a copy of the name */
+== write_core_file  (lines 239-251, 12 groups)
+== main  (lines 260-312, 33 groups)
+groups: 136 flags: 2
+call/string mismatches: 0

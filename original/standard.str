@@ -1,0 +1,147 @@
+--. $Header:   /ub/darpa/ada/RCS/standard.str.v  Revision 1.5  84/03/16  17:15:51  ada  Exp$ 
+--. ******************************************************************
+--.
+--. Copyright 1983      Thomas A. Standish
+--.	 	        Programming Environment Project
+--.                     Department of Information and Computer Science
+--.                     University of California
+--.                     Irvine, California  92717
+--.
+--. All rights reserved. No part of this software may be sold or distributed
+--- in any form or by any means without the prior written permission of the 
+--- author.
+--.
+--. Report problems and direct all inquiries to ada%uci@rand-relay (ARPA net).
+--.
+
+--. $Log:	/ub/darpa/ada/RCS/standard.str.v $
+--. Revision 1.5  84/03/16  17:15:51  ada
+--. same as 1.4.5.1
+--. 
+--. Revision 1.4.5.1  84/03/16  16:00:55  snider
+--. Package ascii is nearly complete.  We still need rep. specs to do it
+--. as in the LRM.
+--. 
+--. Revision 1.4  83/09/08  16:05:33  ada
+--. same as 1.3.9.1
+--. 
+--. Revision 1.3.9.1  83/08/25  14:37:30  ritter
+--. Added Ada-83 standard exception 'program_error'
+--. 
+--. Revision 1.3  83/03/10  16:14:19  ada
+--. same as 1.2.2.1
+--. 
+--. Revision 1.2.2.1  83/03/10  15:00:16  willson
+--. *** empty log message ***
+--. 
+--. Revision 1.2  83/01/12  09:40:46  ada
+--. Added coyright notice.
+--. 
+--. Revision 1.1  82/12/12  21:47:43  tadman
+--. Initial revision (Arcturus release 1.3E)
+--. 
+
+-- define string now that predefined types are interned
+subtype natural is integer range 1..integer'last;
+type string is array(natural range <>) of character;
+package ascii is
+
+--. Control characters:
+--. This is an incomplete version of package ascii.
+ NUL: constant character := character'val(8#0#);
+ SOH: constant character := character'val(8#1#);
+ STX: constant character := character'val(8#2#);
+ ETX: constant character := character'val(8#3#);
+ EOT: constant character := character'val(8#4#);
+ ENQ: constant character := character'val(8#5#);
+ ACK: constant character := character'val(8#6#);
+ BEL: constant character := character'val(8#7#);
+ BS: constant character := character'val(8#10#);
+ HT: constant character := character'val(8#11#);
+ LF: constant character := character'val(8#12#);
+ VT: constant character := character'val(8#13#);
+ FF: constant character := character'val(8#14#);
+ CR: constant character := character'val(8#15#);
+ SO: constant character := character'val(8#16#);
+ SI: constant character := character'val(8#17#);
+ DLE: constant character := character'val(8#20#);
+ DC1: constant character := character'val(8#21#);
+ DC2: constant character := character'val(8#22#);
+ DC3: constant character := character'val(8#23#);
+ DC4: constant character := character'val(8#24#);
+ NAK: constant character := character'val(8#25#);
+ SYN: constant character := character'val(8#26#);
+ ETB: constant character := character'val(8#27#);
+ CAN: constant character := character'val(8#30#);
+ EM: constant character := character'val(8#31#);
+ SUB: constant character := character'val(8#32#);
+ ESC: constant character := character'val(8#33#);
+ FS: constant character := character'val(8#34#);
+ GS: constant character := character'val(8#35#);
+ RS: constant character := character'val(8#36#);
+ US: constant character := character'val(8#37#);
+ DEL: constant character := character'val(8#177#);
+ FEOF: constant character := character'val(8#377#);
+	-- feof is the Unix end of file character, truncated to 8 bits.
+
+ -- other characters:
+
+ EXCLAM		: constant character := '!';
+ QUOTATION	: constant character := '"';
+ SHARP		: constant character := '#';
+ DOLLAR		: constant character := '$';
+ PERCENT	: constant character := '%';
+ AMPERSAND	: constant character := '&';
+ COLON		: constant character := ':';
+ SEMICOLON	: constant character := ';';
+ QUERY		: constant character := '?';
+ AT_SIGN	: constant character := '@';
+ L_BRACKET	: constant character := '[';
+ BACK_SLASH	: constant character := '\';
+ R_BRACKET	: constant character := ']';
+ CIRCUMFLEX	: constant character := '^';
+ UNDERLINE	: constant character := '_';
+ GRAVE		: constant character := '`';
+ L_BRACE	: constant character := '{';
+ BAR		: constant character := '|';
+ R_BRACE	: constant character := '}';
+ TILDE		: constant character := '~';
+
+ -- Lower case letters:
+
+ LC_A	: constant character := 'a';
+ LC_B	: constant character := 'b';
+ LC_C	: constant character := 'c';
+ LC_D	: constant character := 'd';
+ LC_E	: constant character := 'e';
+ LC_F	: constant character := 'f';
+ LC_G	: constant character := 'g';
+ LC_H	: constant character := 'h';
+ LC_I	: constant character := 'i';
+ LC_J	: constant character := 'j';
+ LC_K	: constant character := 'k';
+ LC_L	: constant character := 'l';
+ LC_M	: constant character := 'm';
+ LC_N	: constant character := 'n';
+ LC_O	: constant character := 'o';
+ LC_P	: constant character := 'p';
+ LC_Q	: constant character := 'q';
+ LC_R	: constant character := 'r';
+ LC_S	: constant character := 's';
+ LC_T	: constant character := 't';
+ LC_U	: constant character := 'u';
+ LC_V	: constant character := 'v';
+ LC_W	: constant character := 'w';
+ LC_X	: constant character := 'x';
+ LC_Y	: constant character := 'y';
+ LC_Z	: constant character := 'z';
+ 
+end ascii;
+
+--. Predefined exceptions
+
+constraint_error: exception;
+numeric_error: exception;
+storage_error: exception;
+program_error: exception;
+

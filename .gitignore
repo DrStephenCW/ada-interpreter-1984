@@ -1,0 +1,6 @@
+port/build/
+port/ada
+__pycache__/
+ADA.SAVE
+,ada.*
+user/

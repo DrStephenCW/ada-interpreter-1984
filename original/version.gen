@@ -1,0 +1,44 @@
+# $Header:   /usr/ics/darpa/ada/RCS/version.gen.v  Revision 1.2  83/01/12  09:40:59  ada  Exp$
+#
+#*******************************************************************
+#
+# Copyright 1983      Thomas A. Standish
+#		      Programming Environment Project
+#                     Department of Information and Computer Science
+#                     University of California
+#                     Irvine, California  92717
+#
+# All rights reserved. No part of this software may be sold or distributed
+# in any form or by any means without the prior written permission of the 
+# author.
+#
+# Report problems and direct all inquiries to ada%uci@rand-relay (ARPA net).
+#
+
+
+# $Log:	/usr/ics/darpa/ada/RCS/version.gen.v $
+#Revision 1.2  83/01/12  09:40:59  ada
+#Added coyright notice.
+#
+# Revision 1.1  82/12/12  21:51:05  tadman
+# Initial revision (Arcturus release 1.3E)
+#
+#
+#
+# Makes a new version.c for ada
+#
+#  Call:
+#	version.gen system-name major-version minor-version fix-version
+#
+echo char "systemname[]" = \"$1\"\; > version.c
+echo int majorversion = $2\; >> version.c
+echo int minorversion = $3\; >> version.c
+echo char fixversion = \'$4\'\; >> version.c
+echo char "sysdate[]" = \"`date`\"\; >> version.c
+if ($user == ada) then
+    set st = 'release'
+else
+    set st = $user
+endif
+echo char "systemtype[]" = \"$st\"\; >> version.c
+echo int time_stamp = `time_stamp`\; >> version.c

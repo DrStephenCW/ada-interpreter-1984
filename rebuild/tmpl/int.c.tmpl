@@ -1,0 +1,1664 @@
+static char rcsid[] =
+"$Header:   /ub/darpa/ada/RCS/int.v  Revision 1.9  83/11/30  14:06:23  ada  Exp$";
+
+/*
+ * Arcturus was written by the UC Irvine Arcturus team (Programming
+ * Environment Project, 1982-84).  See CREDITS.md for who they were.
+ * [2026: the original copyright notice was replaced by this pointer.]
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+/* $Log:	/ub/darpa/ada/RCS/int.v $
+ * Revision 1.9  83/11/30  14:06:23  ada
+ *
+ * [RECONSTRUCTED 2026.  The original int.c did not survive on tape.
+ *  This file was rebuilt from the compiled code and debugging symbols in
+ *  the Arcturus 1.6-A executable "ada" (January 5, 1984).  Every line
+ *  that generates code is placed on the line number the 1984 compiler
+ *  recorded for it.  Names of functions, parameters, locals and globals
+ *  are the original ones.  Comments, blank lines, the label "again",
+ *  the names of the three operator macros, and lines 922-927 (compiled
+ *  out of the binary) are not recoverable and are written fresh.
+ *  The earlier RCS log entries are lost.]
+ */
+
+#include <stdio.h>
+#include "macros.h"
+#include "nodes.h"
+#include "int.h"
+#include "sym.h"
+#include "tab.h"
+#include "eval.h"
+#include "adaio.h"
+#include "count.h"
+#include "handler.h"
+#include "oblist.h"
+
+/*	The interpreter.  eval() walks the internal form produced by the
+	parser.  Declarations enter symbols in the current symbol table,
+	statements are executed for their effect, and expressions leave a
+	typed value in *result.
+
+	intstk is a stack of the nodes being evaluated, used by the
+	debugger and by the break loop to say where we are.	*/
+
+extern	nodep goto_p;		/* set by a goto to the statement to resume at */
+
+nodep	intstk[5000];
+nodep	*intsp = intstk - 1;
+nodep	*intstk_end = &intstk[5000];
+retsp	retstk = null;
+
+extern	int stack_level;	/* depth of the dynamic symbol stack */
+
+symtabp	parameter_table;	/* formal parameters are entered here */
+
+fixp	eval();
+extern	typep tyeval();
+extern	char *zalloc();
+extern	nodep mkidnode();
+extern	nodep dogoto();
+extern	char *macro_pname();
+
+/*	Binary operators.  All of them evaluate both operands first, so
+	they are written once here.					*/
+
+#define arith_op(OP) \
+	eval(p->nd.binop.left, eval_mode, &l, null); \
+	eval(p->nd.binop.right, eval_mode, &r, null); \
+	typecheck(r.typ, l.typ); \
+	if (compatible(r.typ, inttype)) \
+		result->val.integer = l.val.integer OP r.val.integer; \
+	else if (compatible(r.typ, realtype)) \
+		result->val.real = l.val.real OP r.val.real; \
+	else error("non-numeric type in arithmetic operator"); \
+	result->typ = base(r.typ)
+
+#define rel_op(OP) \
+	eval(p->nd.binop.left, eval_mode, &l, null); \
+	eval(p->nd.binop.right, eval_mode, &r, null); \
+	typecheck(r.typ, l.typ); \
+	if (compatible(r.typ, inttype)) \
+		result->val.integer = l.val.integer OP r.val.integer; \
+	else if (compatible(r.typ, realtype)) \
+		result->val.integer = l.val.real OP r.val.real; \
+	else error("non-numeric type in relational operator"); \
+	result->typ = booltype
+
+#define bool_op(OP) \
+	eval(p->nd.binop.left, eval_mode, &l, null); \
+	eval(p->nd.binop.right, eval_mode, &r, null); \
+	typecheck(booltype, l.typ); \
+	typecheck(booltype, r.typ); \
+	result->val.integer = l.val.integer OP r.val.integer; \
+	result->typ = booltype
+
+@@144
+clearinterp() {
+	intsp = intstk - 1;
+	retstk = null;
+}
+
+@@150
+copy(dst, src, n)
+char *dst, *src;
+int n;
+{
+	while (n--)
+		*dst++ = *src++;
+}
+
+@@159
+interp(p) nodep p;
+{
+	eval(p, decl_mode, &dummy, null);
+}
+
+@@165
+exprinterp(p) nodep p;
+{
+	eval(p, eval_mode, &dummy, null);
+}
+
+/*	eval -- evaluate node p in the given mode.  Returns a fixp for
+	declarations (the list of names declared) and null otherwise.	*/
+@@180
+fixp eval(p, mode, result, expected_type)
+register nodep p;
+enum int_modes mode; typedval *result;
+typep expected_type;
+{
+@@185
+	if (intsp++ == intstk_end) {
+@@186
+		putf("\nInterpreter stack overflow\n");
+@@187
+		intsp = intstk;
+	}
+@@189
+	/* statements in a list are done by going back to the
+	   top with p set to the next one */
+again:	check_control_c();
+@@193
+	/* an empty list: nothing to do.  The node stack is
+	   popped on every way out of eval */
+
+
+	if (p == null) {
+@@199
+		intsp--;
+@@200
+		return null;
+	}
+@@202
+	if (counting)
+@@203
+		increment_node_counter(p);
+@@205
+	/* trace */
+	if (intdebug)
+@@207
+		putf("[node %s]  ", nodename(p));
+@@208
+	*intsp = p;
+@@210
+	/* each case either breaks out of the switch (an expression,
+	   whose value is in *result), returns (a declaration of names
+	   that the caller will enter), or goes back to "again" with
+	   p set to the next statement in the list.
+
+
+
+	   Case labels are in the order of the tokentypes enumeration
+	   wherever that does not matter.  */
+
+
+	switch (p->ndf.op) {
+@@223
+	case nop_expr: {
+		typedval e;
+
+		/* an expression typed at top level: print its value */
+		eval(p->nd.expr.expr, eval_mode, &e, null);
+@@228
+		typedprint(adaout, e.val.integer, e.typ);
+@@229
+		fflush(adaout);
+@@230
+		break;
+	}
+@@232
+	case nop_with:
+		/* with clauses: every library unit is
+		   always visible, so there is nothing
+		   to do here.  */
+
+
+
+
+		break;
+@@241
+	case nop_use:
+		eval(p->nd.usex.list, decl_mode, &dummy, null);
+@@243
+		p = p->ndf.next;
+@@244
+		goto again;
+@@245
+	case nop_name: {
+		typedval pack;
+		eval(p->nd.name_list.name, symbol_mode, &pack, null);
+@@248
+		if (!compatible(pack.typ, symboltype))
+@@249
+			error("illegal name in use declaration");
+@@250
+		use_sym(pack.val.fptr, currtab);
+@@251
+		p = p->ndf.next;
+@@252
+		goto again;
+	}
+@@254
+	case nop_type:
+	case nop_subtype: {
+		register symp s;
+		register fixp f;
+		typep t;
+		enum symbolclasses class;
+		class = (p->ndf.op == nop_type) ? type_id : subtype_id;
+@@262
+		/* look for an earlier, incomplete declaration */
+
+		f = lookuptab(currtab, p->nd.type_decl.id, false);
+@@266
+		if (p->nd.type_decl.typex == null) {
+@@267
+			/* an incomplete type: "type t;".  Make
+			   an undefined type for it, unless it
+			   is already declared at this
+			   level. */
+
+
+
+
+
+
+			if (f == null || f->fxf.dyna == null || f->fxf.dyna->syf.level != stack_level) {
+@@279
+				f = newfix(varfixform, class);
+@@280
+				s = newsym(varsymbolform, class);
+@@281
+				f->fxf.name = p->nd.type_decl.id;
+@@282
+				s->sy.var.type = newtype(undefform);
+@@283
+				enter(currtab, f, s);
+			}
+@@285
+			else {
+@@286
+				s = f->fxf.dyna;
+@@287
+				if (f->fx.var.int_form)
+@@288
+					/* it had a full declaration */
+					sysputf("%s undefined", f->fxf.name);
+			}
+@@291
+			f->fx.var.int_form = null;
+		}
+@@293
+		/* a full type declaration */
+		else {
+@@296
+			t = tyeval(p->nd.type_decl.typex, p->nd.type_decl.disc, true);
+@@297
+			t->tyf.int_form = mkidnode(p->nd.type_decl.id);
+@@298
+			/* if there was an incomplete
+			   declaration, the new type is
+			   copied over the old one so
+			   that everything which points
+			   to the old type now sees the
+			   full one.  Otherwise make a
+			   new symbol.  */
+
+
+			if (f == null || f->fxf.dyna == null || f->fxf.dyna->syf.level != stack_level) {
+@@309
+				f = newfix(varfixform, class);
+@@310
+				s = newsym(varsymbolform, class);
+@@311
+				f->fxf.name = p->nd.type_decl.id;
+@@312
+				s->sy.var.type = t;
+@@313
+				enter(currtab, f, s);
+			}
+@@315
+			else {
+@@316
+				if (f->fx.var.int_form)
+@@317
+					sysputf("%s redefined", f->fxf.name);
+@@319
+				copy(f->fxf.dyna->sy.var.type, t, maxtypesize);
+@@321
+				f->fxf.class = class;
+			}
+@@323
+			f->fx.var.int_form = p->nd.type_decl.typex;
+		}
+@@325
+		p = p->ndf.next;
+@@326
+		goto again;
+	}
+@@328
+	case nop_id_decl: {
+		register fixp f;
+		/* a list of names being declared: make
+		   a fixform for each and return the
+		   list to the declaration that
+		   contains it */
+		if (mode != decl_mode)
+@@335
+			system_error("bad mode for id_decl");
+@@336
+		f = newfix(fixform, obj_id);
+@@337
+		f->fxf.name = p->nd.id_decl.id;
+@@338
+		/* the rest of the list */
+		f->fxf.next = eval(p->ndf.next, decl_mode, &dummy, null);
+@@340
+		intsp--;
+@@341
+		return f;
+	}
+@@343
+	case nop_obj_decl: {
+		typep typ;
+		register fixp f, temp;
+		register symp s;
+		typedval init;
+
+		/* get the names, then the type,
+		   then the initial value */
+		f = eval(p->nd.obj_decl.id_list, decl_mode, &dummy, null);
+@@353
+		typ = tyeval(p->nd.obj_decl.subtypex, null, false);
+@@355
+		/* the initial value is evaluated once,
+		   and copied into each object */
+		if (p->nd.obj_decl.initexp) {
+@@358
+			eval(p->nd.obj_decl.initexp, eval_mode, &init, typ);
+@@359
+			rangecheck(typ, &init);
+		}
+@@361
+		else
+@@362
+			init.val.integer = 0;
+@@363
+		if (typ->tyf.class == un_arrayform) {
+@@364
+			if (p->nd.obj_decl.initexp)
+@@365
+				typ = init.typ;
+@@366
+			else
+@@367
+				error("object must be constrained");
+		}
+@@369
+		while (f) {
+@@370
+			s = newsym(varsymbolform, obj_id);
+@@371
+			s->sy.var.type = typ;
+@@372
+			/* remember the declaration */
+			f->fx.var.int_form = p->nd.obj_decl.subtypex;
+@@374
+			if (typ == texttype) {
+@@375
+				char name[128];
+				savename(name, f);
+@@377
+				*s->sy.var.value = (int)strsav(name);
+			}
+@@379
+			else
+@@380
+				if (blocktype(typ)) {
+@@381
+					/* arrays and records get
+					   their own space */
+					s->sy.var.value = (int*)zalloc(typ->tyf.size, true);
+@@384
+					if (p->nd.obj_decl.initexp)
+@@385
+						blockmove(s->sy.var.value,
+						    init.val.ptr,
+						    s->sy.var.type->tyf.size);
+				}
+@@389
+				else
+@@390
+					*s->sy.var.value = init.val.integer;
+@@391
+			/* enter frees nothing, so save the link */
+			temp = f->fxf.next;
+@@393
+			enter(currtab, f, s);
+@@394
+			f = temp;
+@@395
+		}
+@@396
+		p = p->ndf.next;
+@@397
+		goto again;
+	}
+@@399
+	case nop_except_decl: {
+		register fixp f, e, temp;
+		register symp s;
+
+		/* names come back as object fixforms */
+		f = eval(p->nd.except_decl.id_list, decl_mode, &dummy, null);
+@@405
+		/* replace each with an exception
+		   fixform */
+
+		while (f) {
+@@409
+			temp = f->fxf.next;
+@@410
+			/* smaller than an object's */
+			e = newfix(exceptfixform, except_id);
+@@412
+			/* keep the name */
+			e->fxf.name = f->fxf.name;
+@@414
+			free(f);
+@@415
+			s = newsym(exceptsymbolform, except_id);
+@@416
+			enter(currtab, e, s);
+@@417
+			f = temp;
+@@418
+		}
+@@419
+		p = p->ndf.next;
+@@420
+		goto again;
+	}
+@@422
+	case nop_param:
+	case nop_macro_param: {
+		register fixp f, temp;
+		register symp s;
+		typep typ;
+		fixp front, paramlist;
+		nodep initval;
+		boolean hasval;
+		/* A formal parameter declaration, e.g.
+			a, b : in out integer := 0
+
+		   is a list of names with a mode, a type
+		   and a default value.  Each name is entered
+		   in parameter_table and linked through
+		   param_link to the next one, so that docall
+		   can match actuals to formals in order.
+		   The later declarations in the formal part
+		   are evaluated first, so that the last name
+		   here can be linked to them.
+
+		   Returns the first name.
+		*/
+
+		paramlist = eval(p->ndf.next, decl_mode, &dummy, null);
+@@447
+		/* the names */
+		front = f = eval(p->nd.param_decl.id_list, decl_mode, &dummy, null);
+@@450
+		/* the type */
+		typ = tyeval(p->nd.param_decl.subtyp, null, false);
+@@453
+		hasval = false;
+@@454
+		initval = null;
+@@455
+		if (p->nd.param_decl.initexp) {
+@@456
+			if (p->nd.param_decl.is_out)
+@@457
+				error("default for out param");
+@@458
+			/* evaluated at call time */
+			hasval = true;
+@@460
+			initval = p->nd.param_decl.initexp;
+		}
+@@462
+		/* the list of names is never empty,
+		   so test at the bottom */
+		for (;;) {
+			s = newsym(varsymbolform, param_id);
+@@466
+			f->fxf.class = param_id;
+@@467
+			s->sy.var.type = typ;
+@@468
+			/* what docall needs to know */
+			f->fx.var.param_has_value = hasval;
+@@470
+			f->fx.var.int_form = initval;
+@@471
+			f->fx.var.param_base_type = typ;
+@@472
+			f->fx.var.param_is_in = p->nd.param_decl.is_in;
+@@473
+			f->fx.var.param_is_out = p->nd.param_decl.is_out;
+@@474
+			f->fx.var.param_link = f->fxf.next;
+@@475
+			enter(parameter_table, f, s);
+@@476
+			if (f->fx.var.param_link == null) {
+@@477
+				f->fx.var.param_link = paramlist;
+@@478
+				intsp--;
+@@479
+				return front;
+			}
+@@481
+			f = f->fx.var.param_link;
+@@482
+		}
+	}
+@@484
+	case nop_in: {
+		typedval l;
+		typep rtyp;
+		int resval;
+		/* "x in a..b" and "x not in a..b" */
+
+
+		eval(p->nd.inop.expr, eval_mode, &l, null);
+@@493
+		rtyp = tyeval(p->nd.inop.rangex, null, false);
+@@495
+		typecheck(l.typ, rtyp);
+@@496
+		/* only scalar ranges */
+
+		resval = rtyp->ty.srange.lbound <= l.val.integer && l.val.integer <= rtyp->ty.srange.ubound;
+@@500
+		if (p->nd.inop.not_in)
+@@501
+			resval = !resval;
+@@502
+		result->val.integer = resval;
+@@503
+		result->typ = booltype;
+@@505
+		break;
+	}
+@@507
+	case nop_asgn: {
+		typedval l, r;
+		fixp f;
+		symp s;
+		nodep lp, rp;
+		/* An assignment.  At top level an
+		   assignment to an undeclared name
+		   declares it, with the type of the
+		   value assigned.  */
+		lp = p->nd.asgn_stmt.lhs;
+@@517
+		rp = p->nd.asgn_stmt.rhs;
+@@518
+		if (lp->ndf.op == nop_ident) {
+@@519
+			f = lookup(currtab, lp->nd.ident.id, false);
+@@520
+			if (f == null) {
+@@521
+				if (currtab == usrtab) {
+@@522
+					/* autodefine */
+					eval(rp, eval_mode, &r, null);
+@@524
+					f = newfix(varfixform, obj_id);
+@@525
+					s = newsym(varsymbolform, obj_id);
+@@526
+					f->fxf.name = lp->nd.ident.id;
+@@527
+					if (r.typ->tyf.int_form == null)
+@@528
+						error("%s undefined", lp->nd.ident.id);
+@@529
+					l.typ = s->sy.var.type = r.typ;
+@@530
+					if (blocktype(r.typ))
+@@531
+						error("Can't autodefine non-scalar type");
+@@532
+					else
+@@533
+						l.val.ptr = s->sy.var.value;
+@@534
+					/* tell the user what was declared */
+					f->fx.var.int_form = r.typ->tyf.int_form;
+@@536
+					enter(currtab, f, s);
+@@537
+					putf("\n(%s: ", f->fxf.name);
+@@538
+					dopp(f->fx.var.int_form, adaout, 0, 0);
+@@539
+					putf(")\n");
+				}
+@@541
+				else
+@@542
+					error("%s undefined as lhs of assignment", lp->nd.ident.id);
+			}
+@@544
+			else {
+@@545
+				s = f->fxf.dyna;
+@@546
+				eval(rp, eval_mode, &r, s->sy.var.type);
+@@547
+				doident(f, addr_mode, &l);
+			}
+		}
+@@550
+		else {
+@@551
+			/* the right side is evaluated
+			   first, so that the address of
+			   the left side can't be changed
+			   by it */
+
+			eval(rp, eval_mode, &r, null);
+@@557
+			eval(lp, addr_mode, &l, null);
+		}
+@@559
+		rangecheck(l.typ, &r);
+@@560
+		if (blocktype(l.typ))
+@@561
+			blockmove(l.val.ptr, r.val.ptr, l.typ->tyf.size);
+@@562
+		else
+@@563
+			*l.val.ptr = r.val.integer;
+@@564
+		p = p->ndf.next;
+@@565
+		goto again;
+	}
+@@567
+	/* constants */
+	case nop_int:
+
+		if (mode != eval_mode)
+@@571
+			error("Can't use integer constant where address req'd");
+@@572
+		result->val.integer = p->nd.integer.val;
+@@573
+		result->typ = inttype;
+@@574
+		break;
+@@575
+	case nop_char:
+		if (mode != eval_mode)
+@@577
+			error("Can't use character constant where address req'd");
+@@578
+		result->val.integer = p->nd.integer.val;
+@@579
+		result->typ = chartype;
+@@580
+		break;
+@@581
+	case nop_real:
+		if (mode != eval_mode)
+@@583
+			error("Can't use float constant where address req'd");
+@@584
+		result->val.real = p->nd.real.val;
+@@585
+		result->typ = realtype;
+@@586
+		break;
+@@587
+	case nop_string: {
+		register typedval *str;
+
+		/* A string constant is converted
+		   once per command (generation) and
+		   the result hung on the node, the
+		   same trick that nop_ident uses for
+		   symbols.  */
+
+		str = (typedval*)p->nd.ident.curr_binding;
+@@597
+		if (p->nd.ident.gen_number != curr_generation || str == null) {
+@@598
+			str = (typedval*)zalloc(sizeof(typedval), false);
+@@599
+			dostring(p->nd.ident.id, str);
+			/* remember it */
+@@601
+			p->nd.ident.curr_binding = (int*)str;
+@@602
+			p->nd.ident.gen_number = curr_generation;
+		}
+@@604
+		result->typ = str->typ;
+@@605
+		result->val = str->val;
+@@606
+		break;
+	}
+@@608
+	case nop_ident: {
+		register fixp f;
+		register symp s;
+		/* the binding is good for one command */
+		f = (fixp)p->nd.ident.curr_binding;
+@@613
+		if (p->nd.ident.gen_number != curr_generation || f == null) {
+@@614
+			if ((f = lookup(currtab, p->nd.ident.id, false)) == null)
+@@615
+				error("undefined: %s", p->nd.ident.id);
+@@616
+			/* lookup is slow, so remember
+			   what it found */
+			p->nd.ident.curr_binding = (int*)f;
+@@619
+			p->nd.ident.gen_number = curr_generation;
+		}
+@@621
+		doident(f, mode, result);
+@@622
+		break;
+	}
+@@624
+	case nop_null:
+		/* the null access value, compatible
+		   with every access type */
+		result->typ = nulltype;
+@@628
+		result->val.ptr = null;
+@@629
+		break;
+@@630
+	case nop_new: {
+		typep ptr;
+
+		/* allocator */
+		ptr = newtype(accessform);
+@@635
+		ptr->tyf.size = sizeof(int*);
+@@636
+		ptr->ty.access.targettype =
+			lookuptypeid(p->nd.newx.type_id->nd.ident.id, true);
+@@638
+		result->typ = ptr;
+@@639
+		/* new object, cleared */
+		result->val.ptr =
+			(int*)zalloc(ptr->ty.access.targettype->tyf.size, true);
+@@642
+		break;
+	}
+@@644
+	case nop_lp:
+		/* parenthesized expression */
+
+		eval(p->nd.uop.child, mode, result, expected_type);
+@@648
+		break;
+@@649
+	/* arithmetic */
+
+	case nop_plus:
+		{ typedval l, r; arith_op(+); break; }
+@@653
+	case nop_minus:
+		{ typedval l, r; arith_op(-); break; }
+@@655
+	case nop_star:
+		{ typedval l, r; arith_op(*); break; }
+@@657
+	case nop_div:
+		{ typedval l, r; arith_op(/); break; }
+@@660
+	case nop_mod: {
+		typedval l, r;
+		eval(p->nd.binop.left, eval_mode, &l, null);
+@@663
+		eval(p->nd.binop.right, eval_mode, &r, null);
+@@664
+		typecheck(r.typ, inttype);
+@@665
+		typecheck(l.typ, inttype);
+@@666
+		result->val.integer = l.val.integer % r.val.integer;
+@@667
+		result->typ = inttype;
+@@668
+		break;
+	}
+@@670
+	/* comparison */
+	case nop_equal:
+	case nop_nequal: {
+		typedval l, r;
+		int res;
+
+		eval(p->nd.binop.left, eval_mode, &l, null);
+@@677
+		eval(p->nd.binop.right, eval_mode, &r, null);
+@@678
+		typecheck(l.typ, r.typ);
+@@679
+		if (blocktype(l.typ))
+@@680
+			res = blockcompare(l.val.ptr, r.val.ptr, l.typ->tyf.size);
+@@681
+		else
+@@682
+			res = l.val.integer == r.val.integer;
+@@683
+		result->typ = booltype;
+@@684
+		result->val.integer = (res == (p->ndf.op == nop_equal));
+@@685
+		break;
+	}
+@@687
+	case nop_lt:
+		{ typedval l, r; rel_op(<); break; }
+@@689
+	case nop_le:
+		{ typedval l, r; rel_op(<=); break; }
+@@691
+	case nop_gt:
+		{ typedval l, r; rel_op(>); break; }
+@@693
+	case nop_ge:
+		{ typedval l, r; rel_op(>=); break; }
+@@695
+	case nop_and:
+		{ typedval l, r; bool_op(&); break; }
+@@697
+	case nop_or:
+		{ typedval l, r; bool_op(|); break; }
+@@699
+	/* short circuit forms */
+	case nop_andthen: {
+		typedval r;
+
+		eval(p->nd.binop.left, eval_mode, &r, null);
+@@704
+		typecheck(r.typ, booltype);
+@@705
+		if (r.val.integer == true) {
+@@706
+			eval(p->nd.binop.right, eval_mode, &r, null);
+@@707
+			typecheck(r.typ, booltype);
+		}
+@@709
+		result->val.integer = r.val.integer;
+@@710
+		result->typ = booltype;
+@@711
+		break;
+	}
+@@713
+	case nop_orelse: {
+		typedval r;
+
+		eval(p->nd.binop.left, eval_mode, &r, null);
+@@717
+		typecheck(r.typ, booltype);
+@@718
+		if (!r.val.integer) {
+@@719
+			eval(p->nd.binop.right, eval_mode, &r, null);
+@@720
+			typecheck(r.typ, booltype);
+		}
+@@722
+		result->val.integer = r.val.integer;
+@@723
+		result->typ = booltype;
+@@724
+		break;
+	}
+@@726
+	case nop_amper: {
+		typedval l, r;
+		/* catenation of arrays (strings) */
+
+
+
+		eval(p->nd.binop.left, eval_mode, &l, null);
+@@733
+		eval(p->nd.binop.right, eval_mode, &r, null);
+@@734
+		catenate(l, r, result);
+@@735
+		/* catenate sets result->typ */
+		break;
+	}
+@@738
+	case nop_not: {
+		typedval r;
+		/* unary operators */
+		eval(p->nd.uop.child, eval_mode, &r, null);
+@@742
+		typecheck(r.typ, booltype);
+@@743
+		result->val.integer = !r.val.integer;
+@@744
+		result->typ = booltype;
+@@745
+		break;
+	}
+@@747
+	case nop_neg: {
+		typedval r;
+
+		eval(p->nd.uop.child, eval_mode, &r, null);
+@@751
+		if (compatible(r.typ, inttype))
+@@752
+			result->val.integer = -r.val.integer;
+@@753
+		else
+@@754
+			if (compatible(r.typ, realtype))
+@@755
+				result->val.real = -r.val.real;
+@@756
+			else
+@@757
+				error("numeric type expected in negation");
+@@758
+		result->typ = r.typ;
+@@759
+		break;
+	}
+@@761
+	case nop_pos: {
+		typedval r;
+
+		eval(p->nd.uop.child, eval_mode, &r, null);
+@@765
+		if (!compatible(r.typ, inttype) &&
+		    !compatible(r.typ, realtype))
+@@767
+			error("numeric type expected in unary plus");
+@@768
+		result->val.integer = r.val.integer;
+@@769
+		result->typ = r.typ;
+@@770
+		break;
+	}
+@@772
+	/* statements */
+	case nop_null_stmt:
+
+		p = p->ndf.next;
+@@776
+		goto again;
+@@777
+	case nop_if:
+		/* a goto out of the statement
+		   leaves goto_p set */
+		doif(p);
+@@781
+		if (goto_p) {
+@@782
+			p = goto_p;
+@@783
+			goto_p = null;
+@@784
+			goto again;
+		}
+@@786
+		p = p->ndf.next;
+@@787
+		goto again;
+@@788
+	case nop_elsif: {	typedval r;
+		/* called from doif with the elsif parts
+		   (the else part has no condition) */
+		while (p) {
+@@792
+			/* the else part */
+			if (p->nd.elsifx.expr == null) {
+@@794
+				/* stmts in the then_part
+				   are executed in the
+				   context of the if */
+				eval(p->nd.elsifx.then_part, eval_mode, &dummy, null);
+@@798
+				intsp--;
+@@799
+				return;
+			}
+@@801
+			eval(p->nd.elsifx.expr, eval_mode, &r, null);
+@@802
+			typecheck(r.typ, booltype);
+@@803
+			if (r.val.integer) {
+@@804
+				/* the first true condition
+				   wins
+				*/
+				eval(p->nd.elsifx.then_part, eval_mode, &dummy, null);
+@@808
+				intsp--;
+@@809
+				return;
+			}
+@@811
+			p = p->ndf.next;
+@@812
+		}
+@@813
+		break;
+	}
+@@815
+	case nop_while:
+		dowhile(p);
+@@817
+		if (goto_p) {
+@@818
+			p = goto_p;
+@@819
+			goto_p = null;
+@@820
+			goto again;
+		}
+@@822
+		p = p->ndf.next;
+@@823
+		goto again;
+@@824
+	case nop_loop:
+
+		doloop(p);
+@@827
+		if (goto_p) {
+@@828
+			p = goto_p;
+@@829
+			goto_p = null;
+@@830
+			goto again;
+		}
+@@832
+		p = p->ndf.next;
+@@833
+		goto again;
+@@834
+	case nop_for:
+
+		dofor(p);
+@@837
+		if (goto_p) {
+@@838
+			p = goto_p;
+@@839
+			goto_p = null;
+@@840
+			goto again;
+		}
+@@842
+		p = p->ndf.next;
+@@843
+		goto again;
+@@844
+	case nop_exit:
+		/* doexit does not return if the exit is taken */
+		doexit(p);
+@@847
+		p = p->ndf.next;
+@@848
+		goto again;
+@@849
+	case nop_return: {
+		retsp rets;
+		rets = retstk;
+@@852
+		/* find the subprogram or macro being returned from */
+		while (rets) {
+@@854
+			enum tokentypes op = rets->p->ndf.op;
+@@855
+			if (op == nop_function ||
+			    op == nop_procedure ||
+			    op == nop_macro) break;
+@@858
+			rets = rets->link;
+@@859
+		}
+@@860
+		if (rets == null)
+@@861
+			error("return is not in a subprogram or macro");
+@@862
+		if (p->nd.returnx.val)
+@@863
+			eval(p->nd.returnx.val, eval_mode, retval, null);
+@@864
+		unwind_retstk(rets, true);
+	}
+@@866
+		/* unwind_retstk does not return */
+
+	case nop_goto:
+		p = dogoto(p);
+@@870
+		p = p->ndf.next;
+@@871
+		goto again;
+@@872
+	case nop_lb:
+		/* a label */
+		p = p->ndf.next;
+@@875
+		goto again;
+@@876
+	/* packages */
+
+	case nop_package:
+		dopackspec(p);
+@@880
+		/* the spec is a declaration */
+		p = p->ndf.next;
+@@882
+		goto again;
+@@883
+	case nop_body:
+
+		dopackbody(p);
+@@886
+		p = p->ndf.next;
+@@887
+		goto again;
+@@888
+	case nop_function:
+	case nop_procedure: {
+		fixp f;
+		symp s;
+		enum symbolclasses class;
+		/* A subprogram declaration (with or without
+		   a body).  Subprograms declared at top level
+		   are written out to usr so that they can be
+		   edited and saved.  */
+
+		if (mode == decl_mode) {	boolean write_out; fixp owner;
+@@899
+			write_out = false;
+@@900
+			owner = currtab->symtab_owner;
+@@902
+			if (p->ndf.op == nop_function)
+@@903
+				class = func_id;
+@@904
+			else
+@@905
+				class = proc_id;
+@@906
+			/* A body for a subprogram that was
+			   declared in a package specification
+			   goes with the declaration in the
+			   package's table.  */
+
+
+
+
+
+
+
+
+			if (owner && owner->fxf.class == pack_id && owner->fx.pack.int_form->nd.packagex.table && (f = lookuptab(owner->fx.pack.int_form->nd.packagex.table, p->nd.subp.name, false))) {
+@@919
+				s = f->fxf.dyna;
+			}
+@@921
+#ifdef notdef
+			/* (six lines here were compiled out
+			    of the 1984 binary; their text is
+			    lost)
+			*/
+
+
+#endif
+			/* a subprogram redeclared at top
+			   level replaces the old one */
+
+			else
+@@934
+				if (currtab == usrtab && (f = lookuptab(currtab, p->nd.subp.name, false))) {
+@@935
+					s = f->fxf.dyna;
+@@936
+					f->fxf.class = class;
+@@937
+					if (f->fx.func.int_form) {
+@@938
+						/* free the old tree */
+						putf("Warning: %s redefined in 'usr'\n", p->nd.subp.name);
+@@940
+						free_tree(f->fx.func.int_form);
+@@941
+						f->fx.func.int_form = null;
+					}
+@@943
+					write_out = true;
+				}
+@@945
+				else {
+@@946
+					if (currtab == usrtab) write_out = true;
+@@947
+					/* a new subprogram */
+					f = newfix(funcfixform, class);
+@@949
+					s = newsym(funcsymbolform, class);
+@@950
+					f->fxf.name = p->nd.subp.name;
+@@951
+					enter(currtab, f, s);
+				}
+@@953
+			/* the internal form is the
+			   subprogram: it is evaluated
+			   again for each call */
+			f->fxf.class = class;
+@@957
+			f->fx.func.int_form = p;
+@@958
+			if (write_out)
+@@959
+				subp_writeout(f);
+@@960
+			if (class == func_id) {
+@@961
+				/* the return type */
+				s->sy.func.type = tyeval(p->nd.subp.ret_type, null, false);
+@@963
+				f->fxf.class = func_id;
+			}
+@@965
+			else
+@@966
+				s->sy.func.type = undeftype;
+@@967
+			if (p->nd.subp.table == null)
+@@968
+				p->nd.subp.table = newtab(32, f);
+@@969
+			/* scope for the body */
+			p->nd.subp.table->symtab_static_link = currtab;
+@@971
+			p = p->ndf.next;
+@@972
+			goto again;
+		}
+@@974
+		else
+			system_error("bad mode in eval in nop_func");
+	}
+@@977
+	/* calls */
+	case nop_proc_call:
+		docall(p, mode, result);
+@@980
+		p = p->ndf.next;
+@@981
+		goto again;
+@@982
+	case nop_call:
+
+		if (p->nd.call.var->ndf.op == nop_quote)
+@@985
+			/* an attribute with an argument */
+			doattr2(p, result);
+@@987
+		/* a function call or an indexed name */
+		else	docall(p, mode, result);
+@@989
+		break;
+@@990
+	case nop_arg: {
+		int i;
+
+		/* evaluate actual parameters into result[] */
+		i = 0;
+@@995
+		/* the node stack shows the
+		   argument being evaluated */
+
+		while (p) {
+@@999
+			eval(p->nd.arg.exp, eval_mode, &result[i++], null);
+@@1000
+			if (i >= MAXARGS-1)
+@@1001
+				error("too many arguments");
+@@1002
+			p = p->ndf.next;
+@@1003
+			*intsp = p;
+@@1004
+		}
+@@1005
+		break;
+	}
+@@1007
+	case nop_declare:
+		/* a block */
+
+		doblock(p);
+@@1011
+		if (goto_p) {
+@@1012
+			p = goto_p;
+@@1013
+			goto_p = null;
+@@1014
+			goto again;
+		}
+@@1016
+		p = p->ndf.next;
+@@1017
+		goto again;
+@@1018
+	case nop_dot:
+		/* selected component, or a name
+		   in a package */
+		dodot(p, mode, result);
+@@1022
+		break;
+@@1023
+	case nop_quote:
+
+		doattr(p, result);
+@@1026
+		break;
+@@1027
+	case nop_pragma:
+
+		dopragma(p);
+@@1030
+		p = p->ndf.next;
+@@1031
+		goto again;
+@@1032
+	case nop_range:
+		result->typ = typetype;
+@@1034
+		result->val.tptr = tyeval(p, null, false);
+@@1035
+		break;
+@@1036
+	case nop_qual_expr: {
+		typep t;
+		t = tyeval(p->nd.aggregate.qualifier, null, false);
+@@1039
+		eval(p->nd.aggregate.agg, eval_mode, result, t);
+@@1040
+		rangecheck(t, result);
+@@1041
+		result->typ = t;
+@@1042
+		break;
+	}
+@@1044
+	case nop_aggregate: {
+		typep t;
+		if (p->nd.aggregate.qualifier)
+@@1047
+			t = tyeval(p->nd.aggregate.qualifier, null, false);
+@@1048
+		else t = expected_type;
+@@1049
+		if (t == null)
+@@1050
+			error("type of aggregate not given by context");
+@@1051
+		agg_eval(p->nd.aggregate.agg, result, t);
+@@1052
+		break;
+	}
+@@1054
+	case nop_case:
+		/* case statement */
+		docase(p, mode, result);
+@@1057
+		if (goto_p) {
+@@1058
+			p = goto_p;
+@@1059
+			goto_p = null;
+@@1060
+			goto again;
+		}
+@@1062
+		p = p->ndf.next;
+@@1063
+		goto again;
+@@1064
+	case nop_obj_ren: {
+		typedval old;
+		fixp f;
+		symp s;
+		typep typ;
+
+		f = eval(p->nd.obj_rename.id_list, decl_mode, &dummy, null);
+@@1071
+		s = newsym(varsymbolform, obj_id);
+@@1072
+		typ = tyeval(p->nd.obj_rename.typex, null, false);
+@@1073
+		eval(p->nd.obj_rename.old_name, addr_mode, &old, null);
+@@1074
+		typecheck(typ, old.typ);
+@@1075
+		s->sy.var.value = old.val.ptr;
+@@1076
+		s->sy.var.type = old.typ;
+@@1077
+		/* the new name shares the old object */
+		f->fx.var.int_form = p;
+@@1079
+		enter(currtab, f, s);
+	}
+@@1081
+		p = p->ndf.next;
+@@1082
+		goto again;
+@@1083
+	case nop_raise:
+		/* raise does not return */
+
+		raise(p->nd.raisex.except);
+@@1087
+	case nop_macro:
+		/* macro declaration (Castor) */
+
+
+
+
+		domacro(p, mode);
+@@1094
+		p = p->ndf.next;
+@@1095
+		goto again;
+@@1096
+	case nop_macro_desig:
+		system_error("Macro designator");
+@@1098
+	case nop_macro_param_list:
+		system_error("Macro parameter list");
+@@1100
+	case nop_macro_arr_param: {
+		fixp paramlist;
+		symp paramsym;
+
+
+		paramlist = eval(p->nd.param_decl.id_list, decl_mode, &dummy, null);
+@@1106
+		paramlist->fxf.class = param_id;
+@@1107
+		paramlist->fx.var.param_is_out = true;
+@@1108
+		paramsym = newsym(varsymbolform, obj_id);
+@@1109
+		enter(parameter_table, paramlist, paramsym);
+@@1110
+		intsp--;
+@@1111
+		return paramlist;
+	}
+@@1113
+	case nop_expr_callf:
+	case nop_name_callf:
+	case nop_type_callf: {
+		int defined;
+		/* macro calls in expressions */
+		defined = macro_call(p, mode, result);
+@@1119
+		if (mode != macro_mode && mode != symbol_mode) {
+@@1120
+			if (defined) {
+@@1121
+				dyn_macro_expand(result->val.nptr, p);
+@@1122
+				p = result->val.nptr;
+@@1123
+				eval(p, mode, result, null);
+			}
+@@1125
+			else error("macro {%s} is not defined", macro_pname(p));
+		}
+@@1127
+		intsp--;
+@@1128
+		return (fixp)defined;
+	}
+@@1130
+	case nop_decl_callf:
+	case nop_stmt_callf:
+	case nop_top_callf: {
+		int defined;
+		/* macro calls in declarations and
+		   statements: the expansion is spliced
+		   into the list in place of the call,
+		   so evaluation carries on with it */
+		defined = macro_call(p, mode, result);
+@@1139
+		if (mode != macro_mode && mode != symbol_mode) {
+@@1140
+			if (defined) {
+@@1141
+				dyn_macro_expand(result->val.nptr, p);
+@@1142
+				p = result->val.nptr;
+@@1143
+				goto again;
+			}
+@@1145
+			else {
+				/* let the user define it */
+				putf("macro {%s} is not defined", macro_pname(p));
+@@1148
+				ada_break(true);
+@@1149
+				p = p->ndf.next;
+@@1150
+				goto again;
+			}
+		}
+@@1153
+		intsp--;
+@@1154
+		return (fixp)defined;
+	}
+@@1156
+	case nop_callf_arg_list:
+		system_error("Calling form argument list.");
+@@1158
+	case nop_callf_ident:
+		system_error("Calling form identifier.");
+@@1160
+	case nop_callf_stmt_arg:
+		system_error("Statement arguments not implemented.");
+@@1162
+	case nop_decl_subst:
+	case nop_ident_subst:
+	case nop_name_subst:
+	case nop_stmt_subst:
+	case nop_subtype_subst:
+	case nop_type_subst:
+		error("Substitution point not in macro.");
+@@1173
+	case nop_abort:
+	case nop_accept:
+	case nop_access:
+	case nop_addr_spec:
+	case nop_agg_comp:
+	case nop_array:
+	case nop_at:
+	case nop_char_enum:
+	case nop_choice:
+	case nop_code:
+	case nop_cond_ent:
+	case nop_delay:
+	case nop_delta:
+	case nop_derived_type:
+	case nop_digits:
+	case nop_disc_type:
+	case nop_discriminant:
+	case nop_entry:
+	case nop_enum:
+	case nop_err:
+	case nop_except_ren:
+	case nop_expon:
+	case nop_func_ginst:
+	case nop_func_ren:
+	case nop_gen_with:
+	case nop_generic:
+	case nop_index:
+	case nop_instant:
+	case nop_len_spec:
+	case nop_limited:
+	case nop_oper_string:
+	case nop_pack_ginst:
+	case nop_pack_ren:
+	case nop_private:
+	case nop_proc_ginst:
+	case nop_proc_ren:
+	case nop_rec_spec:
+	case nop_rec_var:
+	case nop_rec_when:
+	case nop_record:
+	case nop_rem:
+	case nop_sel_when:
+	case nop_select:
+	case nop_subunit:
+	case nop_task:
+	case nop_task_body:
+	case nop_task_ren:
+	case nop_task_type:
+	case nop_terminate:
+	case nop_timed_ent:
+	case nop_when:
+	case nop_xor:
+		error("You've used an unimplemented construct whose internal name is %s", nodename(p));
+@@1226
+	default:
+		system_error("invalid node at %o in eval", p);
+@@1228
+	}
+@@1229
+	intsp--;
+@@1230
+}
