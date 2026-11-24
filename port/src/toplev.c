@@ -145,7 +145,7 @@ boolean recoverable;
 	while (true) {
 		char	*ret;
 		char	buf[1024];
-		fildes _ dup(fileno(stdin));
+		fildes _ dup(fileno(stdin) >= 0 ? fileno(stdin) : 0);	/* port: with -e, stdin is a stream with no descriptor */
 		stdbrk _ fdopen(fildes, "r");
 		setbuf(stdbrk, null);
 		prompt(stdbrk);

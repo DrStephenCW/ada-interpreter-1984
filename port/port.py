@@ -69,6 +69,8 @@ SUBST = {
                    '\tfd _ open(s, 0);\n\tif (fd != -1) { close(fd); sysputf("[port: %s is a memory image; it can\'t be restored on this machine]\\n", s); }\n\treturn false;	/* port */\n'),
                   ('\tdata_addr _ (int)sbrk(0);\n',
                    '\tsysputf("[port: saving a memory image is not supported on this machine]\\n");\n\treturn false;	/* port */\n\tdata_addr _ (int)sbrk(0);\n'),
+                  ('\t\tfildes _ dup(fileno(stdin));\n',
+                   '\t\tfildes _ dup(fileno(stdin) >= 0 ? fileno(stdin) : 0);	/* port: with -e, stdin is a stream with no descriptor */\n'),
 ('\t\t\t\tsysputf("Can\'t continue from this type of error");',
                    '\t\t\t\tsysputf("Can\'t continue from this type of error");\n\t\t\tif (feof(stdin)) exit(1);	/* port: stop at end of piped input */')],
     # the old <varargs.h> walked the stack; on 64-bit machines arguments
