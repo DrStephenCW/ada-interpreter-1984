@@ -32,6 +32,7 @@ __attribute__((constructor)) static void note_brk0(void)
    stdin is replaced by a stream that reads fd 0 a line at a time and
    copies each line to the output.  The 1984 program ignores its
    arguments, so the flag is seen here, before main. */
+#ifndef __wasi__	/* port: the web build echoes input in JavaScript instead */
 #include <string.h>
 #include <sys/types.h>
 ssize_t read(int, void *, size_t), write(int, const void *, size_t);	/* not <unistd.h>: its sbrk clashes with decls64.h */
@@ -59,3 +60,4 @@ __attribute__((constructor)) static void echo_input(int argc, char **argv)
 		if (f) stdin = yyin = f;
 	}
 }
+#endif /* __wasi__ */

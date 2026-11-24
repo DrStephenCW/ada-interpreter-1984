@@ -31,7 +31,7 @@ long catch(lab, fn, arg1, arg2, arg3, arg4, arg5)
 long **lab;      /* global pointer, initialized by this routine */
 long (*fn)();    /* function to call */
 long arg1, arg2, arg3, arg4, arg5; {
-        long flag;       /* tells if normal return from setjmp */
+        volatile long flag;       /* tells if normal return from setjmp */	/* port: volatile, as C requires */
         long res;        /* result value for catch */
         jmp_buf env;    /* place where setjmp stores environment */
 

@@ -86,6 +86,15 @@ SUBST = {
                   ('static boolean newline;', 'static boolean dump_newline;	/* port: was newline */'),
                   ('    newline = false;', '    dump_newline = false;')],   # port: misc.c has the real maptab
     'scanner.c': [('FILE *yyin ={stdin}, *yyout ={stdout};', 'FILE *yyin, *yyout;')],
+    # C leaves a local changed after setjmp undefined after the longjmp
+    # unless it is volatile; with optimization (the WebAssembly build) catch
+    # would call fn a second time after every throw
+    'catch.c':   [('        int flag;       /* tells if normal return from setjmp */',
+                   '        volatile int flag;       /* tells if normal return from setjmp */	/* port: volatile, as C requires */')],
+    # lhs.val is a word (a union) but doindex takes a long.  The VAX, x86 and
+    # ARM pass a one-word union like a long; WebAssembly passes it by address.
+    'intaux.c':  [('\t\t\tlhs.val,\n\t\t\tmode,\n\t\t\tp->nd.call.args,',
+                   '\t\t\tlhs.val.integer,	/* port: was lhs.val, a word union */\n\t\t\tmode,\n\t\t\tp->nd.call.args,')],
 }
 RENAME_PERROR = ('paraux.c', 'parser.c', 'pragint.c', 'scanner.c')
 
