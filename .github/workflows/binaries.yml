@@ -1,0 +1,81 @@
+# Rebuild the static binaries in port/bin whenever the port's sources change,
+# on real x86-64 and ARM64 machines, run the tour on each, and commit them.
+name: port binaries
+
+on:
+  push:
+    paths:
+      - 'port/**'
+      - '!port/bin/**'
+      - '.github/workflows/binaries.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+            cc: gcc
+          - arch: i386
+            runner: ubuntu-latest
+            cc: gcc -m32
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+            cc: gcc
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install 32-bit libraries
+        if: matrix.arch == 'i386'
+        run: sudo apt-get update && sudo apt-get install -y gcc-multilib
+      - name: Build
+        working-directory: port
+        run: |
+          make clean
+          make CC="${{ matrix.cc }}" LDFLAGS=-static
+          strip ada
+          mv ada ada-${{ matrix.arch }}-static
+          file ada-${{ matrix.arch }}-static
+      - name: Run the examples
+        run: |
+          set -e
+          exe=$PWD/port/ada-${{ matrix.arch }}-static
+          export ARCTURUS_LIB=$PWD/port/lib/
+          for f in port/examples/*.ada web/examples/*.ada; do
+            d=$(mktemp -d)
+            (cd "$d" && "$exe" -e < "$GITHUB_WORKSPACE/$f" > out.txt 2>&1 || true)
+            if grep -q "FATAL ERROR" "$d/out.txt"; then cat "$d/out.txt"; exit 1; fi
+          done
+          d=$(mktemp -d)
+          (cd "$d" && "$exe" -e < "$GITHUB_WORKSPACE/port/examples/tour.ada" > out.txt 2>&1)
+          grep -q "caught it" "$d/out.txt"
+          grep -qx "24" "$d/out.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ada-${{ matrix.arch }}-static
+          path: port/ada-${{ matrix.arch }}-static
+
+  commit:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: built
+      - name: Commit the binaries
+        run: |
+          for a in x86_64 i386 aarch64; do
+            install -m 755 built/ada-$a-static/ada-$a-static port/bin/ada-$a-static
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add port/bin
+          if git diff --cached --quiet; then echo "binaries unchanged"; exit 0; fi
+          git commit -m "port/bin: rebuild static binaries from ${GITHUB_SHA::7}"
+          git push
