@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcturus Ada 1984</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday: a working tool with a little history
+   IDEA a 1984 VAX terminal session at UC Irvine, live
+   PICTURE the terminal itself: glass screen in a putty bezel, running Arcturus
+   COLOUR UCI blue band, putty case, dark glass, UCI gold for the cursor and focus
+   TYPE IBM Plex Sans + IBM Plex Mono for the screen
+   LAYOUT blue title band; terminal wide on the left, script pad and reference on the right; stacked on a phone */
+:root{color-scheme:light dark;--bg:light-dark(#f4f2ec,#14171b);--ink:light-dark(#16181c,#e6e8ea);--soft:light-dark(#5a5e66,#a3a9b2);--blue:#0064a4;--blue2:light-dark(#00477a,#0a3a63);--gold:#ffd200;--case:light-dark(#d9d4c7,#3a3833);--case2:light-dark(#c6c0b0,#2c2a26);--glass:#0d1114;--phos:#dfe9e4;--dim:#8fa39a;--err:#ff8f7a;--line:light-dark(#d5d0c4,#2b3036);--panel:light-dark(#ffffff,#1b1f24)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}
+.band{padding:clamp(22px,3vw,40px) max(4vw,16px)}
+header{background:var(--blue);color:#fff}
+.hwrap{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 32px;align-items:end;justify-content:space-between}
+h1{font-size:clamp(32px,4.4vw,48px);line-height:1.05;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.lede{margin:8px 0 0;max-width:60ch;color:#dbe9f5}
+.ex{display:flex;flex-wrap:wrap;gap:8px}
+.ex button{background:var(--blue2);color:#fff;border:1px solid #ffffff55}
+.ex button:hover{border-color:var(--gold)}
+button{font:600 15px/1 "IBM Plex Sans",system-ui,sans-serif;min-height:44px;padding:0 16px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--blue)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+main{max-width:1240px;margin:0 auto;padding:24px max(4vw,16px) 48px;display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:24px;align-items:start}
+.term{background:linear-gradient(var(--case),var(--case2));border-radius:18px;padding:18px 18px 12px;box-shadow:0 2px 0 #00000022,inset 0 1px 0 #ffffff55}
+.screen{background:radial-gradient(120% 90% at 50% 40%,#15201c,var(--glass));border-radius:12px;box-shadow:inset 0 0 0 2px #00000088,inset 0 0 40px #000;height:min(64vh,620px);min-height:380px;overflow-y:auto;padding:14px 16px;font:15px/1.45 "IBM Plex Mono",ui-monospace,monospace;color:var(--phos);cursor:text}
+.screen pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}
+.in{color:#fff;font-weight:600}
+.note{color:var(--err)}
+.sys{color:var(--dim)}
+.line{display:flex;align-items:baseline}
+.line span{white-space:pre}
+#cmd{flex:1;background:transparent;border:0;color:#fff;font:600 15px/1.45 "IBM Plex Mono",ui-monospace,monospace;padding:0;caret-color:var(--gold);outline:none}
+#cmd:focus-visible{outline:none}
+.busy #cmd{opacity:.5}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-top:12px}
+.bar .k{display:flex;flex-wrap:wrap;gap:8px}
+.badge{font:600 13px/1.2 "IBM Plex Sans",sans-serif;color:light-dark(#4a463d,#c9c3b4)}
+.badge b{display:inline-block;width:9px;height:9px;border-radius:50%;background:#e33;margin-right:6px;box-shadow:0 0 6px #f44}
+.term.ok .badge b{background:#3c3;box-shadow:0 0 6px #4f4}
+aside{display:grid;gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+h2{font-size:20px;line-height:1.2;margin:0 0 8px}
+.card p{margin:0 0 10px;color:var(--soft);font-size:15px}
+textarea{width:100%;min-height:200px;resize:vertical;font:14px/1.45 "IBM Plex Mono",ui-monospace,monospace;padding:10px;border:1px solid var(--line);border-radius:8px;background:light-dark(#fbfaf7,#121519);color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+dl{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;font-size:15px}
+dt{font:600 14px/1.5 "IBM Plex Mono",monospace;white-space:nowrap}
+dd{margin:0;color:var(--soft)}
+.about{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px;border-top:1px solid var(--line);padding-top:24px}
+.about h2{font-size:22px}
+.about p{margin:0 0 10px;max-width:68ch}
+.small{font-size:14px;color:var(--soft)}
+@media(max-width:900px){main{grid-template-columns:minmax(0,1fr)}.screen{height:56vh}}
+@media(max-width:600px){.term{padding:10px 10px 8px;border-radius:12px}.screen{font-size:14px;padding:10px;min-height:320px}#cmd{font-size:16px}}
+@media(prefers-reduced-motion:no-preference){.screen{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="hwrap">
+    <div>
+      <h1>Arcturus, the 1984 Ada interpreter</h1>
+      <p class="lede">UC Irvine's interactive Ada environment, release 1.6-A as linked on January 5, 1984. The original C was compiled to WebAssembly and runs in your browser, with nothing on a server.</p>
+    </div>
+    <div class="ex" id="examples" aria-label="Examples"></div>
+  </div>
+</header>
+
+<main>
+  <section class="term" id="term" aria-label="Arcturus terminal">
+    <div class="screen" id="screen">
+      <pre id="out"></pre>
+      <div class="line"><span id="prompt"></span><input id="cmd" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Arcturus input"></div>
+    </div>
+    <div class="bar">
+      <span class="badge" id="status"><b></b>Loading…</span>
+      <div class="k">
+        <button id="eof" title="End of file: leaves an error break, or Arcturus itself">^D</button>
+        <button id="reset">Reset</button>
+        <button id="copy">Copy transcript</button>
+      </div>
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <h2>Script pad</h2>
+      <p>Write several lines, then type them into the session as if you'd typed each one.</p>
+      <textarea id="pad" spellcheck="false" aria-label="Script pad">function fib(n : integer) return integer is
+begin
+   if n < 2 then return n; end if;
+   return fib(n - 1) + fib(n - 2);
+end fib;
+for i in 1..12 loop putint(fib(i)); putstr(" "); end loop;
+new_line;
+pp(fib'sym);</textarea>
+      <div class="row"><button class="primary" id="send">Type it in</button><button id="fresh">Reset, then type it in</button></div>
+    </div>
+    <div class="card">
+      <h2>How it reads you</h2>
+      <dl>
+        <dt>x := 3;</dt><dd>A line ending in ; is a declaration or statement. Assigning an undeclared name declares it.</dd>
+        <dt>x * 6</dt><dd>No ; means an expression, and its value is printed.</dd>
+        <dt>+</dt><dd>The prompt for the next line of an unfinished declaration.</dd>
+        <dt>:</dt><dd>The prompt in an error break. Look around, then press ^D to leave it.</dd>
+        <dt>pp(f'sym);</dt><dd>Prettyprints a declaration.</dd>
+        <dt>dir;</dt><dd>Lists what you have declared.</dd>
+        <dt>where;</dt><dd>Shows the current scope.</dd>
+        <dt>symbol_table;</dt><dd>Dumps the symbol tables.</dd>
+        <dt>↑ ↓</dt><dd>Recall earlier lines.</dd>
+      </dl>
+    </div>
+  </aside>
+
+  <section class="about">
+    <div>
+      <h2>What you're running</h2>
+      <p>Arcturus was built at the Irvine Programming Environment Project in 1982–84 under Professor Thomas A. Standish, with DARPA support. It interprets Ada as you type it, keeps a live symbol table, and lets you inspect and prettyprint whatever you've declared.</p>
+      <p>The release here was recovered from a 1980s backup tape in 2026. Two missing files, the evaluator <code>int.c</code> and the main loop <code>toplev.c</code>, were rebuilt line-exact from the VAX binary.</p>
+    </div>
+    <div>
+      <h2>How it runs here</h2>
+      <p>The ported 1984 C sources are compiled with clang to WebAssembly, against wasi-libc. Arcturus's error recovery uses setjmp and longjmp, which become WebAssembly exceptions. Its run-time Ada files sit in a small in-memory file system.</p>
+      <p>Each line you enter replays the session from the start in a fresh interpreter. That takes a few milliseconds and keeps every run exactly reproducible. A line that crashes or runs for more than 8 seconds is dropped.</p>
+    </div>
+    <div>
+      <h2>Limits it had in 1984</h2>
+      <p>Record aggregates are unimplemented, and tasks and generics print "You've used an unimplemented construct". Integers are 32 bits. Saving a memory image, loading VAX object files and calling an editor can't work here.</p>
+      <p class="small">Source, credits and the full story: <a href="https://github.com/DrStephenCW/ada-interpreter-1984">github.com/DrStephenCW/ada-interpreter-1984</a></p>
+    </div>
+  </section>
+</main>
+
+<script id="wasm-b64" type="application/octet-stream">@@WASM@@</script>
+<script id="lib-json" type="application/json">@@LIB@@</script>
+<script id="wasi-src" type="text/plain">@@WASI@@</script>
+<script>
+{
+  const EXAMPLES = @@EXAMPLES@@;
+  const TIMEOUT_MS = 8000;
+  const $ = (id) => document.getElementById(id);
+  const out = $("out"), promptEl = $("prompt"), cmd = $("cmd"), screen = $("screen"), term = $("term"), statusEl = $("status");
+
+  // the interpreter runs in a worker, so a runaway loop can be stopped
+  const workerSrc = $("wasi-src").textContent + `
+    let mod = null, files = null;
+    self.onmessage = (e) => {
+      const m = e.data;
+      if (m.wasm) { mod = new WebAssembly.Module(m.wasm); files = m.files; postMessage({ ready: true }); return; }
+      const t = performance.now();
+      const r = runArcturus(mod, files, m.lines, { echo: true, stopForInput: true });
+      postMessage({ id: m.id, output: r.output, status: r.status, error: r.error || "", consumed: r.consumed, ms: performance.now() - t });
+    };`;
+  const workerUrl = URL.createObjectURL(new Blob([workerSrc], { type: "text/javascript" }));
+  const b64 = $("wasm-b64").textContent.trim();
+  const wasmBytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  const libFiles = JSON.parse($("lib-json").textContent);
+
+  let worker = null, ready = null, runId = 0, pendingRun = null;
+  function startWorker() {
+    if (worker) worker.terminate();
+    worker = new Worker(workerUrl);
+    ready = new Promise((resolve) => {
+      worker.onmessage = (e) => {
+        if (e.data.ready) { resolve(); return; }
+        if (pendingRun && e.data.id === pendingRun.id) { const p = pendingRun; pendingRun = null; clearTimeout(p.timer); p.resolve(e.data); }
+      };
+    });
+    worker.postMessage({ wasm: wasmBytes.slice(), files: libFiles });
+  }
+  async function run(lines) {
+    await ready;
+    return new Promise((resolve) => {
+      const id = ++runId;
+      const timer = setTimeout(() => {
+        if (!pendingRun || pendingRun.id !== id) return;
+        pendingRun = null;
+        startWorker();
+        resolve({ status: "timeout" });
+      }, TIMEOUT_MS);
+      pendingRun = { id, resolve, timer };
+      worker.postMessage({ id, lines });
+    });
+  }
+
+  // session state: the accepted input lines (null = end of file)
+  let history = [], transcript = "", notes = [], ended = false, busy = false;
+  let recall = [], recallAt = 0;
+  try { const saved = JSON.parse(localStorage.getItem("arcturus-session") || "null"); if (Array.isArray(saved)) history = saved; } catch (e) {}
+  function save() { try { localStorage.setItem("arcturus-session", JSON.stringify(history)); } catch (e) {} }
+
+  function esc(s) { return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
+  function render() {
+    // the text after the last newline is the prompt the interpreter is waiting at
+    const cut = transcript.lastIndexOf("\n");
+    const body = ended ? transcript : transcript.slice(0, cut + 1);
+    promptEl.textContent = ended ? "" : transcript.slice(cut + 1);
+    // mark echoed input lines so they stand out
+    let html = esc(body).replace(/^((?:&gt;|\+|:) )(.*)$/gm, (m, p, t) => p + '<span class="in">' + t + "</span>");
+    html += notes.map((n) => '<span class="note">' + esc(n) + "</span>\n").join("");
+    out.innerHTML = html;
+    cmd.disabled = ended;
+    cmd.parentElement.style.display = ended ? "none" : "";
+    screen.scrollTop = screen.scrollHeight;
+  }
+  function setStatus(text, ok) { statusEl.lastChild.textContent = text; term.classList.toggle("ok", !!ok); }
+
+  async function submit(lines) {
+    if (busy || ended) return;
+    busy = true; term.classList.add("busy"); setStatus("Running…", true);
+    const candidate = history.concat(lines);
+    const r = await run(candidate);
+    busy = false; term.classList.remove("busy");
+    notes = [];
+    if (r.status === "input") {
+      history = candidate; transcript = r.output; save();
+      setStatus("Ready · " + candidate.filter((l) => l !== null).length + " lines · " + Math.max(1, Math.round(r.ms)) + " ms", true);
+    } else if (r.status === "timeout") {
+      notes.push("[Still running after " + TIMEOUT_MS / 1000 + " seconds, so it was stopped. That input was not kept.]");
+      setStatus("Stopped", true);
+    } else if (r.status === "trap") {
+      const why = /divide by zero|division by zero/i.test(r.error) ? "integer division by zero, which stopped Arcturus in 1984 too"
+        : /stack|recursion/i.test(r.error) ? "the browser's call stack ran out (a few hundred nested Ada calls is the limit here)" : r.error;
+      transcript = r.output;
+      notes.push("[Arcturus crashed: " + why + ". That input was not kept; the session goes on from the line before.]");
+      // show the crash, then put the screen back to the last good state on the next line
+      const keep = notes.slice();
+      const back = await run(history);
+      transcript = (back.output || "");
+      notes = keep;
+      setStatus("Ready", true);
+    } else if (lines.length === 1 && lines[0] === null && promptEl.textContent.startsWith(":")) {
+      // ^D can't leave a break after an error Arcturus can't continue from;
+      // in 1984 you went on working at the break prompt, so that's kept here
+      notes.push("[Arcturus can't continue from this error, so ^D doesn't leave this break. Keep working at the : prompt, or press Reset.]");
+      setStatus("Ready", true);
+    } else {
+      history = candidate; transcript = r.output; save();
+      ended = true;
+      notes.push("[Arcturus exited" + (typeof r.status === "number" && r.status ? " with status " + r.status : "") + ". Press Reset to start a new session.]");
+      setStatus("Exited", false);
+    }
+    render();
+    cmd.focus({ preventScroll: true });
+  }
+
+  async function reset() {
+    history = []; ended = false; notes = []; save();
+    setStatus("Starting…", false);
+    const r = await run([]);
+    transcript = r.output || "";
+    render();
+    setStatus("Ready", true);
+  }
+
+  cmd.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const line = cmd.value;
+      if (line.trim()) { recall.push(line); }
+      recallAt = recall.length;
+      cmd.value = "";
+      submit([line]);
+    } else if (e.key === "ArrowUp" && recall.length) {
+      e.preventDefault(); recallAt = Math.max(0, recallAt - 1); cmd.value = recall[recallAt];
+    } else if (e.key === "ArrowDown" && recall.length) {
+      e.preventDefault(); recallAt = Math.min(recall.length, recallAt + 1); cmd.value = recall[recallAt] || "";
+    } else if (e.key === "d" && e.ctrlKey) {
+      e.preventDefault(); submit([null]);
+    }
+  });
+  screen.addEventListener("click", () => { if (!window.getSelection().toString()) cmd.focus(); });
+  $("eof").addEventListener("click", () => submit([null]));
+  $("reset").addEventListener("click", reset);
+  $("copy").addEventListener("click", async (e) => {
+    try { await navigator.clipboard.writeText(transcript); e.target.textContent = "Copied"; } catch (err) { e.target.textContent = "Copy failed"; }
+    setTimeout(() => { e.target.textContent = "Copy transcript"; }, 1500);
+  });
+  const padLines = () => $("pad").value.replace(/\s+$/, "").split("\n");
+  $("send").addEventListener("click", () => submit(padLines()));
+  $("fresh").addEventListener("click", async () => { await reset(); submit(padLines()); });
+  $("examples").innerHTML = EXAMPLES.map((x, i) => '<button data-i="' + i + '">' + esc(x.name) + "</button>").join("");
+  $("examples").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    $("pad").value = EXAMPLES[+b.dataset.i].text;
+    $("fresh").click();
+  });
+
+  startWorker();
+  (async () => {
+    setStatus("Starting…", false);
+    const r = await run(history);
+    if (r.status === "input") transcript = r.output;
+    else { history = []; save(); transcript = (await run([])).output || ""; }
+    render();
+    setStatus("Ready", true);
+  })();
+}
+</script>
+</body>
+</html>

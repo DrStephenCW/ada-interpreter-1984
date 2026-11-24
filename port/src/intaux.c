@@ -656,7 +656,7 @@ long docall(p, mode, result)
 	if (lhs.typ neq functype) {	/* must be array reference */
 		typep arrtype _ lhs.typ;
 		doindex(arrtype,
-			lhs.val,
+			lhs.val.integer,	/* port: was lhs.val, a word union */
 			mode,
 			p->nd.call.args,
 			result);
