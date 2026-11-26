@@ -37,9 +37,9 @@ story from a weekend parser in 1981 to the interpreter here:
 1. [DrStephenCW/ada-parser-1981](https://github.com/DrStephenCW/ada-parser-1981):
    the Ada parser Stephen wrote in MLISP on the UC Irvine PDP-10 in January
    1981, and what came of it.
-2. [Above-the-Garage/ada-parser-1981-go](https://github.com/Above-the-Garage/ada-parser-1981-go):
+2. [DrStephenCW/ada-parser-1981-go](https://github.com/DrStephenCW/ada-parser-1981-go):
    that parser ported to Go in 2026, with
-   [From a Weekend Parser to ADARPE](https://github.com/Above-the-Garage/ada-parser-1981-go/blob/main/docs/adarpe-story-1981.md),
+   [From a Weekend Parser to ADARPE](https://github.com/DrStephenCW/ada-parser-1981-go/blob/main/docs/adarpe-story-1981.md),
    the 1981 Lisp environment that came between the parser and Arcturus.
 3. This repository: Arcturus, the C interpreter of 1982-84, recovered and
    running again.
